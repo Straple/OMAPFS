@@ -14,11 +14,11 @@ Position::Position(uint32_t pos
 , dir(dir)
 #endif
 {
-    ASSERT(0 <= pos && pos < get_map().get_size(), "invalid pos: " + std::to_string(pos));
-    ASSERT(0 <= row && row < get_map().get_rows(), "invalid row: " + std::to_string(row));
-    ASSERT(0 <= col && col < get_map().get_cols(), "invalid col: " + std::to_string(col));
+    ASSERT(pos < get_map().get_size(), "invalid pos: " + std::to_string(pos));
+    ASSERT(row < get_map().get_rows(), "invalid row: " + std::to_string(row));
+    ASSERT(col < get_map().get_cols(), "invalid col: " + std::to_string(col));
 #ifdef ENABLE_ROTATE_MODEL
-    ASSERT(0 <= dir && dir < 4, "invalid dir");
+    ASSERT(dir < DIRECTIONS_NUM, "invalid dir");
 #endif
 }
 
@@ -33,10 +33,10 @@ Position::Position(uint32_t row, uint32_t col
 , dir(dir)
 #endif
 {
-    ASSERT(0 <= row && row < get_map().get_rows(), "invalid row: " + std::to_string(row));
-    ASSERT(0 <= col && col < get_map().get_cols(), "invalid col: " + std::to_string(col));
+    ASSERT(row < get_map().get_rows(), "invalid row: " + std::to_string(row));
+    ASSERT(col < get_map().get_cols(), "invalid col: " + std::to_string(col));
 #ifdef ENABLE_ROTATE_MODEL
-    ASSERT(0 <= dir && dir < 4, "invalid dir");
+    ASSERT(dir < DIRECTIONS_NUM, "invalid dir");
 #endif
 }
 
@@ -59,15 +59,15 @@ uint32_t Position::get_dir() const {
 #endif
 
 bool Position::is_valid() const {
-    return 0 <= row && row < get_map().get_rows() &&
-           0 <= col && col < get_map().get_cols() &&
+    return row < get_map().get_rows() &&
+           col < get_map().get_cols() &&
            get_map().is_free(get_pos());
 }
 
 #ifdef ENABLE_ROTATE_MODEL
 Position Position::move_forward() const {
     Position p = *this;
-    ASSERT(0 <= dir && dir < 4, "invalid position dir");
+    ASSERT(dir < DIRECTIONS_NUM, "invalid position dir");
     if (dir == 0) {
         p.col++;
     } else if (dir == 1) {
@@ -82,15 +82,15 @@ Position Position::move_forward() const {
 
 Position Position::rotate() const {
     Position p = *this;
-    p.dir = (p.dir + 1) % 4;
-    ASSERT(0 <= p.dir && p.dir < 4, "invalid position dir");
+    p.dir = (p.dir + 1) % DIRECTIONS_NUM;
+    ASSERT(p.dir < DIRECTIONS_NUM, "invalid position dir");
     return p;
 }
 
 Position Position::counter_rotate() const {
     Position p = *this;
-    p.dir = (p.dir + 3) % 4;
-    ASSERT(0 <= p.dir && p.dir < 4, "invalid position dir");
+    p.dir = (p.dir + DIRECTIONS_NUM - 1) % DIRECTIONS_NUM;
+    ASSERT(p.dir < DIRECTIONS_NUM, "invalid position dir");
     return p;
 }
 #else

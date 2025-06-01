@@ -12,7 +12,7 @@ Graph::Graph(const Map &map, const GraphGuidance &gg) {
             continue;
         }
 #ifdef ENABLE_ROTATE_MODEL
-        for (uint32_t dir = 0; dir < 4; dir++) {
+        for (uint32_t dir = 0; dir < DIRECTIONS_NUM; dir++) {
             Position p(pos, dir);
             ASSERT(p.is_valid(), "p is invalid");
             pos_to_node[pos][dir] = node_to_pos.size();
@@ -32,7 +32,7 @@ Graph::Graph(const Map &map, const GraphGuidance &gg) {
 
     std::map<std::pair<uint32_t, uint32_t>, uint32_t> edges;
     for (uint32_t node = 1; node < node_to_pos.size(); node++) {
-        for (uint32_t action = 0; action < 4; action++) {
+        for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
             Position p = node_to_pos[node];
             Position to = p.simulate(static_cast<ActionType>(action));
             if (!to.is_valid()) {
@@ -80,7 +80,7 @@ uint32_t Graph::get_node(const Position &pos) const {
     ASSERT(pos.get_pos() < pos_to_node.size(), "invalid pos");
 
 #ifdef ENABLE_ROTATE_MODEL
-    ASSERT(pos.get_dir() < 4, "invalid dir");
+    ASSERT(pos.get_dir() < DIRECTIONS_NUM, "invalid dir");
     return pos_to_node[pos.get_pos()][pos.get_dir()];
 #else
     return pos_to_node[pos.get_pos()];
@@ -94,7 +94,7 @@ uint32_t Graph::get_node(uint32_t pos
 ) const {
     ASSERT(pos < pos_to_node.size(), "invalid pos");
 #ifdef ENABLE_ROTATE_MODEL
-    ASSERT(dir < 4, "invalid dir");
+    ASSERT(dir < DIRECTIONS_NUM, "invalid dir");
     return pos_to_node[pos][dir];
 #else
     return pos_to_node[pos];
@@ -103,19 +103,19 @@ uint32_t Graph::get_node(uint32_t pos
 
 uint32_t Graph::get_to_node(uint32_t node, uint32_t action) const {
     ASSERT(0 < node && node < to_node.size(), "invalid node");
-    ASSERT(action < 4, "invalid action");
+    ASSERT(action < ACTIONS_NUM, "invalid action");
     return to_node[node][action];
 }
 
 uint32_t Graph::get_to_edge(uint32_t node, uint32_t action) const {
     ASSERT(0 < node && node < to_edge.size(), "invalid node");
-    ASSERT(action < 4, "invalid action");
+    ASSERT(action < ACTIONS_NUM, "invalid action");
     return to_edge[node][action];
 }
 
 uint32_t Graph::get_weight(uint32_t node, uint32_t action) const {
     ASSERT(0 < node && node < to_edge.size(), "invalid node");
-    ASSERT(action < 4, "invalid action");
+    ASSERT(action < ACTIONS_NUM, "invalid action");
     return weight[node][action];
 }
 

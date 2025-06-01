@@ -8,9 +8,9 @@ GraphGuidance::GraphGuidance(uint32_t rows, uint32_t cols) : rows(rows), cols(co
 
 uint32_t GraphGuidance::get(const Position &p, uint32_t action) const {
     ASSERT(p.get_pos() < graph.size(), "invalid pos");
-    ASSERT(action < 4, "invalid action");
+    ASSERT(action < ACTIONS_NUM, "invalid action");
 #ifdef ENABLE_ROTATE_MODEL
-    ASSERT(p.get_dir() < 4, "invalid dir");
+    ASSERT(p.get_dir() < DIRECTIONS_NUM, "invalid dir");
     return graph[p.get_pos()][p.get_dir()][action];
 #else
     return graph[p.get_pos()][action];
@@ -19,9 +19,9 @@ uint32_t GraphGuidance::get(const Position &p, uint32_t action) const {
 
 void GraphGuidance::set(const Position &p, uint32_t action, uint32_t weight) {
     ASSERT(p.get_pos() < graph.size(), "invalid pos");
-    ASSERT(action < 4, "invalid action");
+    ASSERT(action < ACTIONS_NUM, "invalid action");
 #ifdef ENABLE_ROTATE_MODEL
-    ASSERT(p.get_dir() < 4, "invalid dir");
+    ASSERT(p.get_dir() < DIRECTIONS_NUM, "invalid dir");
     graph[p.get_pos()][p.get_dir()][action] = weight;
 #else
     graph[p.get_pos()][action] = weight;
@@ -65,8 +65,8 @@ uint32_t GraphGuidance::get_cols() const {
 std::ostream &operator<<(std::ostream &output, const GraphGuidance &gg) {
     output << gg.rows << ' ' << gg.cols << '\n';
 #ifdef ENABLE_ROTATE_MODEL
-    for (uint32_t dir = 0; dir < 4; dir++) {
-        for (uint32_t action = 0; action < 4; action++) {
+    for (uint32_t dir = 0; dir < DIRECTIONS_NUM; dir++) {
+        for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
             for (uint32_t pos = 1; pos < gg.graph.size(); pos++) {
                 if (pos != 1) {
                     output << ' ';
@@ -77,7 +77,7 @@ std::ostream &operator<<(std::ostream &output, const GraphGuidance &gg) {
         }
     }
 #else
-    for (uint32_t action = 0; action < 4; action++) {
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
         for (uint32_t pos = 1; pos < gg.graph.size(); pos++) {
             if (pos != 1) {
                 output << ' ';

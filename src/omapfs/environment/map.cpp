@@ -34,7 +34,7 @@ std::istream &operator>>(std::istream &input, Map &map) {
     ASSERT(line == "map", "unexpected map file format");
     map.map.assign(map.rows * map.cols + 1, false);
     for (uint32_t row = 0; row < map.rows; row++) {
-        std::getline(input, line);
+        input >> line;
         ASSERT(line.size() == map.cols, "unexpected map file format");
         for (uint32_t col = 0; col < map.cols; col++) {
             ASSERT(line[col] == '.' || line[col] == '@' || line[col] == 'T', "unexpected cell type");
