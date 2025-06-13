@@ -4,6 +4,8 @@
 #include <thread>
 #include <vector>
 
+std::vector<std::string> split(const std::string &str, char separator);
+
 template<typename foo_t>
 void launch_threads(const uint32_t threads_num, foo_t &&foo) {
     std::vector<std::thread> threads(threads_num);
