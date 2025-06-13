@@ -1,8 +1,9 @@
 #pragma once
 
-#include <settings.hpp>
-
 #include <cstdint>
+#include <array>
+
+#include <settings.hpp>
 
 enum class ActionType : uint8_t {
 #ifdef ENABLE_ROTATE_MODEL
@@ -19,6 +20,10 @@ enum class ActionType : uint8_t {
 };
 
 constexpr uint32_t ACTIONS_NUM = static_cast<uint32_t>(ActionType::WAIT) + 1;
+
+char action_to_char(ActionType action);
+
+ActionType char_to_action(char symbol);
 
 #ifdef ENABLE_ROTATE_MODEL
 enum class DirectionType : uint8_t {
