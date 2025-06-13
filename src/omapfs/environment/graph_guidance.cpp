@@ -4,6 +4,21 @@
 #include <omapfs/environment/position.hpp>
 
 GraphGuidance::GraphGuidance(uint32_t rows, uint32_t cols) : rows(rows), cols(cols), graph(rows * cols + 1) {
+#ifdef ENABLE_ROTATE_MODEL
+    for (uint32_t dir = 0; dir < DIRECTIONS_NUM; dir++) {
+        for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+            for (uint32_t pos = 1; pos < graph.size(); pos++) {
+                graph[pos][dir][action] = 1;
+            }
+        }
+    }
+#else
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+        for (uint32_t pos = 1; pos < graph.size(); pos++) {
+            graph[pos][action] = 1;
+        }
+    }
+#endif
 }
 
 uint32_t GraphGuidance::get(const Position &p, uint32_t action) const {
@@ -28,28 +43,6 @@ void GraphGuidance::set(const Position &p, uint32_t action, uint32_t weight) {
 #endif
 }
 
-std::istream &operator>>(std::istream &input, GraphGuidance &gg) {
-    uint32_t rows, cols;
-    input >> rows >> cols;
-    gg = GraphGuidance(rows, cols);
-#ifdef ENABLE_ROTATE_MODEL
-    for (uint32_t dir = 0; dir <= static_cast<uint32_t>(DirectionType::NORTH); dir++) {
-        for (uint32_t action = 0; action <= static_cast<uint32_t>(ActionType::WAIT); action++) {
-            for (uint32_t pos = 1; pos < gg.graph.size(); pos++) {
-                input >> gg.graph[pos][dir][action];
-            }
-        }
-    }
-#else
-    for (uint32_t action = 0; action <= static_cast<uint32_t>(ActionType::WAIT); action++) {
-        for (uint32_t pos = 1; pos < gg.graph.size(); pos++) {
-            input >> gg.graph[pos][action];
-        }
-    }
-#endif
-    return input;
-}
-
 uint32_t GraphGuidance::get_size() const {
     return graph.size();
 }
@@ -60,6 +53,28 @@ uint32_t GraphGuidance::get_rows() const {
 
 uint32_t GraphGuidance::get_cols() const {
     return cols;
+}
+
+std::istream &operator>>(std::istream &input, GraphGuidance &gg) {
+    uint32_t rows, cols;
+    input >> rows >> cols;
+    gg = GraphGuidance(rows, cols);
+#ifdef ENABLE_ROTATE_MODEL
+    for (uint32_t dir = 0; dir < DIRECTIONS_NUM; dir++) {
+        for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+            for (uint32_t pos = 1; pos < gg.graph.size(); pos++) {
+                input >> gg.graph[pos][dir][action];
+            }
+        }
+    }
+#else
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+        for (uint32_t pos = 1; pos < gg.graph.size(); pos++) {
+            input >> gg.graph[pos][action];
+        }
+    }
+#endif
+    return input;
 }
 
 std::ostream &operator<<(std::ostream &output, const GraphGuidance &gg) {
