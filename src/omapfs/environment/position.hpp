@@ -14,6 +14,10 @@ class Position {
 public:
     Position() = default;
 
+#ifndef ENABLE_ROTATE_MODEL
+
+    explicit
+#endif
     Position(uint32_t pos
 #ifdef ENABLE_ROTATE_MODEL
             , uint32_t dir
@@ -45,6 +49,7 @@ public:
 
     [[nodiscard]] Position counter_rotate() const;
 #else
+
     [[nodiscard]] Position move_east() const;
 
     [[nodiscard]] Position move_south() const;
@@ -52,6 +57,7 @@ public:
     [[nodiscard]] Position move_west() const;
 
     [[nodiscard]] Position move_north() const;
+
 #endif
 
     [[nodiscard]] Position simulate(const ActionType &action) const;
