@@ -10,6 +10,7 @@ struct Task {
     uint32_t task_id = -1;
     uint32_t agent_assigned = -1;
     std::vector<uint32_t> targets;
+    bool is_taken = false;
 };
 
 class TaskPool {
@@ -21,6 +22,8 @@ class TaskPool {
     uint32_t next_task = 0;
 
 public:
+
+    [[nodiscard]] bool contains(uint32_t task_id) const;
 
     Task &at(uint32_t task_id);
 

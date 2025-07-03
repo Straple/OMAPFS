@@ -3,6 +3,10 @@
 #include <omapfs/basic/assert.hpp>
 #include <omapfs/basic/tools.hpp>
 
+bool TaskPool::contains(uint32_t task_id) const {
+    return pool.contains(task_id);
+}
+
 Task &TaskPool::at(uint32_t task_id) {
     ASSERT(pool.contains(task_id), "no contains");
     return pool.at(task_id);
