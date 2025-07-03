@@ -8,7 +8,6 @@
 #include <omapfs/basic/time.hpp>
 #include <omapfs/basic/tools.hpp>
 
-//#include <atomic>
 #include <unordered_set>
 #include <queue>
 
@@ -235,12 +234,8 @@ void GreedyScheduler::solve(TimePoint end_time) {
     }
 }
 
-std::vector<int> GreedyScheduler::get_schedule() const {
-    std::vector<int> result(desires.size());
-    for (uint32_t r = 0; r < desires.size(); r++) {
-        result[r] = static_cast<int>(desires[r]);
-    }
-    return result;
+std::vector<uint32_t> GreedyScheduler::get_schedule() const {
+    return desires;
 }
 
 double GreedyScheduler::get_score() const {

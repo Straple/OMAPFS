@@ -76,8 +76,8 @@ Position Graph::get_pos(uint32_t node) const {
 }
 
 uint32_t Graph::get_node(const Position &pos) const {
-    ASSERT(pos.is_valid(), "invalid position");
     ASSERT(pos.get_pos() < pos_to_node.size(), "invalid pos");
+    ASSERT(pos.is_valid(), "invalid pos");
 
 #ifdef ENABLE_ROTATE_MODEL
     ASSERT(pos.get_dir() < DIRECTIONS_NUM, "invalid dir");

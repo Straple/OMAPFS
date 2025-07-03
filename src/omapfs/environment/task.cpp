@@ -43,7 +43,7 @@ std::istream &operator>>(std::istream &input, TaskPool &pool) {
         auto strs = split(line, ',');
         pool.task_targets.emplace_back();
         for (auto &s: strs) {
-            pool.task_targets.back().push_back(std::stoll(s));
+            pool.task_targets.back().push_back(std::stoll(s) + 1);
         }
     }
     return input;

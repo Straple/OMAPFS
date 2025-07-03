@@ -2,12 +2,12 @@
 
 #include <omapfs/basic/time.hpp>
 
+#include <settings.hpp>
+
 #include <cstdint>
 #include <vector>
 
-#include <settings.hpp>
-
-struct GreedyScheduler {
+class GreedyScheduler {
 
     double cur_score = 0;
 
@@ -51,7 +51,7 @@ public:
 
     void solve(TimePoint end_time);
 
-    [[nodiscard]] std::vector<int> get_schedule() const;
+    [[nodiscard]] std::vector<uint32_t> get_schedule() const;
 
     [[nodiscard]] double get_score() const;
 };
