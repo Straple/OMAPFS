@@ -17,7 +17,36 @@
 #include <omapfs/planner/epibt/operations_map.hpp>
 
 #include <fstream>
+#include <iomanip>
+#include <map>
 #include <set>
+
+void TestSystem::gen_random_agents() {
+    Randomizer rnd;
+    std::set<uint32_t> agents;
+    uint32_t agents_num = 800;
+    while (agents.size() < agents_num) {
+        uint32_t pos = rnd.get(1, get_map().get_size() - 1);
+        if (get_map().is_free(pos) && !agents.contains(pos)) {
+            agents.insert(pos);
+        }
+    }
+    {
+        std::ofstream output("agents_" + std::to_string(agents_num) + ".csv");
+        output << "agent id,row,col\n";
+        uint32_t id = 0;
+        for (uint32_t pos: agents) {
+#ifdef ENABLE_ROTATE_MODEL
+            Position p(pos, 0);
+#else
+            Position p(pos);
+#endif
+            output << id << ',' << p.get_row() << ',' << p.get_col() << '\n';
+            id++;
+        }
+    }
+    std::exit(0);
+}
 
 void TestSystem::update() {
     // update tasks
@@ -72,33 +101,7 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
     get_graph() = Graph(get_map(), get_gg());
     get_hm() = HeuristicMatrix(get_graph());
 
-    // gen random agents
-    /*{
-        Randomizer rnd;
-        std::set<uint32_t> agents;
-        uint32_t agents_num = 800;
-        while (agents.size() < agents_num) {
-            uint32_t pos = rnd.get(1, get_map().get_size() - 1);
-            if (get_map().is_free(pos) && !agents.contains(pos)) {
-                agents.insert(pos);
-            }
-        }
-        {
-            std::ofstream output("agents_" + std::to_string(agents_num) + ".csv");
-            output << "agent id,row,col\n";
-            uint32_t id = 0;
-            for (uint32_t pos: agents) {
-#ifdef ENABLE_ROTATE_MODEL
-                Position p(pos, 0);
-#else
-                Position p(pos);
-#endif
-                output << id << ',' << p.get_row() << ',' << p.get_col() << '\n';
-                id++;
-            }
-        }
-        std::exit(0);
-    }*/
+    // gen_random_agents();
 
     std::ifstream(robot_filename) >> get_robots();
 
@@ -110,11 +113,22 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
 void TestSystem::simulate(uint32_t steps_num) {
     GreedyScheduler scheduler;
 
+    Timer total_timer;
+
     std::ofstream logger("log.csv");
-    logger << "timestep,finished tasks\n";
+    logger << "timestep,finished tasks,";
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+        logger << action_to_char(static_cast<ActionType>(action)) << ',';
+    }
+    logger << "time(ms),scheduler time(ms),planner time(ms)\n";
     uint64_t total_finished_tasks = 0;
+    std::array<uint32_t, ACTIONS_NUM> total_actions_num{};
+    uint64_t total_scheduler_time = 0;
+    uint64_t total_planner_time = 0;
 
     for (uint32_t step = 0; step < steps_num; step++) {
+        Timer step_timer;
+
         get_curr_timestep() = step;
 
         //std::cout << "\nTimestep: " << step << std::endl;
@@ -127,10 +141,17 @@ void TestSystem::simulate(uint32_t steps_num) {
         }
 
         // call scheduler
-        scheduler.update();
-        scheduler.rebuild_dp(get_now() + Milliseconds(100));
-        scheduler.solve(get_now() + Milliseconds(100));
-        auto schedule = scheduler.get_schedule();
+        std::vector<uint32_t> schedule;
+        uint32_t scheduler_time = 0;
+        {
+            Timer timer;
+            scheduler.update();
+            scheduler.rebuild_dp(get_now() + Milliseconds(100));
+            scheduler.solve(get_now() + Milliseconds(100));
+            schedule = scheduler.get_schedule();
+            scheduler_time = timer.get_ms();
+            total_scheduler_time += timer.get_ns();
+        }
 
         // TODO: validate new schedule
 
@@ -147,23 +168,52 @@ void TestSystem::simulate(uint32_t steps_num) {
         update();
 
         // call planner
-        EPIBT epibt(get_now() + Milliseconds(100));
-        epibt.solve();
-        auto actions = epibt.get_actions();
+        std::vector<ActionType> actions;
+        uint32_t planner_time = 0;
+        {
+            Timer timer;
+            EPIBT epibt(get_now() + Milliseconds(500));
+            epibt.solve();
+            actions = epibt.get_actions();
+            planner_time = timer.get_ms();
+            total_planner_time += timer.get_ns();
+        }
 
-        // TODO: validate actions
+        // validate actions
+        {
+            std::map<uint32_t, uint32_t> pos_usage, edge_usage;
+            for (uint32_t r = 0; r < get_robots().size(); r++) {
+                auto &robot = get_robots()[r];
+                Position to = robot.pos.simulate(actions[r]);
+                ASSERT(!pos_usage.contains(to.get_pos()), "vertex collision");
+                pos_usage[to.get_pos()] = r;
+                ASSERT(!edge_usage.contains(get_graph().get_to_edge(robot.node, static_cast<uint32_t>(actions[r]))), "edge collision");
+            }
+        }
 
+        std::array<uint32_t, ACTIONS_NUM> actions_num{};
         for (uint32_t r = 0; r < get_robots().size(); r++) {
             auto &robot = get_robots()[r];
             robot.pos = robot.pos.simulate(actions[r]);
             robot.node = get_graph().get_node(robot.pos);
+            actions_num[static_cast<uint32_t>(actions[r])]++;
+            total_actions_num[static_cast<uint32_t>(actions[r])]++;
         }
 
         update();
 
-        logger << step << ',' << finished_tasks.size() << std::endl;
+        logger << step << ',' << finished_tasks.size() << ',';
+        for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+            logger << actions_num[action] << ',';
+        }
+        logger << step_timer.get_ms() << ',' << scheduler_time << ',' << planner_time << std::endl;
         total_finished_tasks += finished_tasks.size();
         finished_tasks.clear();
     }
-    logger << "total," << total_finished_tasks << std::endl;
+    logger << std::fixed << std::setprecision(1);
+    logger << "total," << total_finished_tasks << ',';
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+        logger << total_actions_num[action] * 100.0 / steps_num / get_robots().size() << "%,";
+    }
+    logger << total_timer.get_ms() << ',' << total_scheduler_time / 1'000'000 << ',' << total_planner_time / 1'000'000 << std::endl;
 }

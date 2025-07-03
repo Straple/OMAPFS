@@ -9,6 +9,7 @@
 #include <omapfs/environment/task.hpp>
 
 #include <queue>
+#include <set>
 #include <unordered_set>
 
 void GreedyScheduler::rebuild_dp(uint32_t r) {
@@ -72,14 +73,14 @@ void GreedyScheduler::add(uint32_t r, uint32_t t) {
 }
 
 void GreedyScheduler::validate() {
-    /*std::set<uint32_t> S;
+    std::set<uint32_t> S;
     for (uint32_t r = 0; r < desires.size(); r++) {
         if (desires[r] != -1) {
             ASSERT(!S.count(desires[r]), "already contains");
             S.insert(desires[r]);
             ASSERT(task_to_robot[desires[r]] == r, "invalid task to robot");
         }
-    }*/
+    }
 }
 
 void GreedyScheduler::update() {

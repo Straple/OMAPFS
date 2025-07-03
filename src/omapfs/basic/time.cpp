@@ -7,6 +7,10 @@ TimePoint get_now() {
 Timer::Timer() : start(get_now()) {
 }
 
+double Timer::get() const {
+    return static_cast<double>(get_ns()) / 1e9;
+}
+
 uint64_t Timer::get_ms() const {
     return std::chrono::duration_cast<Milliseconds>(get_now() - start).count();
 }

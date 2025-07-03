@@ -15,6 +15,8 @@ class Timer {
 public:
     Timer();
 
+    [[nodiscard]] double get() const;
+
     [[nodiscard]] uint64_t get_ms() const;
 
     [[nodiscard]] uint64_t get_ns() const;

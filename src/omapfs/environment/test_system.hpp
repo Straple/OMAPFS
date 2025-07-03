@@ -8,6 +8,8 @@ class TestSystem {
 
     std::vector<uint32_t> finished_tasks;
 
+    void gen_random_agents();
+
     void update();
 
 public:
