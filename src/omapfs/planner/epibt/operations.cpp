@@ -51,8 +51,6 @@ bool verify_operation(const Operation &op) {
             }
         }
     }
-#else
-
 #endif
     return true;
 }
@@ -173,46 +171,8 @@ std::vector<Operation> &get_operations() {
     return operations;
 }
 
-/*static inline std::vector<uint32_t> operation_depth;
-
-uint32_t get_operation_depth(uint32_t index) {
-    ASSERT(0 <= index && index < operation_depth.size(), "invalid index");
-    ASSERT(operation_depth.size() == get_operations().size(), "unmatch sizes");
-    return operation_depth[index];
-}
-
-std::vector<uint32_t> &get_operations_ids(uint32_t d) {
-    static std::array<std::vector<uint32_t>, DEPTH + 1> data;
-    ASSERT(3 <= d && d <= 5, "invalid d");
-    return data[d];
-}*/
-
 void init_operations() {
     get_operations() = OperationsGenerator().get();
-
-    /*auto get_operation_depth = [&](const Operation &op) {
-        uint32_t d = op.size();
-        for (; d > 0 && op[d - 1] == ActionType::WAIT; d--) {
-        }
-        return d;
-    };
-
-    operation_depth.resize(get_operations().size());
-    for (uint32_t i = 0; i < get_operations().size(); i++) {
-        uint32_t d = get_operation_depth(get_operations()[i]);
-        if (d <= 3) {
-            operation_depth[i] = 3;
-            get_operations_ids(3).push_back(i);
-        } else if (d == 4) {
-            operation_depth[i] = 4;
-            get_operations_ids(4).push_back(i);
-        } else if (d == 5) {
-            operation_depth[i] = 5;
-            get_operations_ids(5).push_back(i);
-        } else {
-            FAILED_ASSERT("unexpected depth");
-        }
-    }*/
 }
 
 std::ostream &operator<<(std::ostream &output, const Operation &op) {
