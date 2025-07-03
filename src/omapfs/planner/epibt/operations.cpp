@@ -4,8 +4,8 @@
 #include <omapfs/environment/position.hpp>
 
 #include <fstream>
-#include <sstream>
 #include <set>
+#include <sstream>
 #include <tuple>
 
 class OperationsGenerator {
@@ -148,16 +148,18 @@ std::vector<Operation> OperationsGenerator::get() {
 #ifdef ENABLE_ROTATE_MODEL
                 p.get_dir()
 #else
-        0
+                0
 #endif
-                , positions};
+                        ,
+                positions};
         if (!visited.count(kek)) {
             visited.insert(kek);
             result.push_back(operation);
         }
     }
 
-    std::cout << "Operations:\n" << result.size() << ' ';
+    std::cout << "Operations:\n"
+              << result.size() << ' ';
     for (auto operation: result) {
         std::cout << operation << ' ';
     }
@@ -171,8 +173,36 @@ std::vector<Operation> &get_operations() {
     return operations;
 }
 
+static inline std::vector<uint32_t> operation_depth;
+
+uint32_t get_operation_depth(uint32_t index) {
+    ASSERT(0 <= index && index < operation_depth.size(), "invalid index");
+    ASSERT(operation_depth.size() == get_operations().size(), "unmatch sizes");
+    return operation_depth[index];
+}
+
+std::vector<uint32_t> &get_operations_ids(uint32_t d) {
+    static std::array<std::vector<uint32_t>, EPIBT_DEPTH + 1> data;
+    ASSERT(0 <= d && d <= 5, "invalid d");
+    return data[d];
+}
+
 void init_operations() {
     get_operations() = OperationsGenerator().get();
+
+    auto get_operation_depth = [&](const Operation &op) {
+        uint32_t d = op.size();
+        for (; d > 0 && op[d - 1] == ActionType::WAIT; d--) {
+        }
+        return d;
+    };
+
+    operation_depth.resize(get_operations().size());
+    for (uint32_t i = 0; i < get_operations().size(); i++) {
+        uint32_t d = get_operation_depth(get_operations()[i]);
+        operation_depth[i] = d;
+        get_operations_ids(d).push_back(i);
+    }
 }
 
 std::ostream &operator<<(std::ostream &output, const Operation &op) {

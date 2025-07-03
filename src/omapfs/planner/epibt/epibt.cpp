@@ -154,6 +154,9 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
     uint32_t old_desired = desires[r];
 
     for (uint32_t desired: robot_desires[r]) {
+        if (get_operation_depth(desired) > available_operation_depth) {
+            continue;
+        }
         desires[r] = desired;
         uint32_t to_r = get_used(r);
         if (to_r == -1) {
@@ -161,6 +164,10 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
             return RetType::ACCEPTED;
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < get_robots().size(), "invalid to_r: " + std::to_string(to_r));
+
+            /*if (get_robots()[r].priority >= get_robots()[to_r].priority) {
+                continue;
+            }*/
 
             if (visited[to_r] == visited_counter || counter > 3'000) {
                 continue;
@@ -286,17 +293,15 @@ EPIBT::EPIBT(TimePoint end_time)
 }
 
 void EPIBT::solve() {
-    for (available_operation_depth = 3; available_operation_depth <= EPIBT_DEPTH + 2; available_operation_depth++) {
-        for (int launch = 0; launch < 2; launch++) {
-            visited_counter++;
-            for (uint32_t r: order) {
-                if (get_now() >= end_time) {
-                    break;
-                }
-                epibt_step++;
-                if (visited[r] != visited_counter) {
-                    build(r);
-                }
+    for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
+        visited_counter++;
+        for (uint32_t r: order) {
+            if (get_now() >= end_time) {
+                break;
+            }
+            epibt_step++;
+            if (visited[r] != visited_counter) {
+                build(r);
             }
         }
     }
@@ -312,16 +317,16 @@ std::vector<ActionType> EPIBT::get_actions() const {
         const auto &op = get_operations()[desires[r]];
         answer[r] = op[0];
 
-#ifdef ENABLE_SMART_OPERATION_EXECUTION
+        /*#ifdef ENABLE_ROTATE_MODEL
         if (get_robots()[r].is_disable()) {
             continue;
         }
         // перебирает набор действий и выбирает лучшее по расстоянию до цели
-        auto update_answer = [&](const std::vector<Action> &actions) {
+        auto update_answer = [&](const std::vector<ActionType> &actions) {
             ASSERT(!actions.empty(), "is empty");
             std::vector<uint32_t> dists;
             for (auto action: actions) {
-                dists.push_back(get_hm().get(get_graph().get_to_node(get_robots()[r].node, action), get_robots()[r].target));
+                dists.push_back(get_hm().get(get_graph().get_to_node(get_robots()[r].node, static_cast<uint32_t>(action)), get_robots()[r].target));
             }
             uint32_t best_i = 0;
             for (uint32_t i = 0; i < actions.size(); i++) {
@@ -333,24 +338,24 @@ std::vector<ActionType> EPIBT::get_actions() const {
         };
 
         // не меняя траекторию мы попробуем другие повороты или ожидание
-        if (op[0] == Action::CR || op[0] == Action::CCR) {
+        if (op[0] == ActionType::ROTATE || op[0] == ActionType::COUNTER_ROTATE) {
             if (op[0] == op[1]) {
-                if (op[2] == Action::W) {
+                if (op[2] == ActionType::WAIT) {
                     // CCW, RRW
-                    update_answer({Action::W, Action::CR, Action::CCR});
+                    update_answer({ActionType::WAIT, ActionType::ROTATE, ActionType::COUNTER_ROTATE});
                 } else {
                     // CC, RR
-                    update_answer({Action::CR, Action::CCR});
+                    update_answer({ActionType::ROTATE, ActionType::COUNTER_ROTATE});
                 }
-            } else if (op[1] == Action::W) {
+            } else if (op[1] == ActionType::WAIT) {
                 // CW, RW
-                update_answer({Action::W, op[0]});
+                update_answer({ActionType::WAIT, op[0]});
             }
         } else if (desires[r] == 0) {
             // WWW
-            update_answer({Action::W, Action::CR, Action::CCR});
+            update_answer({ActionType::WAIT, ActionType::ROTATE, ActionType::COUNTER_ROTATE});
         }
-#endif
+#endif*/
     }
     return answer;
 }
