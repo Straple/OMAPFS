@@ -6,7 +6,7 @@
 
 #define ENABLE_ASSERT
 
-constexpr uint32_t THREADS_NUM = 4;
+constexpr uint32_t THREADS_NUM = 1;
 
 constexpr uint32_t EPIBT_OPERATION_DEPTH = 3;
 
