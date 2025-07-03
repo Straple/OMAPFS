@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-static constexpr inline uint32_t EPIBT_DEPTH = 3;
+constexpr uint32_t EPIBT_DEPTH = 3;
 
 using Operation = std::array<ActionType, EPIBT_DEPTH>;
 

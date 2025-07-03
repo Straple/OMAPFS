@@ -1,8 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
+#include <vector>
 
 class TestSystem {
+
+    std::vector<uint32_t> finished_tasks;
 
     void update();
 

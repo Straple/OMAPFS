@@ -29,10 +29,10 @@ void TestSystem::update() {
                 task.is_taken = true;
                 task.targets.erase(task.targets.begin());
                 if (task.targets.empty()) {
-                    std::cout << "finished task\n";
                     robot.task_id = -1;
                     robot.target = 0;
                     robot.priority = -1;
+                    finished_tasks.push_back(task.task_id);
                     get_task_pool().erase(task.task_id);
                 }
             }
@@ -45,7 +45,20 @@ void TestSystem::update() {
         if (robot.task_id != -1) {
             auto &task = get_task_pool().at(robot.task_id);
             robot.target = task.targets[0];
-            robot.priority = r;// TODO: dist to task
+            robot.priority = 0;
+
+            uint32_t d = get_hm().get(robot.node, robot.target);
+            for (int i = 0; i + 1 < task.targets.size(); i++) {
+                uint32_t source = task.targets[i];
+                uint32_t target = task.targets[i + 1];
+#ifdef ENABLE_ROTATE_MODEL
+                Position pos(source, 0);
+#else
+                Position pos(source);
+#endif
+                d += get_hm().get(get_graph().get_node(pos), target);
+            }
+            robot.priority = d;
         }
     }
 }
@@ -63,23 +76,26 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
     /*{
         Randomizer rnd;
         std::set<uint32_t> agents;
-        while (agents.size() < 100) {
+        uint32_t agents_num = 800;
+        while (agents.size() < agents_num) {
             uint32_t pos = rnd.get(1, get_map().get_size() - 1);
             if (get_map().is_free(pos) && !agents.contains(pos)) {
                 agents.insert(pos);
             }
         }
-        std::ofstream output("agents.csv");
-        output << "agent id,row,col\n";
-        uint32_t id = 0;
-        for (uint32_t pos: agents) {
+        {
+            std::ofstream output("agents_" + std::to_string(agents_num) + ".csv");
+            output << "agent id,row,col\n";
+            uint32_t id = 0;
+            for (uint32_t pos: agents) {
 #ifdef ENABLE_ROTATE_MODEL
-            Position p(pos, 0);
+                Position p(pos, 0);
 #else
-            Position p(pos);
+                Position p(pos);
 #endif
-            output << id << ',' << p.get_row() << ',' << p.get_col() << '\n';
-            id++;
+                output << id << ',' << p.get_row() << ',' << p.get_col() << '\n';
+                id++;
+            }
         }
         std::exit(0);
     }*/
@@ -93,8 +109,15 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
 
 void TestSystem::simulate(uint32_t steps_num) {
     GreedyScheduler scheduler;
+
+    std::ofstream logger("log.csv");
+    logger << "timestep,finished tasks\n";
+    uint64_t total_finished_tasks = 0;
+
     for (uint32_t step = 0; step < steps_num; step++) {
         get_curr_timestep() = step;
+
+        //std::cout << "\nTimestep: " << step << std::endl;
 
         update();
 
@@ -137,5 +160,10 @@ void TestSystem::simulate(uint32_t steps_num) {
         }
 
         update();
+
+        logger << step << ',' << finished_tasks.size() << std::endl;
+        total_finished_tasks += finished_tasks.size();
+        finished_tasks.clear();
     }
+    logger << "total," << total_finished_tasks << std::endl;
 }

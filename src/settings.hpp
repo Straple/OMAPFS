@@ -6,6 +6,8 @@
 
 #define ENABLE_ASSERT
 
+#define ENABLE_SCHEDULER_CHANGE_TASK
+
 constexpr uint32_t THREADS_NUM = 1;
 
 /* TODO

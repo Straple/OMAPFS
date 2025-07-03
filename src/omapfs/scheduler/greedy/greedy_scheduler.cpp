@@ -92,15 +92,18 @@ void GreedyScheduler::update() {
 
     // build free_tasks
     for (auto &[t, task]: get_task_pool()) {
-        uint32_t r = task.agent_assigned;
         if (
-                r == -1// нет агента
+                task.agent_assigned == -1// нет агента
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-                || task.idx_next_loc == 0// мы можем поменять задачу
+                || !task.is_taken// мы можем поменять задачу
 #endif
         ) {
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-            task.agent_assigned = -1;// IMPORTANT! remove task agent assigned
+            if(task.agent_assigned != -1) {
+                get_robots()[task.agent_assigned].task_id = -1;
+                get_robots()[task.agent_assigned].target = 0;
+                task.agent_assigned = -1;
+            }
 #endif
             free_tasks.push_back(t);
         }
@@ -120,7 +123,7 @@ void GreedyScheduler::update() {
                 // нет задачи
                 !get_task_pool().contains(t)
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-                || env->task_pool.at(t).idx_next_loc == 0
+                || !get_task_pool().at(t).is_taken
 #endif
         ) {
             free_robots.push_back(r);
