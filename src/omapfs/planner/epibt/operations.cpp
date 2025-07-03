@@ -97,22 +97,45 @@ std::vector<Operation> OperationsGenerator::get() {
     }*/
 
     auto get_operation_weight = [&](Operation op) {
-        int64_t s = 0;
+        int64_t score = 0;
         for (uint32_t d = 0; d < op.size(); d++) {
 #ifdef ENABLE_ROTATE_MODEL
-            s += (op[d] == ActionType::FORWARD) * static_cast<int64_t>(op.size() - d) * 10;
-            s -= (op[d] == ActionType::WAIT) * static_cast<int64_t>(op.size() - d) * 1;
-            s -= (op[d] == ActionType::ROTATE) * static_cast<int64_t>(op.size() - d) * 2;
-            s -= (op[d] == ActionType::COUNTER_ROTATE) * static_cast<int64_t>(op.size() - d) * 2;
+            score += (op[d] == ActionType::FORWARD) * static_cast<int64_t>(op.size() - d) * 10;
+            score -= (op[d] == ActionType::WAIT) * static_cast<int64_t>(op.size() - d) * 1;
+            score -= (op[d] == ActionType::ROTATE) * static_cast<int64_t>(op.size() - d) * 1;
+            score -= (op[d] == ActionType::COUNTER_ROTATE) * static_cast<int64_t>(op.size() - d) * 1;
 #else
-            s += (op[d] == ActionType::EAST) * static_cast<int64_t>(op.size() - d) * 10;
-            s += (op[d] == ActionType::SOUTH) * static_cast<int64_t>(op.size() - d) * 10;
-            s += (op[d] == ActionType::WEST) * static_cast<int64_t>(op.size() - d) * 10;
-            s += (op[d] == ActionType::NORTH) * static_cast<int64_t>(op.size() - d) * 10;
-            s -= (op[d] == ActionType::WAIT) * static_cast<int64_t>(op.size() - d) * 1;
+            /*score += (op[d] == ActionType::EAST) * static_cast<int64_t>(op.size() - d) * 10;
+            score += (op[d] == ActionType::SOUTH) * static_cast<int64_t>(op.size() - d) * 10;
+            score += (op[d] == ActionType::WEST) * static_cast<int64_t>(op.size() - d) * 10;
+            score += (op[d] == ActionType::NORTH) * static_cast<int64_t>(op.size() - d) * 10;
+            score -= (op[d] == ActionType::WAIT) * static_cast<int64_t>(op.size() - d) * 1;*/
 #endif
         }
-        return s;
+
+#ifndef ENABLE_ROTATE_MODEL
+        std::set<std::pair<uint32_t, uint32_t>> visited;
+        Position p;
+        visited.insert({0, 0});
+        for (uint32_t d = 0; d < op.size(); d++) {
+            if (op[d] == ActionType::WAIT) {
+                score -= 10000 * (op.size() - d);
+            }
+        }
+        for (uint32_t d = 0; d < op.size(); d++) {
+            p = p.simulate(op[d]);
+            if (visited.contains({p.get_row(), p.get_col()})) {
+                score -= 5 * (op.size() - d + 1);
+            }
+            visited.insert({p.get_row(), p.get_col()});
+        }
+        for (uint32_t d = 0; d + 1 < op.size(); d++) {
+            if (op[d] == op[d + 1]) {
+                score += 1;
+            }
+        }
+#endif
+        return score;
     };
     std::stable_sort(pool.begin(), pool.end(), [&](auto lhs, auto rhs) {
         return get_operation_weight(lhs) < get_operation_weight(rhs);
@@ -183,7 +206,7 @@ uint32_t get_operation_depth(uint32_t index) {
 
 std::vector<uint32_t> &get_operations_ids(uint32_t d) {
     static std::array<std::vector<uint32_t>, EPIBT_DEPTH + 1> data;
-    ASSERT(0 <= d && d <= 5, "invalid d");
+    ASSERT(0 <= d && d <= EPIBT_DEPTH, "invalid d");
     return data[d];
 }
 
