@@ -56,7 +56,7 @@ bool verify_operation(const Operation &op) {
 }
 
 void OperationsGenerator::generate(Operation &op, uint32_t i) {
-    if (i == DEPTH) {
+    if (i == EPIBT_DEPTH) {
         if (verify_operation(op)) {
             pool.push_back(op);
         }
@@ -81,7 +81,7 @@ std::vector<Operation> OperationsGenerator::get() {
 
                 "136 WWWWW CCWWF RWWWF CWWWF WWWWF RRWFW RWWFW CWWFW WWWFW RRFWW RRWFF RWFWW RWWFF CWFWW CWWFF RRFRF RRFCF WWFWW WWWFF RRFWF RWFRF RWFCF CWFRF CWFCF RFWWW RWFWF CFWWW CWFWF WWFRF WWFCF WFWWW WWFWF RFRRF CFRRF RRFFW RFRWF RFCWF CFRWF CFCWF RFWWF RWFFW CFWWF CWFFW WFRRF WFRWF WFCWF FWWWW WFWWF WWFFW RRFFF RFRFW RFCFW CFRFW CFCFW FRRWF RFWFW RWFFF CFWFW CWFFF FRWWF FCWWF WFRFW WFCFW FWWWF WFWFW WWFFF RFRFF RFCFF CFRFF CFCFF FRRFW RFFWW RFWFF CFFWW CFWFF FRWFW FCWFW WFRFF WFCFF FWWFW WFFWW WFWFF FRRFF RFFRF RFFCF CFFRF CFFCF RFFWF CFFWF FRFWW FRWFF FCFWW FCWFF WFFRF WFFCF FWFWW FWWFF WFFWF FRFRF FRFCF FCFRF FCFCF RFFFW CFFFW FRFWF FCFWF FWFRF FWFCF FFWWW FWFWF WFFFW FFRRF RFFFF CFFFF FRFFW FCFFW FFRWF FFCWF FFWWF FWFFW WFFFF FRFFF FCFFF FFRFW FFCFW FFWFW FWFFF FFRFF FFCFF FFFWW FFWFF FFFRF FFFCF FFFWF FFFFW FFFFF",
         };
-        std::stringstream input(operations_pool_strs.at(EPIBT_OPERATION_DEPTH - 3));
+        std::stringstream input(operations_pool_strs.at(EPIBT_DEPTH - 3));
         uint32_t num;
         input >> num;
         for (uint32_t i = 0; i < num; i++) {
@@ -133,18 +133,18 @@ std::vector<Operation> OperationsGenerator::get() {
 
     std::vector<Operation> result;
 
-    std::set<std::tuple<uint32_t, std::array<std::pair<uint32_t, uint32_t>, DEPTH>>> visited;
+    std::set<std::tuple<uint32_t, std::array<std::pair<uint32_t, uint32_t>, EPIBT_DEPTH>>> visited;
     for (auto operation: pool) {
-        std::array<std::pair<uint32_t, uint32_t>, DEPTH> positions{};
+        std::array<std::pair<uint32_t, uint32_t>, EPIBT_DEPTH> positions{};
         Position p;
         std::set<std::pair<uint32_t, uint32_t>> visited_poses;
         visited_poses.insert({p.get_row(), p.get_col()});
-        for (uint32_t d = 0; d < DEPTH; d++) {
+        for (uint32_t d = 0; d < EPIBT_DEPTH; d++) {
             p = p.simulate(operation[d]);
             positions[d] = {p.get_row(), p.get_col()};
             visited_poses.insert(positions[d]);
         }
-        std::tuple<uint32_t, std::array<std::pair<uint32_t, uint32_t>, DEPTH>> kek = {
+        std::tuple<uint32_t, std::array<std::pair<uint32_t, uint32_t>, EPIBT_DEPTH>> kek = {
 #ifdef ENABLE_ROTATE_MODEL
                 p.get_dir()
 #else

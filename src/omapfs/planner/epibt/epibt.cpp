@@ -19,7 +19,7 @@ uint32_t EPIBT::get_used(uint32_t r) const {
     uint32_t answer = -1;
 
     auto &poses_path = get_omap().get_poses_path(get_robots()[r].node, desires[r]);
-    for (uint32_t depth = 0; depth < DEPTH; depth++) {
+    for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         if (used_pos[to_pos][depth] != -1) {
             if (answer == -1) {
@@ -31,7 +31,7 @@ uint32_t EPIBT::get_used(uint32_t r) const {
     }
 
     const auto &edges_path = get_omap().get_edges_path(get_robots()[r].node, desires[r]);
-    for (uint32_t depth = 0; depth < DEPTH; depth++) {
+    for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_edge = edges_path[depth];
         if (used_edge[to_edge][depth] != -1) {
             if (answer == -1) {
@@ -75,7 +75,7 @@ int64_t EPIBT::get_smart_dist_IMPL(uint32_t r, uint32_t desired) const {
         }
     }*/
 
-    for (uint32_t d = 0; d < DEPTH; d++) {
+    for (uint32_t d = 0; d < EPIBT_DEPTH; d++) {
         if (get_graph().get_pos(path[d]).get_pos() == target) {
             dist = d;
             dist = -dist;
@@ -100,7 +100,7 @@ void EPIBT::add_path(uint32_t r) {
     ASSERT(0 <= desires[r] && desires[r] < get_operations().size(), "invalid desired");
 
     const auto &poses_path = get_omap().get_poses_path(get_robots()[r].node, desires[r]);
-    for (uint32_t depth = 0; depth < DEPTH; depth++) {
+    for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         ASSERT(to_pos < used_pos.size(), "invalid to_pos");
         ASSERT(used_pos[to_pos][depth] == -1, "already used");
@@ -108,7 +108,7 @@ void EPIBT::add_path(uint32_t r) {
     }
 
     const auto &edges_path = get_omap().get_edges_path(get_robots()[r].node, desires[r]);
-    for (uint32_t depth = 0; depth < DEPTH; depth++) {
+    for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_edge = edges_path[depth];
         if (to_edge) {
             ASSERT(to_edge < used_edge.size(), "invalid to_edge");
@@ -125,14 +125,14 @@ void EPIBT::remove_path(uint32_t r) {
     ASSERT(0 <= desires[r] && desires[r] < get_operations().size(), "invalid desired");
 
     const auto &poses_path = get_omap().get_poses_path(get_robots()[r].node, desires[r]);
-    for (uint32_t depth = 0; depth < DEPTH; depth++) {
+    for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         ASSERT(to_pos < used_pos.size(), "invalid to_pos");
         ASSERT(used_pos[to_pos][depth] == r, "invalid node");
         used_pos[to_pos][depth] = -1;
     }
     const auto &edges_path = get_omap().get_edges_path(get_robots()[r].node, desires[r]);
-    for (uint32_t depth = 0; depth < DEPTH; depth++) {
+    for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_edge = edges_path[depth];
         if (to_edge) {
             ASSERT(to_edge < used_edge.size(), "invalid to_edge");
@@ -230,11 +230,11 @@ EPIBT::EPIBT(TimePoint end_time)
     }
 
     {
-        std::array<uint32_t, DEPTH> value{};
-        for (uint32_t depth = 0; depth < DEPTH; depth++) {
+        std::array<uint32_t, EPIBT_DEPTH> value{};
+        for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
             value[depth] = -1;
         }
-        used_pos.resize(get_graph().get_nodes_size(), value);
+        used_pos.resize(get_map().get_size(), value);
         used_edge.resize(get_graph().get_edges_size(), value);
     }
 
@@ -284,7 +284,7 @@ EPIBT::EPIBT(TimePoint end_time)
 }
 
 void EPIBT::solve() {
-    for (available_operation_depth = 3; available_operation_depth <= EPIBT_OPERATION_DEPTH + 2; available_operation_depth++) {
+    for (available_operation_depth = 3; available_operation_depth <= EPIBT_DEPTH + 2; available_operation_depth++) {
         for (int launch = 0; launch < 2; launch++) {
             visited_counter++;
             for (uint32_t r: order) {

@@ -7,11 +7,11 @@
 #include <vector>
 #include <iostream>
 
-static constexpr inline uint32_t DEPTH = 3;
+static constexpr inline uint32_t EPIBT_DEPTH = 3;
 
-using Operation = std::array<ActionType, DEPTH>;
+using Operation = std::array<ActionType, EPIBT_DEPTH>;
 
-using Path = std::array<uint32_t, DEPTH>;
+using Path = std::array<uint32_t, EPIBT_DEPTH>;
 
 std::vector<Operation> &get_operations();
 

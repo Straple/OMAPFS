@@ -1,15 +1,15 @@
 #include <omapfs/scheduler/greedy/greedy_scheduler.hpp>
 
-#include <omapfs/environment/info.hpp>
-#include <omapfs/environment/task.hpp>
-#include <omapfs/environment/robot.hpp>
-#include <omapfs/environment/heuristic_matrix.hpp>
 #include <omapfs/basic/assert.hpp>
 #include <omapfs/basic/time.hpp>
 #include <omapfs/basic/tools.hpp>
+#include <omapfs/environment/heuristic_matrix.hpp>
+#include <omapfs/environment/info.hpp>
+#include <omapfs/environment/robot.hpp>
+#include <omapfs/environment/task.hpp>
 
-#include <unordered_set>
 #include <queue>
+#include <unordered_set>
 
 void GreedyScheduler::rebuild_dp(uint32_t r) {
     dp[r].clear();
@@ -96,9 +96,9 @@ void GreedyScheduler::update() {
         if (
                 r == -1// нет агента
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-            || task.idx_next_loc == 0// мы можем поменять задачу
+                || task.idx_next_loc == 0// мы можем поменять задачу
 #endif
-                ) {
+        ) {
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
             task.agent_assigned = -1;// IMPORTANT! remove task agent assigned
 #endif
@@ -117,12 +117,12 @@ void GreedyScheduler::update() {
             continue;
         }
         if (
-            // нет задачи
+                // нет задачи
                 !get_task_pool().contains(t)
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-            || env->task_pool.at(t).idx_next_loc == 0
+                || env->task_pool.at(t).idx_next_loc == 0
 #endif
-                ) {
+        ) {
             free_robots.push_back(r);
         }
     }
@@ -142,7 +142,12 @@ void GreedyScheduler::update() {
             for (int i = 0; i + 1 < task.targets.size(); i++) {
                 uint32_t source = task.targets[i];
                 uint32_t target = task.targets[i + 1];
-                d += get_hm().get(get_graph().get_node(Position(source, 0)), target);
+#ifdef ENABLE_ROTATE_MODEL
+                Position pos(source, 0);
+#else
+                Position pos(source);
+#endif
+                d += get_hm().get(get_graph().get_node(pos), target);
             }
             task_metric[t] = d;
         }
