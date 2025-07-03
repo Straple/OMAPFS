@@ -17,6 +17,11 @@ void TaskPool::insert(const Task &task) {
     pool.emplace(task.task_id, task);
 }
 
+void TaskPool::erase(uint32_t task_id) {
+    ASSERT(pool.contains(task_id), "no contains");
+    pool.erase(task_id);
+}
+
 [[nodiscard]] uint32_t TaskPool::size() const {
     return pool.size();
 }

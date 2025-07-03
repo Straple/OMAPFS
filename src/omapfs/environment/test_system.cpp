@@ -12,10 +12,43 @@
 
 #include <omapfs/scheduler/greedy/greedy_scheduler.hpp>
 
+#include <omapfs/planner/epibt/epibt.hpp>
 #include <omapfs/planner/epibt/operations.hpp>
+#include <omapfs/planner/epibt/operations_map.hpp>
 
 #include <fstream>
 #include <set>
+
+void TestSystem::update() {
+    // update tasks
+    for (uint32_t r = 0; r < get_robots().size(); r++) {
+        auto &robot = get_robots()[r];
+        if (robot.task_id != -1) {
+            auto &task = get_task_pool().at(robot.task_id);
+            if (robot.pos.get_pos() == task.targets[0]) {
+                task.is_taken = true;
+                task.targets.erase(task.targets.begin());
+                if (task.targets.empty()) {
+                    std::cout << "finished task\n";
+                    robot.task_id = -1;
+                    robot.target = 0;
+                    robot.priority = -1;
+                    get_task_pool().erase(task.task_id);
+                }
+            }
+        }
+    }
+
+    // update metrics
+    for (uint32_t r = 0; r < get_robots().size(); r++) {
+        auto &robot = get_robots()[r];
+        if (robot.task_id != -1) {
+            auto &task = get_task_pool().at(robot.task_id);
+            robot.target = task.targets[0];
+            robot.priority = r;// TODO: dist to task
+        }
+    }
+}
 
 TestSystem::TestSystem(const std::string &map_filename, const std::string &task_filename, const std::string &robot_filename) {
     std::ifstream(map_filename) >> get_map();
@@ -55,12 +88,15 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
 
     // epibt
     init_operations();
+    get_omap() = OperationsMap(get_graph(), get_operations());
 }
 
 void TestSystem::simulate(uint32_t steps_num) {
     GreedyScheduler scheduler;
     for (uint32_t step = 0; step < steps_num; step++) {
         get_curr_timestep() = step;
+
+        update();
 
         // update task pool
         while (get_task_pool().size() < get_robots().size() * 1.5) {
@@ -84,5 +120,22 @@ void TestSystem::simulate(uint32_t steps_num) {
             get_robots()[r].task_id = schedule[r];
             get_task_pool().at(schedule[r]).agent_assigned = r;
         }
+
+        update();
+
+        // call planner
+        EPIBT epibt(get_now() + Milliseconds(100));
+        epibt.solve();
+        auto actions = epibt.get_actions();
+
+        // TODO: validate actions
+
+        for (uint32_t r = 0; r < get_robots().size(); r++) {
+            auto &robot = get_robots()[r];
+            robot.pos = robot.pos.simulate(actions[r]);
+            robot.node = get_graph().get_node(robot.pos);
+        }
+
+        update();
     }
 }

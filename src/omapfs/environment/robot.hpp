@@ -9,6 +9,10 @@ struct Robot {
     uint32_t node = 0;
     Position pos;
     uint32_t task_id = -1;
+    uint32_t target = 0;
+    uint32_t priority = -1;// -1 if disabled agent
+
+    [[nodiscard]] bool is_disable() const;
 };
 
 class Robots {

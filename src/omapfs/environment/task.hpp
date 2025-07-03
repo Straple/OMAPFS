@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
-#include <unordered_map>
-#include <string>
 #include <istream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 struct Task {
     uint32_t task_id = -1;
@@ -22,12 +22,13 @@ class TaskPool {
     uint32_t next_task = 0;
 
 public:
-
     [[nodiscard]] bool contains(uint32_t task_id) const;
 
     Task &at(uint32_t task_id);
 
     void insert(const Task &task);
+
+    void erase(uint32_t task_id);
 
     [[nodiscard]] uint32_t size() const;
 

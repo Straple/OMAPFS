@@ -4,6 +4,10 @@
 #include <omapfs/basic/tools.hpp>
 #include <omapfs/environment/graph.hpp>
 
+bool Robot::is_disable() const {
+    return priority == -1;
+}
+
 Robots::Robots(uint32_t robots_num) : robots(robots_num) {
 }
 
