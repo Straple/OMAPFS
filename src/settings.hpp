@@ -12,4 +12,5 @@ constexpr uint32_t THREADS_NUM = 8;
 
 /* TODO
  * 1) добавить GraphGuidanceBuilder, который строит GG для разных карт
+ * 2) улучшить проверки в Answer
  */

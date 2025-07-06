@@ -156,7 +156,11 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
     get_omap() = OperationsMap(get_graph(), get_operations());
 }
 
-void TestSystem::simulate(uint32_t steps_num) {
+Answer TestSystem::simulate(uint32_t steps_num) {
+    Answer answer;
+    answer.steps_num = steps_num;
+    answer.robots.resize(get_robots().size());
+
     Timer total_timer;
 
     std::ofstream logger("log.csv");
@@ -165,6 +169,7 @@ void TestSystem::simulate(uint32_t steps_num) {
         logger << action_to_char(static_cast<ActionType>(action)) << ',';
     }
     logger << "time(ms),scheduler time(ms),planner time(ms)\n";
+
     uint64_t total_finished_tasks = 0;
     std::array<uint32_t, ACTIONS_NUM> total_actions_num{};
     uint64_t total_scheduler_time = 0;
@@ -174,6 +179,10 @@ void TestSystem::simulate(uint32_t steps_num) {
         Timer step_timer;
 
         get_curr_timestep() = step;
+
+        for (uint32_t r = 0; r < answer.robots.size(); r++) {
+            answer.robots[r].positions.push_back(get_robots()[r].pos);
+        }
 
         update();
 
@@ -194,7 +203,14 @@ void TestSystem::simulate(uint32_t steps_num) {
             total_scheduler_time += timer.get_ns();
         }
 
-        // TODO: validate new schedule
+        for (uint32_t r = 0; r < get_robots().size(); r++) {
+            answer.robots[r].assigned_task.push_back(schedule[r]);
+        }
+        answer.tasks.emplace_back();
+        for (auto &[id, task]: get_task_pool()) {
+            answer.tasks[step][id] = task;
+        }
+        answer.validate_schedule(step);
 
         // set new schedule
         for (uint32_t r = 0; r < get_robots().size(); r++) {
@@ -218,17 +234,11 @@ void TestSystem::simulate(uint32_t steps_num) {
             total_planner_time += timer.get_ns();
         }
 
-        // validate actions
-        {
-            std::map<uint32_t, uint32_t> pos_usage, edge_usage;
-            for (uint32_t r = 0; r < get_robots().size(); r++) {
-                auto &robot = get_robots()[r];
-                Position to = robot.pos.simulate(actions[r]);
-                ASSERT(!pos_usage.contains(to.get_pos()), "vertex collision");
-                pos_usage[to.get_pos()] = r;
-                ASSERT(!edge_usage.contains(get_graph().get_to_edge(robot.node, static_cast<uint32_t>(actions[r]))), "edge collision");
-            }
+        for (uint32_t r = 0; r < get_robots().size(); r++) {
+            answer.robots[r].actions.push_back(actions[r]);
         }
+
+        answer.validate_actions(step);
 
         std::array<uint32_t, ACTIONS_NUM> actions_num{};
         for (uint32_t r = 0; r < get_robots().size(); r++) {
@@ -255,4 +265,6 @@ void TestSystem::simulate(uint32_t steps_num) {
         logger << total_actions_num[action] * 100.0 / steps_num / get_robots().size() << "%,";
     }
     logger << total_timer.get_ms() << ',' << total_scheduler_time / 1'000'000 << ',' << total_planner_time / 1'000'000 << std::endl;
+
+    return answer;
 }

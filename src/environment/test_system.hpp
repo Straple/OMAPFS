@@ -1,6 +1,6 @@
 #pragma once
 
-#include <environment/action_model.hpp>
+#include <environment/answer.hpp>
 
 #include <cstdint>
 #include <string>
@@ -23,5 +23,5 @@ public:
 
     TestSystem(const std::string &map_filename, const std::string &task_filename, const std::string &robot_filename);
 
-    void simulate(uint32_t steps_num);
+    Answer simulate(uint32_t steps_num);
 };
