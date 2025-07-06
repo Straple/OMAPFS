@@ -21,6 +21,9 @@ class TaskPool {
     std::vector<std::vector<uint32_t>> task_targets;
     uint32_t next_task = 0;
 
+    // [r] = number of finished tasks
+    std::vector<uint32_t> task_counter;
+
 public:
     [[nodiscard]] bool contains(uint32_t task_id) const;
 
@@ -37,6 +40,8 @@ public:
     std::unordered_map<uint32_t, Task>::iterator end();
 
     void gen_next_task();
+
+    uint32_t gen_const_next_task(uint32_t r);
 
     friend std::istream &operator>>(std::istream &input, TaskPool &pool);
 };

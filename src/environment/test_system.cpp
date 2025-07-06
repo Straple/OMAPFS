@@ -94,6 +94,50 @@ void TestSystem::update() {
     }
 }
 
+std::vector<uint32_t> TestSystem::get_schedule() {
+    std::vector<uint32_t> schedule;
+    if (get_scheduler_type() == SchedulerType::CONST) {
+        schedule.resize(get_robots().size());
+        for (uint32_t r = 0; r < get_robots().size(); r++) {
+            auto &robot = get_robots()[r];
+            if (robot.task_id == -1) {
+                uint32_t task_id = get_task_pool().gen_const_next_task(r);
+                schedule[r] = task_id;
+            } else {
+                schedule[r] = robot.task_id;
+            }
+        }
+    } else if (get_scheduler_type() == SchedulerType::GREEDY) {
+        static GreedyScheduler scheduler;
+        scheduler.update();
+        scheduler.rebuild_dp(get_now() + Milliseconds(100));
+        scheduler.solve(get_now() + Milliseconds(100));
+        schedule = scheduler.get_schedule();
+    }
+    return schedule;
+}
+
+std::vector<ActionType> TestSystem::get_actions() {
+    std::vector<ActionType> actions;
+    TimePoint end_time = get_now() + Milliseconds(100);
+    if (get_planner_type() == PlannerType::EPIBT) {
+        EPIBT epibt(end_time);
+        epibt.solve();
+        actions = epibt.get_actions();
+    } else if (get_planner_type() == PlannerType::EPIBT_LNS) {
+        EPIBT_LNS pibt(end_time);
+        pibt.solve(42);
+        actions = pibt.get_actions();
+    } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
+        PEPIBT_LNS pibt(end_time);
+        pibt.solve(42);
+        actions = pibt.get_actions();
+    } else {
+        FAILED_ASSERT("unexpected planner type");
+    }
+    return actions;
+}
+
 TestSystem::TestSystem(const std::string &map_filename, const std::string &task_filename, const std::string &robot_filename) {
     std::ifstream(map_filename) >> get_map();
     std::ifstream(task_filename) >> get_task_pool();
@@ -113,8 +157,6 @@ TestSystem::TestSystem(const std::string &map_filename, const std::string &task_
 }
 
 void TestSystem::simulate(uint32_t steps_num) {
-    GreedyScheduler scheduler;
-
     Timer total_timer;
 
     std::ofstream logger("log.csv");
@@ -133,13 +175,13 @@ void TestSystem::simulate(uint32_t steps_num) {
 
         get_curr_timestep() = step;
 
-        //std::cout << "\nTimestep: " << step << std::endl;
-
         update();
 
         // update task pool
-        while (get_task_pool().size() < get_robots().size() * 1.5) {
-            get_task_pool().gen_next_task();
+        if (get_scheduler_type() != SchedulerType::CONST) {
+            while (get_task_pool().size() < get_robots().size() * 1.5) {
+                get_task_pool().gen_next_task();
+            }
         }
 
         // call scheduler
@@ -147,10 +189,7 @@ void TestSystem::simulate(uint32_t steps_num) {
         uint32_t scheduler_time = 0;
         {
             Timer timer;
-            scheduler.update();
-            scheduler.rebuild_dp(get_now() + Milliseconds(100));
-            scheduler.solve(get_now() + Milliseconds(100));
-            schedule = scheduler.get_schedule();
+            schedule = get_schedule();
             scheduler_time = timer.get_ms();
             total_scheduler_time += timer.get_ns();
         }
@@ -174,22 +213,7 @@ void TestSystem::simulate(uint32_t steps_num) {
         uint32_t planner_time = 0;
         {
             Timer timer;
-            TimePoint end_time = get_now() + Milliseconds(100);
-            if (get_planner_type() == PlannerType::EPIBT) {
-                EPIBT epibt(end_time);
-                epibt.solve();
-                actions = epibt.get_actions();
-            } else if (get_planner_type() == PlannerType::EPIBT_LNS) {
-                EPIBT_LNS pibt(end_time);
-                pibt.solve(42);
-                actions = pibt.get_actions();
-            } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
-                PEPIBT_LNS pibt(end_time);
-                pibt.solve(42);
-                actions = pibt.get_actions();
-            } else {
-                FAILED_ASSERT("unexpected planner type");
-            }
+            actions = get_actions();
             planner_time = timer.get_ms();
             total_planner_time += timer.get_ns();
         }

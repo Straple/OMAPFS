@@ -14,3 +14,10 @@ enum class PlannerType {
 };
 
 PlannerType &get_planner_type();
+
+enum class SchedulerType {
+    CONST,
+    GREEDY,
+};
+
+SchedulerType &get_scheduler_type();

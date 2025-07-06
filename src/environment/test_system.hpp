@@ -1,5 +1,7 @@
 #pragma once
 
+#include <environment/action_model.hpp>
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -11,6 +13,10 @@ class TestSystem {
     void gen_random_agents();
 
     void update();
+
+    std::vector<uint32_t> get_schedule();
+
+    std::vector<ActionType> get_actions();
 
 public:
     TestSystem() = default;

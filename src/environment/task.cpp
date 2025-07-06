@@ -2,6 +2,7 @@
 
 #include <basic/assert.hpp>
 #include <basic/tools.hpp>
+#include <environment/robot.hpp>
 
 bool TaskPool::contains(uint32_t task_id) const {
     return pool.contains(task_id);
@@ -37,6 +38,18 @@ std::unordered_map<uint32_t, Task>::iterator TaskPool::end() {
 void TaskPool::gen_next_task() {
     insert(Task{next_task, static_cast<uint32_t>(-1), task_targets[next_task % task_targets.size()]});
     next_task++;
+}
+
+uint32_t TaskPool::gen_const_next_task(uint32_t r) {
+    if (task_counter.size() <= r) {
+        task_counter.resize(get_robots().size());
+    }
+    Task task{next_task, static_cast<uint32_t>(-1), task_targets[(task_counter[r] * get_robots().size()) % task_targets.size()]};
+    task.targets.resize(1);
+    task_counter[r]++;
+    next_task++;
+    insert(task);
+    return task.task_id;
 }
 
 std::istream &operator>>(std::istream &input, TaskPool &pool) {
