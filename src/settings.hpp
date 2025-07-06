@@ -8,7 +8,7 @@
 
 #define ENABLE_SCHEDULER_CHANGE_TASK
 
-constexpr uint32_t THREADS_NUM = 1;
+constexpr uint32_t THREADS_NUM = 8;
 
 /* TODO
  * 1) добавить GraphGuidanceBuilder, который строит GG для разных карт

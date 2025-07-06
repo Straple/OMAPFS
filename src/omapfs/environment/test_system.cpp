@@ -13,8 +13,10 @@
 #include <omapfs/scheduler/greedy/greedy_scheduler.hpp>
 
 #include <omapfs/planner/epibt/epibt.hpp>
+#include <omapfs/planner/epibt/epibt_lns.hpp>
 #include <omapfs/planner/epibt/operations.hpp>
 #include <omapfs/planner/epibt/operations_map.hpp>
+#include <omapfs/planner/epibt/pepibt_lns.hpp>
 
 #include <fstream>
 #include <iomanip>
@@ -172,9 +174,22 @@ void TestSystem::simulate(uint32_t steps_num) {
         uint32_t planner_time = 0;
         {
             Timer timer;
-            EPIBT epibt(get_now() + Milliseconds(500));
-            epibt.solve();
-            actions = epibt.get_actions();
+            TimePoint end_time = get_now() + Milliseconds(100);
+            if (get_planner_type() == PlannerType::EPIBT) {
+                EPIBT epibt(end_time);
+                epibt.solve();
+                actions = epibt.get_actions();
+            } else if (get_planner_type() == PlannerType::EPIBT_LNS) {
+                EPIBT_LNS pibt(end_time);
+                pibt.solve(42);
+                actions = pibt.get_actions();
+            } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
+                PEPIBT_LNS pibt(end_time);
+                pibt.solve(42);
+                actions = pibt.get_actions();
+            } else {
+                FAILED_ASSERT("unexpected planner type");
+            }
             planner_time = timer.get_ms();
             total_planner_time += timer.get_ns();
         }

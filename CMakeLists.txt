@@ -7,6 +7,8 @@ find_package(Threads REQUIRED)
 
 include_directories("src")
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
 file(GLOB SOURCES
         src/omapfs/basic/*.cpp
         src/omapfs/environment/*.cpp
