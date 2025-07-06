@@ -23,7 +23,12 @@ struct Answer {
     // [step] = task pool
     std::vector<std::map<uint32_t, Task>> tasks;
 
+    // [row][col][action]
+    std::vector<std::vector<std::array<uint64_t, ACTIONS_NUM + 1>>> heatmap;
+
     void validate_actions(uint32_t step) const;
 
     void validate_schedule(uint32_t step) const;
+
+    void write_heatmap(std::ostream& output, uint32_t action) const;
 };

@@ -54,3 +54,18 @@ void Answer::validate_schedule(uint32_t step) const {
         }
     }
 }
+
+void Answer::write_heatmap(std::ostream &output, uint32_t action) const {
+    output << "row\\col";
+    for (uint32_t col = 0; col < get_map().get_cols(); col++) {
+        output << ',' << col;
+    }
+    output << '\n';
+    for (uint32_t row = 0; row < get_map().get_rows(); row++) {
+        output << row;
+        for (uint32_t col = 0; col < get_map().get_cols(); col++) {
+            output << ',' << heatmap[row][col][action];
+        }
+        output << '\n';
+    }
+}

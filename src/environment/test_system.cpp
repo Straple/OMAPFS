@@ -160,6 +160,7 @@ Answer TestSystem::simulate(uint32_t steps_num) {
     Answer answer;
     answer.steps_num = steps_num;
     answer.robots.resize(get_robots().size());
+    answer.heatmap = std::vector(get_map().get_rows(), std::vector(get_map().get_cols(), std::array<uint64_t, ACTIONS_NUM + 1>()));
 
     Timer total_timer;
 
@@ -243,10 +244,14 @@ Answer TestSystem::simulate(uint32_t steps_num) {
         std::array<uint32_t, ACTIONS_NUM> actions_num{};
         for (uint32_t r = 0; r < get_robots().size(); r++) {
             auto &robot = get_robots()[r];
+            auto action = static_cast<uint32_t>(actions[r]);
+            answer.heatmap[robot.pos.get_row()][robot.pos.get_col()][action]++;
+            answer.heatmap[robot.pos.get_row()][robot.pos.get_col()].back()++;
+            actions_num[action]++;
+            total_actions_num[action]++;
+
             robot.pos = robot.pos.simulate(actions[r]);
             robot.node = get_graph().get_node(robot.pos);
-            actions_num[static_cast<uint32_t>(actions[r])]++;
-            total_actions_num[static_cast<uint32_t>(actions[r])]++;
         }
 
         update();
