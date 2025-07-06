@@ -1,5 +1,5 @@
-#include <omapfs/environment/info.hpp>
-#include <omapfs/environment/test_system.hpp>
+#include <environment/info.hpp>
+#include <environment/test_system.hpp>
 
 int main() {
     // EPIBT: 3459

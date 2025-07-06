@@ -10,13 +10,13 @@ include_directories("src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 file(GLOB SOURCES
-        src/omapfs/basic/*.cpp
-        src/omapfs/environment/*.cpp
+        src/basic/*.cpp
+        src/environment/*.cpp
 
-        src/omapfs/planner/*.cpp
-        src/omapfs/planner/epibt/*.cpp
+        src/planner/*.cpp
+        src/planner/epibt/*.cpp
 
-        src/omapfs/scheduler/greedy/*.cpp
+        src/scheduler/greedy/*.cpp
         )
 
 add_executable(main src/main.cpp ${SOURCES})
