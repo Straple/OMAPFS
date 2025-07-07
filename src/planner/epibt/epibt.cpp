@@ -203,8 +203,8 @@ void EPIBT::build(uint32_t r) {
     }
 }
 
-EPIBT::EPIBT(TimePoint end_time)
-    : end_time(end_time), desires(get_robots().size()), visited(get_robots().size()) {
+EPIBT::EPIBT(TimePoint end_time, const std::vector<uint32_t> &operations)
+    : end_time(end_time), desires(operations), visited(get_robots().size()) {
 
     Timer timer;
 
@@ -286,14 +286,15 @@ EPIBT::EPIBT(TimePoint end_time)
         });
     }
 
+    ASSERT(operations == desires, "invalid desires");
     for (uint32_t r = 0; r < get_robots().size(); r++) {
         add_path(r);
     }
 }
 
 void EPIBT::solve() {
-    for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
-        visited_counter++;
+    //for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
+    //    visited_counter++;
         for (uint32_t r: order) {
             if (get_now() >= end_time) {
                 break;
@@ -303,11 +304,15 @@ void EPIBT::solve() {
                 build(r);
             }
         }
-    }
+    //}
 }
 
 double EPIBT::get_score() const {
     return cur_score;
+}
+
+std::vector<uint32_t> EPIBT::get_desires() const {
+    return desires;
 }
 
 std::vector<ActionType> EPIBT::get_actions() const {

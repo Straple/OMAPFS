@@ -1,23 +1,23 @@
 #include <planner/epibt/pepibt_lns.hpp>
 
-#include <planner/epibt/epibt_lns.hpp>
 #include <basic/tools.hpp>
+#include <planner/epibt/epibt_lns.hpp>
 
-PEPIBT_LNS::PEPIBT_LNS(TimePoint end_time) : end_time(end_time), actions(get_robots().size(), ActionType::WAIT) {
+PEPIBT_LNS::PEPIBT_LNS(TimePoint end_time, const std::vector<uint32_t> &operations) : end_time(end_time), best_actions(get_robots().size(), ActionType::WAIT), best_desires(operations) {
 }
 
 void PEPIBT_LNS::solve(uint64_t seed) {
     Timer timer;
-    EPIBT_LNS main(end_time);
+    EPIBT_LNS main(end_time, best_desires);
     main.EPIBT::solve();
 
-    // (score, actions, time, epibt_steps, lns_steps)
-    using ItemType = std::tuple<double, std::vector<ActionType>, uint32_t, uint32_t, uint32_t>;
+    // (score, actions, desires, time, epibt_steps, lns_steps)
+    using ItemType = std::tuple<double, std::vector<ActionType>, std::vector<uint32_t>, uint32_t, uint32_t, uint32_t>;
 
     constexpr uint32_t THR = THREADS_NUM;
     std::vector<std::vector<ItemType>> results_pack(THR);
 
-    results_pack[0].emplace_back(main.get_score(), main.get_actions(), timer.get_ms(), main.get_epibt_steps(), main.get_lns_steps());
+    results_pack[0].emplace_back(main.get_score(), main.get_actions(), main.get_desires(), timer.get_ms(), main.get_epibt_steps(), main.get_lns_steps());
 
     launch_threads(THR, [&](uint32_t thr) {
         Randomizer rnd(seed * (thr + 1) + 426136423);
@@ -26,7 +26,7 @@ void PEPIBT_LNS::solve(uint64_t seed) {
             EPIBT_LNS solver = main;
             solver.parallel_solve(rnd.get());
             auto time = timer.get_ms();
-            results_pack[thr].emplace_back(solver.get_score(), solver.get_actions(), time, solver.get_epibt_steps(), solver.get_lns_steps());
+            results_pack[thr].emplace_back(solver.get_score(), solver.get_actions(), solver.get_desires(), time, solver.get_epibt_steps(), solver.get_lns_steps());
         }
     });
 
@@ -42,14 +42,19 @@ void PEPIBT_LNS::solve(uint64_t seed) {
         return std::get<0>(lhs) > std::get<0>(rhs);
     });
 
-    for (const auto &[score, plan, time, epibt_steps, lns_steps]: results) {
+    for (const auto &[score, actions, desires, time, epibt_steps, lns_steps]: results) {
         if (best_score < score) {
             best_score = score;
-            actions = plan;
+            best_actions = actions;
+            best_desires = desires;
         }
     }
 }
 
+std::vector<uint32_t> PEPIBT_LNS::get_desires() const {
+    return best_desires;
+}
+
 std::vector<ActionType> PEPIBT_LNS::get_actions() const {
-    return actions;
+    return best_actions;
 }

@@ -21,7 +21,7 @@ class EPIBT_LNS : public EPIBT {
     void try_build(uint32_t r);
 
 public:
-    EPIBT_LNS(TimePoint end_time);
+    EPIBT_LNS(TimePoint end_time, const std::vector<uint32_t>& operations);
 
     void solve(uint64_t seed);
 

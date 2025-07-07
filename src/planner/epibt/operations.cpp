@@ -186,7 +186,7 @@ std::vector<Operation> OperationsGenerator::get() {
     for (auto operation: result) {
         std::cout << operation << ' ';
     }
-    std::cout << '\n';
+    std::cout << std::endl;
     //_exit(100);
     return result;
 }
@@ -202,6 +202,14 @@ uint32_t get_operation_depth(uint32_t index) {
     ASSERT(0 <= index && index < operation_depth.size(), "invalid index");
     ASSERT(operation_depth.size() == get_operations().size(), "unmatch sizes");
     return operation_depth[index];
+}
+
+static inline std::vector<uint32_t> operation_next;
+
+uint32_t get_operation_next(uint32_t index) {
+    ASSERT(0 <= index && index < operation_next.size(), "invalid index");
+    ASSERT(operation_next.size() == get_operations().size(), "unmatch sizes");
+    return operation_next[index];
 }
 
 std::vector<uint32_t> &get_operations_ids(uint32_t d) {
@@ -220,8 +228,26 @@ void init_operations() {
         return d;
     };
 
+    auto get_operation_next = [&](Operation op) {
+        // ABC -> BCW
+
+        for (uint32_t i = 0; i + 1 < EPIBT_DEPTH; i++) {
+            op[i] = op[i + 1];
+        }
+        op.back() = ActionType::WAIT;
+        for (uint32_t i = 0; i < get_operations().size(); i++) {
+            if (get_operations()[i] == op) {
+                return i;
+            }
+        }
+        FAILED_ASSERT("failed to get next operation");
+        return uint32_t();
+    };
+
     operation_depth.resize(get_operations().size());
+    operation_next.resize(get_operations().size());
     for (uint32_t i = 0; i < get_operations().size(); i++) {
+        operation_next[i] = get_operation_next(get_operations()[i]);
         uint32_t d = get_operation_depth(get_operations()[i]);
         operation_depth[i] = d;
         get_operations_ids(d).push_back(i);

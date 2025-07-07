@@ -119,19 +119,34 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
-    TimePoint end_time = get_now() + Milliseconds(100);
+    TimePoint end_time = get_now() + Milliseconds(30);
     if (get_planner_type() == PlannerType::EPIBT) {
-        EPIBT epibt(end_time);
-        epibt.solve();
-        actions = epibt.get_actions();
+        static std::vector<uint32_t> prev_operations(get_robots().size());
+        EPIBT solver(end_time, prev_operations);
+        solver.solve();
+        actions = solver.get_actions();
+        prev_operations = solver.get_desires();
+        for (uint32_t r = 0; r < prev_operations.size(); r++) {
+            prev_operations[r] = get_operation_next(prev_operations[r]);
+        }
     } else if (get_planner_type() == PlannerType::EPIBT_LNS) {
-        EPIBT_LNS pibt(end_time);
-        pibt.solve(42);
-        actions = pibt.get_actions();
+        static std::vector<uint32_t> prev_operations(get_robots().size());
+        EPIBT_LNS solver(end_time, prev_operations);
+        solver.solve(42);
+        actions = solver.get_actions();
+        prev_operations = solver.get_desires();
+        for (uint32_t r = 0; r < prev_operations.size(); r++) {
+            prev_operations[r] = get_operation_next(prev_operations[r]);
+        }
     } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
-        PEPIBT_LNS pibt(end_time);
-        pibt.solve(42);
-        actions = pibt.get_actions();
+        static std::vector<uint32_t> prev_operations(get_robots().size());
+        PEPIBT_LNS solver(end_time, prev_operations);
+        solver.solve(42);
+        actions = solver.get_actions();
+        prev_operations = solver.get_desires();
+        for (uint32_t r = 0; r < prev_operations.size(); r++) {
+            prev_operations[r] = get_operation_next(prev_operations[r]);
+        }
     } else {
         FAILED_ASSERT("unexpected planner type");
     }
@@ -189,7 +204,7 @@ Answer TestSystem::simulate(uint32_t steps_num) {
 
         // update task pool
         if (get_scheduler_type() != SchedulerType::CONST) {
-            while (get_task_pool().size() < get_robots().size() * 1.5) {
+            while (get_task_pool().size() * 2 < get_robots().size() * 3) {
                 get_task_pool().gen_next_task();
             }
         }

@@ -4,9 +4,6 @@
 #include <fstream>
 
 int main() {
-    // EPIBT: 3459
-    // EPIBT+LNS: 4500
-    // PEPIBT+LNS: 5027
     get_planner_type() = PlannerType::EPIBT;
     get_scheduler_type() = SchedulerType::GREEDY;
 

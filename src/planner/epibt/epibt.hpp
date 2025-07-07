@@ -13,7 +13,7 @@ protected:
 
     uint32_t epibt_step = 0;
 
-    uint32_t available_operation_depth = 0;
+    uint32_t available_operation_depth = -1;
 
     uint32_t visited_counter = 1;
 
@@ -62,11 +62,13 @@ protected:
     void build(uint32_t r);
 
 public:
-    EPIBT(TimePoint end_time);
+    EPIBT(TimePoint end_time, const std::vector<uint32_t>& operations);
 
     void solve();
 
     [[nodiscard]] double get_score() const;
+
+    [[nodiscard]] std::vector<uint32_t> get_desires() const;
 
     [[nodiscard]] std::vector<ActionType> get_actions() const;
 
