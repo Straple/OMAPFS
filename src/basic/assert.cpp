@@ -2,6 +2,7 @@
 
 #include <csignal>
 #include <iostream>
+#include <unistd.h>
 
 bool my_assert_failed(const std::string &message, const std::string &filename, const int line) {
     std::cerr.flush();

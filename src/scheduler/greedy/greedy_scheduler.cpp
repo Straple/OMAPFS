@@ -8,6 +8,8 @@
 #include <environment/robot.hpp>
 #include <environment/task.hpp>
 
+#include <algorithm>
+#include <atomic>
 #include <queue>
 #include <set>
 #include <unordered_set>

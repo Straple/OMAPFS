@@ -20,3 +20,4 @@ file(GLOB SOURCES
         )
 
 add_executable(main src/main.cpp ${SOURCES})
+target_link_libraries(main Threads::Threads)
