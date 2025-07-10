@@ -1,6 +1,6 @@
 #include <environment/graph_guidance.hpp>
 
-#include <basic/assert.hpp>
+#include <utils/assert.hpp>
 #include <environment/position.hpp>
 
 GraphGuidance::GraphGuidance(uint32_t rows, uint32_t cols) : rows(rows), cols(cols), graph(rows * cols + 1) {

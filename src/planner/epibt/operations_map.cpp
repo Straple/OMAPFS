@@ -1,6 +1,6 @@
 #include <planner/epibt/operations_map.hpp>
 
-#include <basic/assert.hpp>
+#include <utils/assert.hpp>
 
 std::tuple<Path, Path, Path> get_paths(uint32_t node, const Operation &operation) {
     if (!node) {

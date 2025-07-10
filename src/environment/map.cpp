@@ -1,6 +1,6 @@
 #include <environment/map.hpp>
 
-#include <basic/assert.hpp>
+#include <utils/assert.hpp>
 
 uint32_t Map::get_rows() const {
     return rows;

@@ -1,6 +1,6 @@
 #include <environment/answer.hpp>
 
-#include <basic/assert.hpp>
+#include <utils/assert.hpp>
 #include <environment/graph.hpp>
 
 #include <map>

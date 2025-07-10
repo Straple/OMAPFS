@@ -1,6 +1,6 @@
 #include <planner/epibt/epibt_lns.hpp>
 
-#include <basic/assert.hpp>
+#include <utils/assert.hpp>
 #include <environment/info.hpp>
 
 bool EPIBT_LNS::consider() {

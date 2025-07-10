@@ -1,15 +1,24 @@
+#include <utils/config.hpp>
 #include <environment/info.hpp>
 #include <environment/test_system.hpp>
 
 #include <fstream>
+#include <iostream>
 
-int main() {
-    get_planner_type() = PlannerType::EPIBT;
-    get_scheduler_type() = SchedulerType::GREEDY;
+int main(int argc, char* argv[]) {
+    RuntimeConfig config;
+    
+    if (argc >= 2) {
+        std::string config_file = argv[1];
+        std::cout << "Loading config file: " << config_file << std::endl;
+        config = load_config(config_file);
+    } else {
+        std::cout << "No config file specified, using default values" << std::endl;
+    }
+    apply_runtime_config(config);
 
-    TestSystem test_system("tests/random/random-32-32-20.map", "tests/random/tasks.csv", "tests/random/agents_400.csv");
+    TestSystem test_system(config.map_file, config.tasks_file, config.agents_file);
     Answer answer = test_system.simulate(1000);
-
     for (uint32_t action = 0; action <= ACTIONS_NUM; action++) {
         std::string filename = "heatmap_";
         if (action < ACTIONS_NUM) {
