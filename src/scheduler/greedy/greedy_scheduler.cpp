@@ -1,13 +1,15 @@
 #include <scheduler/greedy/greedy_scheduler.hpp>
 
-#include <basic/assert.hpp>
-#include <basic/time.hpp>
-#include <basic/tools.hpp>
+#include <utils/assert.hpp>
+#include <utils/time.hpp>
+#include <utils/tools.hpp>
 #include <environment/heuristic_matrix.hpp>
 #include <environment/info.hpp>
 #include <environment/robot.hpp>
 #include <environment/task.hpp>
 
+#include <algorithm>
+#include <atomic>
 #include <queue>
 #include <set>
 #include <unordered_set>

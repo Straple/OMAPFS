@@ -2,13 +2,33 @@
 
 #include <cstdint>
 
-#define ENABLE_ROTATE_MODEL
+// Compile-time settings now controlled by CMake options:
+// -DENABLE_ROTATE_MODEL=ON/OFF
+// -DENABLE_ASSERT=ON/OFF  
+// -DENABLE_SCHEDULER_CHANGE_TASK=ON/OFF
+// -DEPIBT_DEPTH=<value>
+// -DTHREADS_NUM_DEFAULT=<value>
 
-#define ENABLE_ASSERT
+// These are now defined by CMake, but we provide fallback defaults:
 
-#define ENABLE_SCHEDULER_CHANGE_TASK
+#ifndef ENABLE_ROTATE_MODEL
+//#define ENABLE_ROTATE_MODEL  // Controlled by CMake option
+#endif
 
-constexpr uint32_t THREADS_NUM = 8;
+#ifndef ENABLE_ASSERT
+#define ENABLE_ASSERT  // Default: enabled
+#endif
+
+#ifndef ENABLE_SCHEDULER_CHANGE_TASK
+#define ENABLE_SCHEDULER_CHANGE_TASK  // Default: enabled
+#endif
+
+#ifndef THREADS_NUM_DEFAULT
+#define THREADS_NUM_DEFAULT 8  // Default fallback
+#endif
+
+// Use the CMake-defined value, or fallback
+constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
 
 /* TODO
  * 1) добавить GraphGuidanceBuilder, который строит GG для разных карт
