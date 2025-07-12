@@ -1,7 +1,7 @@
 #include <planner/epibt/operations.hpp>
 
-#include <utils/assert.hpp>
 #include <environment/position.hpp>
+#include <utils/assert.hpp>
 
 #include <fstream>
 #include <set>

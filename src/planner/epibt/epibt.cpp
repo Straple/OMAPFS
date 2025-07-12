@@ -1,24 +1,24 @@
 #include <planner/epibt/epibt.hpp>
 
-#include <utils/assert.hpp>
-#include <utils/tools.hpp>
 #include <environment/heuristic_matrix.hpp>
 #include <planner/epibt/operations_map.hpp>
+#include <utils/assert.hpp>
+#include <utils/tools.hpp>
 
 #include <algorithm>
 #include <numeric>
 
 bool EPIBT::validate_path(uint32_t r, uint32_t desired) const {
-    ASSERT(0 <= r && r < get_robots().size(), "invalid r");
+    ASSERT(0 <= r && r < robots.size(), "invalid r");
     ASSERT(0 <= desired && desired < get_operations().size(), "invalid desired");
-    uint32_t node = get_robots()[r].node;
+    uint32_t node = robots[r].node;
     return get_omap().get_poses_path(node, desired)[0] > 0;
 }
 
 uint32_t EPIBT::get_used(uint32_t r) const {
     uint32_t answer = -1;
 
-    auto &poses_path = get_omap().get_poses_path(get_robots()[r].node, desires[r]);
+    auto &poses_path = get_omap().get_poses_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         if (used_pos[to_pos][depth] != -1) {
@@ -30,7 +30,7 @@ uint32_t EPIBT::get_used(uint32_t r) const {
         }
     }
 
-    const auto &edges_path = get_omap().get_edges_path(get_robots()[r].node, desires[r]);
+    const auto &edges_path = get_omap().get_edges_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_edge = edges_path[depth];
         if (used_edge[to_edge][depth] != -1) {
@@ -45,14 +45,14 @@ uint32_t EPIBT::get_used(uint32_t r) const {
 }
 
 int64_t EPIBT::get_smart_dist_IMPL(uint32_t r, uint32_t desired) const {
-    if (get_robots()[r].is_disable()) {
+    if (robots[r].is_disable()) {
         return desired;
     }
 
     const auto &op = get_operations()[desired];
-    const auto &path = get_omap().get_nodes_path(get_robots()[r].node, desired);
+    const auto &path = get_omap().get_nodes_path(robots[r].node, desired);
 
-    const uint32_t target = get_robots()[r].target;
+    const uint32_t target = robots[r].target;
 
     int64_t dist = get_hm().get(path.back(), target);
 
@@ -97,10 +97,10 @@ void EPIBT::update_score(uint32_t r, uint32_t desired, int sign) {
 }
 
 void EPIBT::add_path(uint32_t r) {
-    ASSERT(0 <= r && r < get_robots().size(), "invalid r");
+    ASSERT(0 <= r && r < robots.size(), "invalid r");
     ASSERT(0 <= desires[r] && desires[r] < get_operations().size(), "invalid desired");
 
-    const auto &poses_path = get_omap().get_poses_path(get_robots()[r].node, desires[r]);
+    const auto &poses_path = get_omap().get_poses_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         ASSERT(to_pos < used_pos.size(), "invalid to_pos");
@@ -108,7 +108,7 @@ void EPIBT::add_path(uint32_t r) {
         used_pos[to_pos][depth] = r;
     }
 
-    const auto &edges_path = get_omap().get_edges_path(get_robots()[r].node, desires[r]);
+    const auto &edges_path = get_omap().get_edges_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_edge = edges_path[depth];
         if (to_edge) {
@@ -122,17 +122,17 @@ void EPIBT::add_path(uint32_t r) {
 }
 
 void EPIBT::remove_path(uint32_t r) {
-    ASSERT(0 <= r && r < get_robots().size(), "invalid r");
+    ASSERT(0 <= r && r < robots.size(), "invalid r");
     ASSERT(0 <= desires[r] && desires[r] < get_operations().size(), "invalid desired");
 
-    const auto &poses_path = get_omap().get_poses_path(get_robots()[r].node, desires[r]);
+    const auto &poses_path = get_omap().get_poses_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         ASSERT(to_pos < used_pos.size(), "invalid to_pos");
         ASSERT(used_pos[to_pos][depth] == r, "invalid node");
         used_pos[to_pos][depth] = -1;
     }
-    const auto &edges_path = get_omap().get_edges_path(get_robots()[r].node, desires[r]);
+    const auto &edges_path = get_omap().get_edges_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_edge = edges_path[depth];
         if (to_edge) {
@@ -162,9 +162,9 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
             add_path(r);
             return RetType::ACCEPTED;
         } else if (to_r != -2) {
-            ASSERT(0 <= to_r && to_r < get_robots().size(), "invalid to_r: " + std::to_string(to_r));
+            ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            /*if (get_robots()[r].priority >= get_robots()[to_r].priority) {
+            /*if (robots[r].priority >= robots[to_r].priority) {
                 continue;
             }*/
 
@@ -203,29 +203,29 @@ void EPIBT::build(uint32_t r) {
     }
 }
 
-EPIBT::EPIBT(TimePoint end_time, const std::vector<uint32_t> &operations)
-    : end_time(end_time), desires(operations), visited(get_robots().size()) {
+EPIBT::EPIBT(Robots move_robots, TimePoint end_time, const std::vector<uint32_t> &operations)
+    : robots(std::move(move_robots)), end_time(end_time), desires(operations), visited(robots.size()) {
 
     Timer timer;
 
     {
-        order.resize(get_robots().size());
+        order.resize(robots.size());
         std::iota(order.begin(), order.end(), 0);
         std::stable_sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
-            return get_robots()[lhs].priority < get_robots()[rhs].priority;
+            return robots[lhs].priority < robots[rhs].priority;
         });
 
-        std::vector<int32_t> weight(get_robots().size());
+        std::vector<int32_t> weight(robots.size());
 
-        for (uint32_t i = 0; i < get_robots().size(); i++) {
+        for (uint32_t i = 0; i < robots.size(); i++) {
             weight[order[i]] = i;
         }
-        int32_t max_weight = get_robots().size() + 1;
+        int32_t max_weight = robots.size() + 1;
 
-        robot_power.resize(get_robots().size());
-        for (uint32_t r = 0; r < get_robots().size(); r++) {
+        robot_power.resize(robots.size());
+        for (uint32_t r = 0; r < robots.size(); r++) {
             double power = (max_weight - weight[r]) * 1.0 / max_weight;
-            if (get_robots()[r].is_disable()) {
+            if (robots[r].is_disable()) {
                 power = 0;
             }
             power = power * power;
@@ -248,10 +248,10 @@ EPIBT::EPIBT(TimePoint end_time, const std::vector<uint32_t> &operations)
 
     // init smart_dist_dp
     {
-        smart_dist_dp.resize(get_robots().size(), std::vector<int64_t>(get_operations().size()));
+        smart_dist_dp.resize(robots.size(), std::vector<int64_t>(get_operations().size()));
 
         launch_threads(THREADS_NUM, [&](uint32_t thr) {
-            for (uint32_t r = thr; r < get_robots().size(); r += THREADS_NUM) {
+            for (uint32_t r = thr; r < robots.size(); r += THREADS_NUM) {
                 for (uint32_t desired = 0; desired < get_operations().size(); desired++) {
                     if (!validate_path(r, desired)) {
                         continue;
@@ -264,10 +264,10 @@ EPIBT::EPIBT(TimePoint end_time, const std::vector<uint32_t> &operations)
 
     // init robot_desires
     {
-        robot_desires.resize(get_robots().size());
+        robot_desires.resize(robots.size());
 
         launch_threads(THREADS_NUM, [&](uint32_t thr) {
-            for (uint32_t r = thr; r < get_robots().size(); r += THREADS_NUM) {
+            for (uint32_t r = thr; r < robots.size(); r += THREADS_NUM) {
                 // (priority, desired)
                 std::vector<std::pair<int64_t, uint32_t>> steps;
                 for (uint32_t desired = 1; desired < get_operations().size(); desired++) {
@@ -287,7 +287,7 @@ EPIBT::EPIBT(TimePoint end_time, const std::vector<uint32_t> &operations)
     }
 
     ASSERT(operations == desires, "invalid desires");
-    for (uint32_t r = 0; r < get_robots().size(); r++) {
+    for (uint32_t r = 0; r < robots.size(); r++) {
         add_path(r);
     }
 }
@@ -295,15 +295,15 @@ EPIBT::EPIBT(TimePoint end_time, const std::vector<uint32_t> &operations)
 void EPIBT::solve() {
     //for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
     //    visited_counter++;
-        for (uint32_t r: order) {
-            if (get_now() >= end_time) {
-                break;
-            }
-            epibt_step++;
-            if (visited[r] != visited_counter) {
-                build(r);
-            }
+    for (uint32_t r: order) {
+        if (get_now() >= end_time) {
+            break;
         }
+        epibt_step++;
+        if (visited[r] != visited_counter) {
+            build(r);
+        }
+    }
     //}
 }
 
@@ -316,13 +316,13 @@ std::vector<uint32_t> EPIBT::get_desires() const {
 }
 
 std::vector<ActionType> EPIBT::get_actions() const {
-    std::vector<ActionType> answer(get_robots().size());
-    for (uint32_t r = 0; r < get_robots().size(); r++) {
+    std::vector<ActionType> answer(robots.size());
+    for (uint32_t r = 0; r < robots.size(); r++) {
         const auto &op = get_operations()[desires[r]];
         answer[r] = op[0];
 
         /*#ifdef ENABLE_ROTATE_MODEL
-        if (get_robots()[r].is_disable()) {
+        if (robots[r].is_disable()) {
             continue;
         }
         // перебирает набор действий и выбирает лучшее по расстоянию до цели
@@ -330,7 +330,7 @@ std::vector<ActionType> EPIBT::get_actions() const {
             ASSERT(!actions.empty(), "is empty");
             std::vector<uint32_t> dists;
             for (auto action: actions) {
-                dists.push_back(get_hm().get(get_graph().get_to_node(get_robots()[r].node, static_cast<uint32_t>(action)), get_robots()[r].target));
+                dists.push_back(get_hm().get(get_graph().get_to_node(robots[r].node, static_cast<uint32_t>(action)), robots[r].target));
             }
             uint32_t best_i = 0;
             for (uint32_t i = 0; i < actions.size(); i++) {

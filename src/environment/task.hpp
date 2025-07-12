@@ -29,6 +29,8 @@ public:
 
     Task &at(uint32_t task_id);
 
+    const Task &at(uint32_t task_id) const;
+
     void insert(const Task &task);
 
     void erase(uint32_t task_id);
@@ -39,11 +41,13 @@ public:
 
     std::unordered_map<uint32_t, Task>::iterator end();
 
+    std::unordered_map<uint32_t, Task>::const_iterator begin() const;
+
+    std::unordered_map<uint32_t, Task>::const_iterator end() const;
+
     void gen_next_task();
 
-    uint32_t gen_const_next_task(uint32_t r);
+    uint32_t gen_const_next_task(uint32_t r, uint32_t agents_num);
 
     friend std::istream &operator>>(std::istream &input, TaskPool &pool);
 };
-
-TaskPool &get_task_pool();

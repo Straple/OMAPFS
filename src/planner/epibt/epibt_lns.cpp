@@ -1,7 +1,7 @@
 #include <planner/epibt/epibt_lns.hpp>
 
-#include <utils/assert.hpp>
 #include <environment/info.hpp>
+#include <utils/assert.hpp>
 
 bool EPIBT_LNS::consider() {
     return old_score - 1e-6 <= cur_score
@@ -33,7 +33,7 @@ EPIBT_LNS::RetType EPIBT_LNS::try_build(uint32_t r, uint32_t &counter) {
                 return RetType::REJECTED;
             }
         } else if (to_r != -2) {
-            ASSERT(0 <= to_r && to_r < get_robots().size(), "invalid to_r");
+            ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r");
 
             if (visited[to_r] == visited_counter || rnd.get_d() < 0.3 || counter > 3'000) {
                 continue;
@@ -72,8 +72,8 @@ void EPIBT_LNS::try_build(uint32_t r) {
     }
 }
 
-EPIBT_LNS::EPIBT_LNS(TimePoint end_time, const std::vector<uint32_t>& operations)
-    : EPIBT(end_time, operations) {
+EPIBT_LNS::EPIBT_LNS(Robots robots, TimePoint end_time, const std::vector<uint32_t> &operations)
+    : EPIBT(std::move(robots), end_time, operations) {
 }
 
 void EPIBT_LNS::solve(uint64_t seed) {
@@ -82,7 +82,7 @@ void EPIBT_LNS::solve(uint64_t seed) {
     rnd = Randomizer(seed);
     temp = 0.001;
     while (get_now() < end_time) {
-        uint32_t r = rnd.get(0, get_robots().size() - 1);
+        uint32_t r = rnd.get(0, robots.size() - 1);
         try_build(r);
         temp *= 0.999;
         lns_step++;
@@ -92,8 +92,8 @@ void EPIBT_LNS::solve(uint64_t seed) {
 void EPIBT_LNS::parallel_solve(uint64_t seed) {
     rnd = Randomizer(seed);
     temp = 0.001;
-    while (get_now() < end_time && lns_step < get_robots().size() * 10) {
-        uint32_t r = rnd.get(0, get_robots().size() - 1);
+    while (get_now() < end_time && lns_step < robots.size() * 10) {
+        uint32_t r = rnd.get(0, robots.size() - 1);
         try_build(r);
         temp *= 0.999;
         lns_step++;

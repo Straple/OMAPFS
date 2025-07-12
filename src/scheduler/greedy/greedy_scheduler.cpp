@@ -1,12 +1,12 @@
 #include <scheduler/greedy/greedy_scheduler.hpp>
 
-#include <utils/assert.hpp>
-#include <utils/time.hpp>
-#include <utils/tools.hpp>
 #include <environment/heuristic_matrix.hpp>
 #include <environment/info.hpp>
 #include <environment/robot.hpp>
 #include <environment/task.hpp>
+#include <utils/assert.hpp>
+#include <utils/time.hpp>
+#include <utils/tools.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -44,7 +44,7 @@ uint64_t GreedyScheduler::get_dist(uint32_t r, uint32_t t) const {
         return 1e6;
     }
 
-    uint32_t source = get_robots()[r].node;
+    uint32_t source = robots[r].node;
     uint64_t dist_to_target = get_hm().get(source, task_target[t]);
     uint64_t dist = dist_to_target * 5 + task_metric[t];
     ASSERT(static_cast<uint32_t>(dist) == dist, "overflow");
@@ -85,8 +85,11 @@ void GreedyScheduler::validate() {
     }
 }
 
+GreedyScheduler::GreedyScheduler(Robots &robots, TaskPool &task_pool) : robots(robots), task_pool(task_pool) {
+}
+
 void GreedyScheduler::update() {
-    desires.resize(get_robots().size(), -1);
+    desires.resize(robots.size(), -1);
     timestep_updated.resize(desires.size());
     dp.resize(desires.size());
 
@@ -94,7 +97,7 @@ void GreedyScheduler::update() {
     free_tasks.clear();
 
     // build free_tasks
-    for (auto &[t, task]: get_task_pool()) {
+    for (auto &[t, task]: task_pool) {
         if (
                 task.agent_assigned == -1// нет агента
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
@@ -102,9 +105,9 @@ void GreedyScheduler::update() {
 #endif
         ) {
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-            if(task.agent_assigned != -1) {
-                get_robots()[task.agent_assigned].task_id = -1;
-                get_robots()[task.agent_assigned].target = 0;
+            if (task.agent_assigned != -1) {
+                robots[task.agent_assigned].task_id = -1;
+                robots[task.agent_assigned].target = 0;
                 task.agent_assigned = -1;
             }
 #endif
@@ -113,20 +116,20 @@ void GreedyScheduler::update() {
     }
 
     // build free_robots
-    for (uint32_t r = 0; r < get_robots().size(); r++) {
-        uint32_t t = get_robots()[r].task_id;
+    for (uint32_t r = 0; r < robots.size(); r++) {
+        uint32_t t = robots[r].task_id;
 
         // есть задача и она в процессе выполнения
         // не можем ее убрать
-        if (get_task_pool().contains(t) && get_task_pool().at(t).is_taken) {
+        if (task_pool.contains(t) && task_pool.at(t).is_taken) {
             desires[r] = t;
             continue;
         }
         if (
                 // нет задачи
-                !get_task_pool().contains(t)
+                !task_pool.contains(t)
 #ifdef ENABLE_SCHEDULER_CHANGE_TASK
-                || !get_task_pool().at(t).is_taken
+                || !task_pool.at(t).is_taken
 #endif
         ) {
             free_robots.push_back(r);
@@ -141,7 +144,7 @@ void GreedyScheduler::update() {
                 task_metric.resize(t + 1, -1);
                 task_target.resize(t + 1);
             }
-            auto &task = get_task_pool().at(t);
+            auto &task = task_pool.at(t);
             task_target[t] = task.targets[0];
 
             uint32_t d = 0;
@@ -187,11 +190,11 @@ void GreedyScheduler::solve(TimePoint end_time) {
             return false;
         }
         // this task is not available
-        if (!get_task_pool().contains(task_id)) {
+        if (!task_pool.contains(task_id)) {
             return false;
         }
         // robot already used this task
-        if (get_task_pool().at(task_id).agent_assigned != -1) {
+        if (task_pool.at(task_id).agent_assigned != -1) {
             return false;
         }
         return true;
@@ -222,8 +225,8 @@ void GreedyScheduler::solve(TimePoint end_time) {
             continue;
         }
 
-        ASSERT(get_task_pool().contains(task_id), "no contains");
-        ASSERT(get_task_pool().at(task_id).agent_assigned == -1, "already assigned");
+        ASSERT(task_pool.contains(task_id), "no contains");
+        ASSERT(task_pool.at(task_id).agent_assigned == -1, "already assigned");
         ASSERT(!used_task.count(task_id), "already used");
 
         add(r, task_id);

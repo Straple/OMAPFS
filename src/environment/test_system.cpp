@@ -52,10 +52,10 @@ void TestSystem::gen_random_agents() {
 
 void TestSystem::update() {
     // update tasks
-    for (uint32_t r = 0; r < get_robots().size(); r++) {
-        auto &robot = get_robots()[r];
+    for (uint32_t r = 0; r < robots.size(); r++) {
+        auto &robot = robots[r];
         if (robot.task_id != -1) {
-            auto &task = get_task_pool().at(robot.task_id);
+            auto &task = task_pool.at(robot.task_id);
             if (robot.pos.get_pos() == task.targets[0]) {
                 task.is_taken = true;
                 task.targets.erase(task.targets.begin());
@@ -64,17 +64,17 @@ void TestSystem::update() {
                     robot.target = 0;
                     robot.priority = -1;
                     finished_tasks.push_back(task.task_id);
-                    get_task_pool().erase(task.task_id);
+                    task_pool.erase(task.task_id);
                 }
             }
         }
     }
 
     // update metrics
-    for (uint32_t r = 0; r < get_robots().size(); r++) {
-        auto &robot = get_robots()[r];
+    for (uint32_t r = 0; r < robots.size(); r++) {
+        auto &robot = robots[r];
         if (robot.task_id != -1) {
-            auto &task = get_task_pool().at(robot.task_id);
+            auto &task = task_pool.at(robot.task_id);
             robot.target = task.targets[0];
             robot.priority = 0;
 
@@ -97,18 +97,17 @@ void TestSystem::update() {
 std::vector<uint32_t> TestSystem::get_schedule() {
     std::vector<uint32_t> schedule;
     if (get_scheduler_type() == SchedulerType::CONST) {
-        schedule.resize(get_robots().size());
-        for (uint32_t r = 0; r < get_robots().size(); r++) {
-            auto &robot = get_robots()[r];
+        schedule.resize(robots.size());
+        for (uint32_t r = 0; r < robots.size(); r++) {
+            auto &robot = robots[r];
             if (robot.task_id == -1) {
-                uint32_t task_id = get_task_pool().gen_const_next_task(r);
+                uint32_t task_id = task_pool.gen_const_next_task(r, robots.size());
                 schedule[r] = task_id;
             } else {
                 schedule[r] = robot.task_id;
             }
         }
     } else if (get_scheduler_type() == SchedulerType::GREEDY) {
-        static GreedyScheduler scheduler;
         scheduler.update();
         scheduler.rebuild_dp(get_now() + Milliseconds(100));
         scheduler.solve(get_now() + Milliseconds(100));
@@ -121,8 +120,8 @@ std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
     TimePoint end_time = get_now() + Milliseconds(30);
     if (get_planner_type() == PlannerType::EPIBT) {
-        static std::vector<uint32_t> prev_operations(get_robots().size());
-        EPIBT solver(end_time, prev_operations);
+        static std::vector<uint32_t> prev_operations(robots.size());
+        EPIBT solver(robots, end_time, prev_operations);
         solver.solve();
         actions = solver.get_actions();
         prev_operations = solver.get_desires();
@@ -130,8 +129,8 @@ std::vector<ActionType> TestSystem::get_actions() {
             prev_operations[r] = get_operation_next(prev_operations[r]);
         }
     } else if (get_planner_type() == PlannerType::EPIBT_LNS) {
-        static std::vector<uint32_t> prev_operations(get_robots().size());
-        EPIBT_LNS solver(end_time, prev_operations);
+        static std::vector<uint32_t> prev_operations(robots.size());
+        EPIBT_LNS solver(robots, end_time, prev_operations);
         solver.solve(42);
         actions = solver.get_actions();
         prev_operations = solver.get_desires();
@@ -139,8 +138,8 @@ std::vector<ActionType> TestSystem::get_actions() {
             prev_operations[r] = get_operation_next(prev_operations[r]);
         }
     } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
-        static std::vector<uint32_t> prev_operations(get_robots().size());
-        PEPIBT_LNS solver(end_time, prev_operations);
+        static std::vector<uint32_t> prev_operations(robots.size());
+        PEPIBT_LNS solver(robots, end_time, prev_operations);
         solver.solve(42);
         actions = solver.get_actions();
         prev_operations = solver.get_desires();
@@ -153,28 +152,14 @@ std::vector<ActionType> TestSystem::get_actions() {
     return actions;
 }
 
-TestSystem::TestSystem(const std::string &map_filename, const std::string &task_filename, const std::string &robot_filename) {
-    std::ifstream(map_filename) >> get_map();
-    std::ifstream(task_filename) >> get_task_pool();
-
-    // environment
-    get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
-    get_graph() = Graph(get_map(), get_gg());
-    get_hm() = HeuristicMatrix(get_graph());
-
+TestSystem::TestSystem(Robots robots, TaskPool task_pool) : robots(std::move(robots)), task_pool(std::move(task_pool)), scheduler(this->robots, this->task_pool) {
     // gen_random_agents();
-
-    std::ifstream(robot_filename) >> get_robots();
-
-    // epibt
-    init_operations();
-    get_omap() = OperationsMap(get_graph(), get_operations());
 }
 
 Answer TestSystem::simulate(uint32_t steps_num) {
     Answer answer;
     answer.steps_num = steps_num;
-    answer.robots.resize(get_robots().size());
+    answer.robots.resize(robots.size());
     answer.heatmap = std::vector(get_map().get_rows(), std::vector(get_map().get_cols(), std::array<uint64_t, ACTIONS_NUM + 1>()));
 
     Timer total_timer;
@@ -197,15 +182,15 @@ Answer TestSystem::simulate(uint32_t steps_num) {
         get_curr_timestep() = step;
 
         for (uint32_t r = 0; r < answer.robots.size(); r++) {
-            answer.robots[r].positions.push_back(get_robots()[r].pos);
+            answer.robots[r].positions.push_back(robots[r].pos);
         }
 
         update();
 
         // update task pool
         if (get_scheduler_type() != SchedulerType::CONST) {
-            while (get_task_pool().size() * 2 < get_robots().size() * 3) {
-                get_task_pool().gen_next_task();
+            while (task_pool.size() * 2 < robots.size() * 3) {
+                task_pool.gen_next_task();
             }
         }
 
@@ -219,23 +204,23 @@ Answer TestSystem::simulate(uint32_t steps_num) {
             total_scheduler_time += timer.get_ns();
         }
 
-        for (uint32_t r = 0; r < get_robots().size(); r++) {
+        for (uint32_t r = 0; r < robots.size(); r++) {
             answer.robots[r].assigned_task.push_back(schedule[r]);
         }
         answer.tasks.emplace_back();
-        for (auto &[id, task]: get_task_pool()) {
+        for (auto &[id, task]: task_pool) {
             answer.tasks[step][id] = task;
         }
         answer.validate_schedule(step);
 
         // set new schedule
-        for (uint32_t r = 0; r < get_robots().size(); r++) {
-            uint32_t old_t = get_robots()[r].task_id;
+        for (uint32_t r = 0; r < robots.size(); r++) {
+            uint32_t old_t = robots[r].task_id;
             if (old_t != -1) {
-                get_task_pool().at(old_t).agent_assigned = -1;
+                task_pool.at(old_t).agent_assigned = -1;
             }
-            get_robots()[r].task_id = schedule[r];
-            get_task_pool().at(schedule[r]).agent_assigned = r;
+            robots[r].task_id = schedule[r];
+            task_pool.at(schedule[r]).agent_assigned = r;
         }
 
         update();
@@ -250,15 +235,15 @@ Answer TestSystem::simulate(uint32_t steps_num) {
             total_planner_time += timer.get_ns();
         }
 
-        for (uint32_t r = 0; r < get_robots().size(); r++) {
+        for (uint32_t r = 0; r < robots.size(); r++) {
             answer.robots[r].actions.push_back(actions[r]);
         }
 
         answer.validate_actions(step);
 
         std::array<uint32_t, ACTIONS_NUM> actions_num{};
-        for (uint32_t r = 0; r < get_robots().size(); r++) {
-            auto &robot = get_robots()[r];
+        for (uint32_t r = 0; r < robots.size(); r++) {
+            auto &robot = robots[r];
             auto action = static_cast<uint32_t>(actions[r]);
             answer.heatmap[robot.pos.get_row()][robot.pos.get_col()][action]++;
             answer.heatmap[robot.pos.get_row()][robot.pos.get_col()].back()++;
@@ -282,7 +267,7 @@ Answer TestSystem::simulate(uint32_t steps_num) {
     logger << std::fixed << std::setprecision(1);
     logger << "total," << total_finished_tasks << ',';
     for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
-        logger << total_actions_num[action] * 100.0 / steps_num / get_robots().size() << "%,";
+        logger << total_actions_num[action] * 100.0 / steps_num / robots.size() << "%,";
     }
     logger << total_timer.get_ms() << ',' << total_scheduler_time / 1'000'000 << ',' << total_planner_time / 1'000'000 << std::endl;
 

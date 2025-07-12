@@ -1,12 +1,14 @@
 #pragma once
 
-#include <utils/time.hpp>
-#include <planner/epibt/operations.hpp>
 #include <environment/robot.hpp>
+#include <planner/epibt/operations.hpp>
+#include <utils/time.hpp>
 
 // Enhanced Priority Inheritance with BackTracking
 class EPIBT {
 protected:
+    Robots robots;
+
     TimePoint end_time;
 
     double cur_score = 0;
@@ -62,7 +64,7 @@ protected:
     void build(uint32_t r);
 
 public:
-    EPIBT(TimePoint end_time, const std::vector<uint32_t>& operations);
+    EPIBT(Robots robots, TimePoint end_time, const std::vector<uint32_t> &operations);
 
     void solve();
 

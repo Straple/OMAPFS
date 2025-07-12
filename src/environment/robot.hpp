@@ -31,5 +31,3 @@ public:
 
     friend std::istream &operator>>(std::istream &input, Robots &robots);
 };
-
-Robots &get_robots();

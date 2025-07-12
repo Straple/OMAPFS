@@ -4,8 +4,8 @@
 
 #include <array>
 #include <cstdint>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 // Use CMake-defined EPIBT_DEPTH, with fallback default
 #ifndef EPIBT_DEPTH

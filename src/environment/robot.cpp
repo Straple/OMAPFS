@@ -51,8 +51,3 @@ std::istream &operator>>(std::istream &input, Robots &robots) {
     }
     return input;
 }
-
-Robots &get_robots() {
-    static Robots robots;
-    return robots;
-}

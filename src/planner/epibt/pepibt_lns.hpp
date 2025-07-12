@@ -1,11 +1,13 @@
 #pragma once
 
-#include <utils/time.hpp>
-#include <environment/robot.hpp>
 #include <environment/action_model.hpp>
+#include <environment/robot.hpp>
+#include <utils/time.hpp>
 
 // Parallel Enhanced Priority Inheritance with BackTracking + Large Neighborhood Search
 class PEPIBT_LNS {
+
+    Robots robots;
 
     TimePoint end_time;
 
@@ -14,7 +16,7 @@ class PEPIBT_LNS {
     std::vector<uint32_t> best_desires;
 
 public:
-    PEPIBT_LNS(TimePoint end_time, const std::vector<uint32_t> &operations);
+    PEPIBT_LNS(Robots robots, TimePoint end_time, const std::vector<uint32_t> &operations);
 
     void solve(uint64_t seed);
 

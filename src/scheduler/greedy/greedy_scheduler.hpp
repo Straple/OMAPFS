@@ -1,5 +1,8 @@
 #pragma once
 
+#include <environment/robot.hpp>
+#include <environment/task.hpp>
+
 #include <utils/time.hpp>
 
 #include <settings.hpp>
@@ -8,6 +11,10 @@
 #include <vector>
 
 class GreedyScheduler {
+
+    Robots &robots;
+
+    TaskPool &task_pool;
 
     double cur_score = 0;
 
@@ -44,6 +51,8 @@ class GreedyScheduler {
 
 public:
     GreedyScheduler() = default;
+
+    GreedyScheduler(Robots &robots, TaskPool &task_pool);
 
     void update();
 

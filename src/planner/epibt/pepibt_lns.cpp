@@ -1,14 +1,14 @@
 #include <planner/epibt/pepibt_lns.hpp>
 
-#include <utils/tools.hpp>
 #include <planner/epibt/epibt_lns.hpp>
+#include <utils/tools.hpp>
 
-PEPIBT_LNS::PEPIBT_LNS(TimePoint end_time, const std::vector<uint32_t> &operations) : end_time(end_time), best_actions(get_robots().size(), ActionType::WAIT), best_desires(operations) {
+PEPIBT_LNS::PEPIBT_LNS(Robots robots, TimePoint end_time, const std::vector<uint32_t> &operations) : robots(std::move(robots)), end_time(end_time), best_actions(this->robots.size(), ActionType::WAIT), best_desires(operations) {
 }
 
 void PEPIBT_LNS::solve(uint64_t seed) {
     Timer timer;
-    EPIBT_LNS main(end_time, best_desires);
+    EPIBT_LNS main(robots, end_time, best_desires);
     main.EPIBT::solve();
 
     // (score, actions, desires, time, epibt_steps, lns_steps)
