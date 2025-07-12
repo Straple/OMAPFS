@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-uint32_t &get_curr_timestep();
-
 enum class PlannerType {
     PIBT,      // pibt
     PIBT_TF,   // pibt + trafficflow

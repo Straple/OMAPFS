@@ -1,9 +1,11 @@
 #include <environment/answer.hpp>
 
-#include <utils/assert.hpp>
 #include <environment/graph.hpp>
+#include <utils/assert.hpp>
 
+#include <iomanip>
 #include <map>
+#include <numeric>
 
 void Answer::validate_actions(uint32_t step) const {
     // проверить, что нет коллизий по вершинам и ребрам
@@ -68,4 +70,35 @@ void Answer::write_heatmap(std::ostream &output, uint32_t action) const {
         }
         output << '\n';
     }
+}
+
+void Answer::write_heatmap(std::ostream &&output, uint32_t action) const {
+    write_heatmap(output, action);
+}
+
+void Answer::write_log(std::ostream &output) const {
+    output << "timestep,finished tasks,";
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+        output << action_to_char(static_cast<ActionType>(action)) << ',';
+    }
+    output << "time(ms),scheduler time(ms),planner time(ms)\n";
+
+    for (uint32_t timestep = 0; timestep < steps_num; timestep++) {
+        output << timestep << ',' << finished_tasks_in_step[timestep] << ',';
+        for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+            output << actions_num[timestep][action] << ',';
+        }
+        output << static_cast<uint32_t>(step_time[timestep] * 1000) << ',' << static_cast<uint32_t>(scheduler_time[timestep] * 1000) << ',' << static_cast<uint32_t>(planner_time[timestep] * 1000) << '\n';
+    }
+
+    output << std::fixed << std::setprecision(1);
+    output << "total," << finished_tasks.size() << ',';
+    for (uint32_t action = 0; action < ACTIONS_NUM; action++) {
+        output << (static_cast<double>(actions_num.back()[action]) * 100 / steps_num) / static_cast<double>(robots.size()) << "%,";
+    }
+    output << std::accumulate(step_time.begin(), step_time.end(), 0.0) * 1000 << ',' << std::accumulate(scheduler_time.begin(), scheduler_time.end(), 0.0) * 1000 << ',' << std::accumulate(planner_time.begin(), planner_time.end(), 0.0) * 1000 << '\n';
+}
+
+void Answer::write_log(std::ostream &&output) const {
+    write_log(output);
 }

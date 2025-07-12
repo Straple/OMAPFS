@@ -20,7 +20,7 @@ void GreedyScheduler::rebuild_dp(uint32_t r) {
         dp[r].emplace_back(get_dist(r, t), t);
     }
     std::sort(dp[r].begin(), dp[r].end());
-    timestep_updated[r] = get_curr_timestep() + 1;
+    timestep_updated[r] = timestep + 1;
 }
 
 void GreedyScheduler::rebuild_dp(TimePoint end_time) {
@@ -88,7 +88,8 @@ void GreedyScheduler::validate() {
 GreedyScheduler::GreedyScheduler(Robots &robots, TaskPool &task_pool) : robots(robots), task_pool(task_pool) {
 }
 
-void GreedyScheduler::update() {
+void GreedyScheduler::update(uint32_t timestep) {
+    this->timestep = timestep;
     desires.resize(robots.size(), -1);
     timestep_updated.resize(desires.size());
     dp.resize(desires.size());

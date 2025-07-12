@@ -16,6 +16,8 @@ class GreedyScheduler {
 
     TaskPool &task_pool;
 
+    uint32_t timestep = 0;
+
     double cur_score = 0;
 
     // desires[r] = task id
@@ -50,11 +52,9 @@ class GreedyScheduler {
     void validate();
 
 public:
-    GreedyScheduler() = default;
-
     GreedyScheduler(Robots &robots, TaskPool &task_pool);
 
-    void update();
+    void update(uint32_t timestep);
 
     void rebuild_dp(TimePoint end_time);
 

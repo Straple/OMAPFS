@@ -11,24 +11,27 @@
 
 class TestSystem {
 
+    uint32_t timestep = 0;
+
     Robots robots;
+
     TaskPool task_pool;
 
     GreedyScheduler scheduler;
 
     std::vector<uint32_t> finished_tasks;
 
+    std::vector<uint32_t> epibt_prev_operations;
+
     void gen_random_agents();
 
-    void update();
+    void update(Answer &answer);
 
     std::vector<uint32_t> get_schedule();
 
     std::vector<ActionType> get_actions();
 
 public:
-    TestSystem() = default;
-
     TestSystem(Robots robots, TaskPool task_pool);
 
     Answer simulate(uint32_t steps_num);

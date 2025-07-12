@@ -26,9 +26,33 @@ struct Answer {
     // [row][col][action]
     std::vector<std::vector<std::array<uint64_t, ACTIONS_NUM + 1>>> heatmap;
 
+    // (timestep, task_id, agent_id)
+    std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> finished_tasks;
+
+    // [step][action]
+    std::vector<std::array<uint32_t, ACTIONS_NUM>> actions_num;
+
+    // [step]
+    std::vector<uint32_t> finished_tasks_in_step;
+
+    // [step]
+    std::vector<double> scheduler_time;
+
+    // [step]
+    std::vector<double> planner_time;
+
+    // [step]
+    std::vector<double> step_time;
+
     void validate_actions(uint32_t step) const;
 
     void validate_schedule(uint32_t step) const;
 
-    void write_heatmap(std::ostream& output, uint32_t action) const;
+    void write_heatmap(std::ostream &output, uint32_t action) const;
+
+    void write_heatmap(std::ostream &&output, uint32_t action) const;
+
+    void write_log(std::ostream &output) const;
+
+    void write_log(std::ostream &&output) const;
 };
