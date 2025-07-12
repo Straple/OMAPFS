@@ -7,13 +7,15 @@
 
 // Runtime configurable settings (only parameters actually used in code)
 struct RuntimeConfig {
+    MapType map_type = MapType::RANDOM;
     PlannerType planner_type = PlannerType::EPIBT;
     SchedulerType scheduler_type = SchedulerType::CONST;
 
     // TestSystem file paths
-    std::string map_file = "tests/random/random-32-32-20.map";
+    std::string map_file = "tests/random/map.txt";
     std::string tasks_file = "tests/random/tasks.csv";
     std::string agents_file = "tests/random/agents_400.csv";
+    std::string output_dir = "solutions";
     uint32_t steps_num = 1000;
 };
 

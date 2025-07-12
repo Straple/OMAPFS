@@ -20,6 +20,7 @@ bool Map::is_free(uint32_t pos) const {
 }
 
 std::istream &operator>>(std::istream &input, Map &map) {
+    ASSERT(input, "unable to read");
     // TODO: нормально читать
     std::string line;
     std::getline(input, line);

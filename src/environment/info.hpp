@@ -3,6 +3,16 @@
 #include <cstdint>
 #include <string>
 
+enum class MapType : uint8_t {
+    RANDOM,
+    CITY,
+    GAME,
+    SORTATION,
+    WAREHOUSE,
+
+    NUM
+};
+
 enum class PlannerType : uint8_t {
     PIBT,      // pibt
     PIBT_TF,   // pibt + trafficflow
@@ -14,15 +24,31 @@ enum class PlannerType : uint8_t {
     NUM,
 };
 
-std::string planner_type_to_str(PlannerType type);
-
-PlannerType &get_planner_type();
-
 enum class SchedulerType : uint8_t {
     CONST,
     GREEDY,
+
+    NUM
 };
 
-std::string scheduler_type_to_str(SchedulerType type);
+// ==================================
+
+std::string map_type_to_string(MapType type);
+
+MapType string_to_map_type(const std::string &str);
+
+std::string planner_type_to_string(PlannerType type);
+
+PlannerType string_to_planner_type(const std::string &str);
+
+std::string scheduler_type_to_string(SchedulerType type);
+
+SchedulerType string_to_scheduler_type(const std::string &str);
+
+// ==================================
+
+MapType &get_map_type();
+
+PlannerType &get_planner_type();
 
 SchedulerType &get_scheduler_type();

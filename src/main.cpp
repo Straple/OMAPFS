@@ -17,10 +17,13 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <numeric>
 
 int main(int argc, char *argv[]) {
     RuntimeConfig config;
+
+    std::cout << "Threads_num: " << THREADS_NUM_DEFAULT << std::endl;
 
     if (argc >= 2) {
         std::string config_file = argv[1];
@@ -44,29 +47,68 @@ int main(int argc, char *argv[]) {
     init_operations();
     get_omap() = OperationsMap(get_graph(), get_operations());
 
-    std::vector<uint32_t> agents_nums = {
-            100,
-            200,
-            300,
-            400,
-            500,
-            600,
-            700,
-            800,
-    };
+    std::vector<uint32_t> agents_nums;
+    if (get_map_type() == MapType::SORTATION || get_map_type() == MapType::WAREHOUSE) {
+        agents_nums = {
+                1000,
+                2000,
+                3000,
+                4000,
+                5000,
+                6000,
+                7000,
+                8000,
+                9000,
+                10000,
+        };
+    } else if (get_map_type() == MapType::GAME || get_map_type() == MapType::CITY) {
+        agents_nums = {
+                500,
+                1000,
+                1500,
+                2000,
+                2500,
+                3000,
+                3500,
+                4000,
+                4500,
+                5000,
+        };
+    } else if (get_map_type() == MapType::RANDOM) {
+        agents_nums = {
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
+        };
+    }
 
-    std::string output_dir = "answers/random/ed=3/";
+    std::filesystem::create_directories(config.output_dir);
 
-    std::filesystem::create_directories(output_dir);
+    std::mutex mutex;
+
+    std::vector<bool> visited(agents_nums.size());
 
     launch_threads(THREADS_NUM, [&](uint32_t thr) {
-        for (uint32_t test = thr; test < agents_nums.size(); test += THREADS_NUM) {
+        for (int test = agents_nums.size() - 1; test >= 0; test--) {
+            {
+                std::unique_lock locker(mutex);
+                if (visited[test]) {
+                    continue;
+                }
+                visited[test] = true;
+            }
+
             Robots robots;
             std::ifstream(config.agents_file + "/agents_" + std::to_string(agents_nums[test]) + ".csv") >> robots;
 
             TestSystem test_system(robots, task_pool);
 
-            std::string test_dir = output_dir + std::to_string(test) + "/";
+            std::string test_dir = config.output_dir + std::to_string(test) + "/";
             std::filesystem::create_directories(test_dir);
 
             Answer answer = test_system.simulate(config.steps_num);
@@ -87,8 +129,11 @@ int main(int argc, char *argv[]) {
             {
                 std::ofstream output(test_dir + "metrics.csv");
                 output << "metric,value\n";
-                output << "scheduler type," << scheduler_type_to_str(config.scheduler_type) << '\n';
-                output << "planner type," << planner_type_to_str(config.planner_type) << '\n';
+                output << "scheduler type," << scheduler_type_to_string(config.scheduler_type) << '\n';
+                output << "planner type," << planner_type_to_string(config.planner_type);
+                if (config.planner_type == PlannerType::EPIBT || config.planner_type == PlannerType::EPIBT_LNS || config.planner_type == PlannerType::PEPIBT_LNS) {
+                    output << "(" << EPIBT_DEPTH_VALUE << ")\n";
+                }
                 output << "agents num," << robots.size() << '\n';
                 output << "steps num," << config.steps_num << '\n';
                 output << "finished tasks," << answer.finished_tasks.size() << '\n';
@@ -102,4 +147,6 @@ int main(int argc, char *argv[]) {
             }
         }
     });
+
+    std::cout << "\nDone" << std::endl;
 }

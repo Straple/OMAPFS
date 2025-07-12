@@ -7,6 +7,7 @@
 #include <set>
 #include <sstream>
 #include <tuple>
+#include <algorithm>
 
 class OperationsGenerator {
     std::vector<Operation> pool;

@@ -106,8 +106,8 @@ std::vector<uint32_t> TestSystem::get_schedule() {
         }
     } else if (get_scheduler_type() == SchedulerType::GREEDY) {
         scheduler.update(timestep);
-        scheduler.rebuild_dp(get_now() + Milliseconds(100));
-        scheduler.solve(get_now() + Milliseconds(100));
+        scheduler.rebuild_dp(get_now() + Milliseconds(500));
+        scheduler.solve(get_now() + Milliseconds(500));
         schedule = scheduler.get_schedule();
     }
     return schedule;
@@ -115,7 +115,7 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
-    TimePoint end_time = get_now() + Milliseconds(30);
+    TimePoint end_time = get_now() + Milliseconds(1000);
     if (get_planner_type() == PlannerType::EPIBT) {
         EPIBT solver(robots, end_time, epibt_prev_operations);
         solver.solve();
