@@ -1,13 +1,13 @@
-#include <utils/config.hpp>
 #include <environment/info.hpp>
 #include <environment/test_system.hpp>
+#include <utils/config.hpp>
 
 #include <fstream>
 #include <iostream>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     RuntimeConfig config;
-    
+
     if (argc >= 2) {
         std::string config_file = argv[1];
         std::cout << "Loading config file: " << config_file << std::endl;
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     apply_runtime_config(config);
 
     TestSystem test_system(config.map_file, config.tasks_file, config.agents_file);
-    Answer answer = test_system.simulate(1000);
+    Answer answer = test_system.simulate(config.steps_num);
     for (uint32_t action = 0; action <= ACTIONS_NUM; action++) {
         std::string filename = "heatmap_";
         if (action < ACTIONS_NUM) {
