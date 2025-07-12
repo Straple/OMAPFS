@@ -87,6 +87,8 @@ int main(int argc, char *argv[]) {
             {
                 std::ofstream output(test_dir + "metrics.csv");
                 output << "metric,value\n";
+                output << "scheduler type," << scheduler_type_to_str(config.scheduler_type) << '\n';
+                output << "planner type," << planner_type_to_str(config.planner_type) << '\n';
                 output << "agents num," << robots.size() << '\n';
                 output << "steps num," << config.steps_num << '\n';
                 output << "finished tasks," << answer.finished_tasks.size() << '\n';
