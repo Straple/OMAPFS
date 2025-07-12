@@ -1,15 +1,15 @@
 import pandas as pd
 import os
 
-INPUT_DIR = "../answers/"
+INPUT_DIR = "solutions/"
 
 table = {
 }
 
 for map in ["random", "city", "game", "sortation", "warehouse"]:
-    for ed in range(4):
+    for ed in range(10):
         for test in range(10):
-            filename = INPUT_DIR + map + "/ed=" + str(ed) + "/" + str(test) + "/metrics.csv"
+            filename = INPUT_DIR + map + "/epd=" + str(ed) + "/" + str(test) + "/metrics.csv"
             if os.path.exists(filename):
                 df = pd.read_csv(filename)
                 df = df.T
@@ -17,7 +17,7 @@ for map in ["random", "city", "game", "sortation", "warehouse"]:
                 df = df[1:]
 
                 for column_name in df.columns:
-                    value = df[column_name][0]
+                    value = df[column_name].iloc[0]
                     if not column_name in table:
                         table[column_name] = []
                     table[column_name].append(value)

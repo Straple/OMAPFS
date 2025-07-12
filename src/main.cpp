@@ -129,6 +129,7 @@ int main(int argc, char *argv[]) {
             {
                 std::ofstream output(test_dir + "metrics.csv");
                 output << "metric,value\n";
+                output << "map type," << map_type_to_string(config.map_type) << '\n';
                 output << "scheduler type," << scheduler_type_to_string(config.scheduler_type) << '\n';
                 output << "planner type," << planner_type_to_string(config.planner_type);
                 if (config.planner_type == PlannerType::EPIBT || config.planner_type == PlannerType::EPIBT_LNS || config.planner_type == PlannerType::PEPIBT_LNS) {
