@@ -22,16 +22,15 @@ data['avg step time (ms)'] = data['avg step time (ms)'].astype(int)
 
 is_first = True
 
+
 def add_map(map_name, map_text, column):
     global is_first
     grouped = data.groupby('map type').get_group(map_name)
-    agents_ticks = list(grouped.groupby('agents num').groups.keys())
-    print(agents_ticks)
     grouped = grouped.groupby('planner type')
 
     if True:
         ax = axes[0][column]
-        ax.imshow(np.asarray(Image.open(map_name.lower() + '.png')))
+        ax.imshow(np.asarray(Image.open("../../image/" + map_name.lower() + '.png')))
         ax.title.set_text(map_text)
         ax.set_xticks([])
         ax.set_yticks([])
@@ -45,13 +44,8 @@ def add_map(map_name, map_text, column):
             if is_first:
                 ax.set_ylabel('Throughput')
             ax.grid(True)
-            #ax.set_xticks(agents_ticks)
 
-            # Берём текущие позиции тиков и форматируем их как целые
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-            #ax.yaxis.set_major_formatter(FixedFormatter([f"{int(y)}" for y in ax.get_yticks()]))
-            #current_ticks = ax.t()[0]
-            #ax.set_yticks(current_ticks, labels=[int(tick) for tick in current_ticks])
 
         if True:
             ax = axes[2][column]
@@ -61,7 +55,7 @@ def add_map(map_name, map_text, column):
                 ax.set_ylabel('Decision Time (ms)')
             ax.grid(True)
             ax.set_xlabel('Number of Agents')
-            #ax.set_xticks(agents_ticks)
+            # ax.set_xticks(agents_ticks)
 
     if is_first:
         is_first = False

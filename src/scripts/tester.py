@@ -13,7 +13,7 @@ for map in ["RANDOM", "CITY", "GAME", "SORTATION", "WAREHOUSE"]:
 map_type = {map}\n\
 \n\
 # Planner algorithms: PIBT, PIBT_TF, EPIBT, EPIBT_LNS, PEPIBT_LNS, WPPL\n\
-planner_type = EPIBT_LNS\n\
+planner_type = EPIBT\n\
 \n\
 # Scheduler types: CONST, GREEDY\n\
 scheduler_type = CONST\n\
