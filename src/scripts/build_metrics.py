@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-INPUT_DIR = "solutions/"
+INPUT_DIR = "../../solutions_epibt/"
 
 table = {
 }
