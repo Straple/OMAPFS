@@ -206,8 +206,6 @@ void EPIBT::build(uint32_t r) {
 EPIBT::EPIBT(Robots move_robots, TimePoint end_time, const std::vector<uint32_t> &operations)
     : robots(std::move(move_robots)), end_time(end_time), desires(operations), visited(robots.size()) {
 
-    Timer timer;
-
     {
         order.resize(robots.size());
         std::iota(order.begin(), order.end(), 0);

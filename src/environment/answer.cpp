@@ -66,7 +66,12 @@ void Answer::write_heatmap(std::ostream &output, uint32_t action) const {
     for (uint32_t row = 0; row < get_map().get_rows(); row++) {
         output << row;
         for (uint32_t col = 0; col < get_map().get_cols(); col++) {
-            output << ',' << heatmap[row][col][action];
+            output << ',';
+            if (get_map().is_free(row * get_map().get_cols() + col + 1)) {
+                output << heatmap[row][col][action];
+            } else {
+                output << -1;
+            }
         }
         output << '\n';
     }
