@@ -13,6 +13,8 @@ protected:
 
     double cur_score = 0;
 
+    double old_score = 0;
+
     uint32_t epibt_step = 0;
 
     uint32_t available_operation_depth = -1;

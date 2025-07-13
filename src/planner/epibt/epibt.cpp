@@ -160,13 +160,15 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         uint32_t to_r = get_used(r);
         if (to_r == -1) {
             add_path(r);
-            return RetType::ACCEPTED;
+            if (old_score - 1e-6 <= cur_score) {
+                return RetType::ACCEPTED;
+            } else {
+                remove_path(r);
+                desires[r] = old_desired;
+                return RetType::REJECTED;
+            }
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
-
-            /*if (robots[r].priority >= robots[to_r].priority) {
-                continue;
-            }*/
 
             if (visited[to_r] == visited_counter || counter > 3'000) {
                 continue;
@@ -196,6 +198,7 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
 }
 
 void EPIBT::build(uint32_t r) {
+    old_score = cur_score;
     remove_path(r);
     uint32_t counter = 0;
     if (build(r, counter) != RetType::ACCEPTED) {
@@ -291,18 +294,23 @@ EPIBT::EPIBT(Robots move_robots, TimePoint end_time, const std::vector<uint32_t>
 }
 
 void EPIBT::solve() {
-    //for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
-    //    visited_counter++;
-    for (uint32_t r: order) {
-        if (get_now() >= end_time) {
-            break;
-        }
-        epibt_step++;
-        if (visited[r] != visited_counter) {
-            build(r);
+    for (uint32_t iter = 0; iter < 2; iter++) {
+        for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
+            std::sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
+                return get_smart_dist(lhs, desires[lhs]) < get_smart_dist(rhs, desires[rhs]);
+            });
+            visited_counter++;
+            for (uint32_t r: order) {
+                if (get_now() >= end_time) {
+                    break;
+                }
+                epibt_step++;
+                if (visited[r] != visited_counter) {
+                    build(r);
+                }
+            }
         }
     }
-    //}
 }
 
 double EPIBT::get_score() const {

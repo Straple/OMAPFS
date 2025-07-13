@@ -34,3 +34,10 @@ constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
  * 1) добавить GraphGuidanceBuilder, который строит GG для разных карт
  * 2) улучшить проверки в Answer
  */
+
+/*
+EPIBT, CONST, RANDOM, 1000 STEPS
+400: 6431 51ms
+700: 5063 174ms
+800: 4401 366ms
+ */
