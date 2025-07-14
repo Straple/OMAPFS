@@ -160,7 +160,7 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         uint32_t to_r = get_used(r);
         if (to_r == -1) {
             add_path(r);
-            if (old_score - 1e-6 <= cur_score) {
+            if (old_score + 1e-3 < cur_score) {
                 return RetType::ACCEPTED;
             } else {
                 remove_path(r);
@@ -170,7 +170,7 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (visited[to_r] == visited_counter || counter > 3'000) {
+            if (visited[to_r] == visited_counter || counter > 1000) {
                 continue;
             }
 
@@ -294,8 +294,8 @@ EPIBT::EPIBT(Robots move_robots, TimePoint end_time, const std::vector<uint32_t>
 }
 
 void EPIBT::solve() {
-    for (uint32_t iter = 0; iter < 2; iter++) {
-        for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH; available_operation_depth++) {
+    for (uint32_t it = 0; it < 3; it++) {
+        for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH_VALUE; available_operation_depth++) {
             std::sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
                 return get_smart_dist(lhs, desires[lhs]) < get_smart_dist(rhs, desires[rhs]);
             });

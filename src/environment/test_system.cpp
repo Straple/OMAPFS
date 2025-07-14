@@ -101,9 +101,7 @@ std::vector<uint32_t> TestSystem::get_schedule() {
                 while (true) {
                     uint32_t task_id = task_pool.gen_const_next_task(r, robots.size());
                     if (robot.pos == Position(task_pool.at(task_id).targets[0])) {
-                        std::cout << "skip\n";
-                        // already here
-                        continue;
+                        continue; // already here, skip bad task
                     }
                     schedule[r] = task_id;
                     break;
@@ -124,6 +122,10 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
     TimePoint end_time = get_now() + Milliseconds(1000);
+
+    // выключить наследование операций EPIBT
+    std::vector<uint32_t> epibt_prev_operations(robots.size());
+
     if (get_planner_type() == PlannerType::EPIBT) {
         EPIBT solver(robots, end_time, epibt_prev_operations);
         solver.solve();

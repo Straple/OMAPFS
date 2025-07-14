@@ -103,6 +103,8 @@ int main(int argc, char *argv[]) {
                 visited[test] = true;
             }
 
+            Timer timer;
+
             Robots robots;
             std::ifstream(config.agents_file + "/agents_" + std::to_string(agents_nums[test]) + ".csv") >> robots;
 
@@ -145,6 +147,11 @@ int main(int argc, char *argv[]) {
                 output << "avg step time (ms)," << std::accumulate(answer.step_time.begin(), answer.step_time.end(), 0.0) * 1000 / config.steps_num << '\n';
                 output << "avg scheduler time (ms)," << std::accumulate(answer.scheduler_time.begin(), answer.scheduler_time.end(), 0.0) * 1000 / config.steps_num << '\n';
                 output << "avg planner time (ms)," << std::accumulate(answer.planner_time.begin(), answer.planner_time.end(), 0.0) * 1000 / config.steps_num << '\n';
+
+                {
+                    std::unique_lock locker(mutex);
+                    std::cout << "Done test " << test << ' ' << timer << '\n';
+                }
             }
         }
     });
