@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-INPUT_DIR = "../../solutions_epibt/"
+INPUT_DIR = "solutions_epibt_lns/"
 
 table = {
 }
@@ -23,4 +23,4 @@ for map in ["random", "city", "game", "sortation", "warehouse"]:
                     table[column_name].append(value)
 
 table = pd.DataFrame(data=table)
-table.to_csv('metrics.csv', index=False)
+table.to_csv('metrics_2.csv', index=False)

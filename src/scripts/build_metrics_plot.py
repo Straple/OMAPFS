@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import matplotlib.colors
-import seaborn as sns
+#import seaborn as sns
 import pandas as pd
 from PIL import Image
 from matplotlib.ticker import FixedFormatter
@@ -14,10 +14,10 @@ from matplotlib.ticker import MaxNLocator
 # plan_algos_name = ['EPIBT+LNS+GG', 'EPIBT+LNS', 'EPIBT+GG', 'EPIBT', 'PIBT+GG', 'PIBT', 'WPPL+GG', 'PIBT+traffic flow']
 # markers = ['o', 'v', 's', 'p', '*', 'x', 'D', 'P', 'o', 'v', 's', 'p', '*', 'x', 'D', 'P', 'o', 'v', 's', 'p', '*', 'x', 'D', 'P']
 
-color_palette = sns.color_palette("tab10", 8)
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_palette)
+#color_palette = sns.color_palette("tab10", 8)
+#plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_palette)
 
-data = pd.read_csv('../../metrics.csv', sep=',')
+data = pd.read_csv('metrics.csv', sep=',')
 data['avg step time (ms)'] = data['avg step time (ms)'].astype(int)
 
 is_first = True
@@ -30,7 +30,7 @@ def add_map(map_name, map_text, column):
 
     if True:
         ax = axes[0][column]
-        ax.imshow(np.asarray(Image.open("../../image/" + map_name.lower() + '.png')))
+        ax.imshow(np.asarray(Image.open("image/" + map_name.lower() + '.png')))
         ax.title.set_text(map_text)
         ax.set_xticks([])
         ax.set_yticks([])

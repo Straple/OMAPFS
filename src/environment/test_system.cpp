@@ -98,8 +98,16 @@ std::vector<uint32_t> TestSystem::get_schedule() {
         for (uint32_t r = 0; r < robots.size(); r++) {
             auto &robot = robots[r];
             if (robot.task_id == -1) {
-                uint32_t task_id = task_pool.gen_const_next_task(r, robots.size());
-                schedule[r] = task_id;
+                while (true) {
+                    uint32_t task_id = task_pool.gen_const_next_task(r, robots.size());
+                    if (robot.pos == Position(task_pool.at(task_id).targets[0])) {
+                        std::cout << "skip\n";
+                        // already here
+                        continue;
+                    }
+                    schedule[r] = task_id;
+                    break;
+                }
             } else {
                 schedule[r] = robot.task_id;
             }
