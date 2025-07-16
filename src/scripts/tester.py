@@ -20,9 +20,9 @@ scheduler_type = CONST\n\
 \n\
 # TestSystem file paths\n\
 map_file = tests/{map.lower()}/map.txt\n\
-tasks_file = tests/{map.lower()}/tasks.csv\n\
+tasks_file = tests/{map.lower()}/tasks_one.csv\n\
 agents_file = tests/{map.lower()}/\n\
 steps_num = {steps_num}\n\
-output_dir = solutions/{map.lower()}/epd=3", file=file
+output_dir = solutions/{map.lower()}", file=file
         )
     os.system("./bin/main tmp.config")

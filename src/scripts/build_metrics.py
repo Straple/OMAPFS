@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-INPUT_DIRS = ["solutions/epibt_new/"]
+INPUT_DIRS = ["solutions/"]
 
 table = {
 }
@@ -35,5 +35,7 @@ for dir in INPUT_DIRS:
     scan_directory(dir)
 
 table = pd.DataFrame(data=table)
+table['agents num'] = table['agents num'].astype(int)
+table['finished tasks'] = table['finished tasks'].astype(int)
 table = table.sort_values(by=['map type', 'agents num', 'finished tasks'], ascending=[True, True, True])
 table.to_csv('metrics_2.csv', index=False)
