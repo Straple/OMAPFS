@@ -35,13 +35,14 @@ int main(int argc, char *argv[]) {
     apply_runtime_config(config);
 
     std::ifstream(config.map_file) >> get_map();
-    TaskPool task_pool;
-    std::ifstream(config.tasks_file) >> task_pool;
 
     // environment
     get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
     get_graph() = Graph(get_map(), get_gg());
     get_hm() = HeuristicMatrix(get_graph());
+
+    TaskPool task_pool;
+    std::ifstream(config.tasks_file) >> task_pool;
 
     // epibt
     init_operations();

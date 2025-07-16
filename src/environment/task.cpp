@@ -1,5 +1,6 @@
 #include <environment/task.hpp>
 
+#include <environment/map.hpp>
 #include <utils/assert.hpp>
 #include <utils/tools.hpp>
 
@@ -73,7 +74,9 @@ std::istream &operator>>(std::istream &input, TaskPool &pool) {
         auto strs = split(line, ',');
         pool.task_targets.emplace_back();
         for (auto &s: strs) {
-            pool.task_targets.back().push_back(std::stoll(s) + 1);
+            uint32_t pos = std::stoll(s) + 1;
+            pool.task_targets.back().push_back(pos);
+            ASSERT(get_map().is_free(pos), "is not free");
         }
     }
     return input;
