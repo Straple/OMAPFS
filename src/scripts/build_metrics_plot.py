@@ -69,6 +69,7 @@ def add_map(map_name, map_text, column):
                 ax.set_ylabel('Decision Time (ms)')
             ax.grid(True)
             ax.set_xlabel('Number of Agents')
+            ax.set_ylim(None, 1000)
             # ax.set_xticks(agents_ticks)
 
     if is_first:

@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-INPUT_DIRS = ["solutions"]
+INPUT_DIRS = ["solutions1", "solutions2"]
 OUTPUT_FILENAME = 'metrics.csv'
 
 table = {
