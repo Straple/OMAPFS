@@ -123,8 +123,9 @@ std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
     TimePoint end_time = get_now() + Milliseconds(1000);
 
-    // выключить наследование операций EPIBT
+#ifndef ENABLE_EPIBT_INHERITANCE
     std::vector<uint32_t> epibt_prev_operations(robots.size());
+#endif
 
     if (get_planner_type() == PlannerType::EPIBT) {
         EPIBT solver(robots, end_time, epibt_prev_operations);

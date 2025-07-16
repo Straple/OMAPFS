@@ -35,24 +35,12 @@ constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
  * 2) улучшить проверки в Answer
  */
 
-/*
-EPIBT, CONST, RANDOM, 1000 STEPS
-400: 6431 51ms
-700: 5063 174ms
-800: 4401 366ms
+#define ENABLE_EPIBT_ROLLBACK
 
-EPIBT(2), CONST, RANDOM, 1000 STEPS
-100: 3885 25ms
-200: 6423 26ms
-300: 7232 27ms
-400: 7113 29ms
-500: 6545 35ms
-600: 6204 39ms
-700: 6029 43ms
-800: 5328 72ms
+#define ENABLE_MULTILEVEL_LAUNCH
 
- */
-
+// выключить наследование операций EPIBT
+// #define ENABLE_EPIBT_INHERITANCE
 // TODO: выключить наследование операций EPIBT
 // оно показывает хуже результаты
 
