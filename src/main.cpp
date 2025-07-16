@@ -10,6 +10,7 @@
 #include <planner/epibt/operations.hpp>
 #include <planner/epibt/operations_map.hpp>
 
+#include <utils/assert.hpp>
 #include <utils/config.hpp>
 #include <utils/tools.hpp>
 
@@ -32,6 +33,48 @@ int main(int argc, char *argv[]) {
     } else {
         std::cout << "No config file specified, using default values" << std::endl;
     }
+    /*for(auto map_name : {"Berlin_1_256", "Berlin_1_256_small", "Paris_1_256", "Paris_1_256_small", "random_256_10", "random_256_10_small", "random_256_20", "random_256_20_small", "sortation_large", "sortation_small", "warehouse_large", "warehouse_small"}) {
+        std::string dir = "tests_sillm";
+        config.map_file = dir + "/" + map_name + "/" + map_name + ".map";
+
+        apply_runtime_config(config);
+
+        std::ifstream(config.map_file) >> get_map();
+
+        // environment
+        get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
+        get_graph() = Graph(get_map(), get_gg());
+        //get_hm() = HeuristicMatrix(get_graph());
+
+        for (uint32_t i = 0; i < 25; i++) {
+            for (uint32_t agents_num: {600, 10'000}) {
+                std::string filename = dir + "/" + map_name + "/" + map_name + "_" + std::to_string(i) + "_" + std::to_string(agents_num) + ".agents";
+                std::ifstream input(filename);
+                if (!input) {
+                    continue;
+                }
+                std::cout << filename << '\n';
+
+                uint32_t num = 0;
+                input >> num;
+                ASSERT(num == agents_num, "does not match agents num");
+
+                std::ofstream output(dir + "/" + map_name + "/agents_" + std::to_string(i) + ".csv");
+                output << "agent id,row,col\n";
+                for (uint32_t j = 0; j < num; j++) {
+                    uint32_t pos = 0;
+                    input >> pos;
+                    pos++;
+
+                    ASSERT(get_map().is_free(pos), "is not free");
+
+                    Position p(pos);
+                    output << j << ',' << p.get_row() << ',' << p.get_col() << '\n';
+                }
+            }
+        }
+    }
+    return 0;*/
     apply_runtime_config(config);
 
     std::ifstream(config.map_file) >> get_map();
@@ -41,61 +84,25 @@ int main(int argc, char *argv[]) {
     get_graph() = Graph(get_map(), get_gg());
     get_hm() = HeuristicMatrix(get_graph());
 
-    TaskPool task_pool;
-    std::ifstream(config.tasks_file) >> task_pool;
-
     // epibt
     init_operations();
     get_omap() = OperationsMap(get_graph(), get_operations());
-
-    std::vector<uint32_t> agents_nums;
-    if (get_map_type() == MapType::SORTATION || get_map_type() == MapType::WAREHOUSE || get_map_type() == MapType::CITY) {
-        agents_nums = {
-                1000,
-                2000,
-                3000,
-                4000,
-                5000,
-                6000,
-                7000,
-                8000,
-                9000,
-                10000,
-        };
-    } else if (get_map_type() == MapType::GAME) {
-        agents_nums = {
-                500,
-                1000,
-                1500,
-                2000,
-                2500,
-                3000,
-                3500,
-                4000,
-                4500,
-                5000,
-        };
-    } else if (get_map_type() == MapType::RANDOM) {
-        agents_nums = {
-                100,
-                200,
-                300,
-                400,
-                500,
-                600,
-                700,
-                800,
-        };
-    }
 
     std::filesystem::create_directories(config.output_dir);
 
     std::mutex mutex;
 
-    std::vector<bool> visited(agents_nums.size());
+    std::vector<bool> visited;
+    for (uint32_t i = 0;; i++) {
+        std::string filename = config.agents_path + "/agents_" + std::to_string(i) + ".csv";
+        if (!std::filesystem::exists(filename)) {
+            break;
+        }
+        visited.push_back(false);
+    }
 
     launch_threads(THREADS_NUM, [&](uint32_t thr) {
-        for (int test = agents_nums.size() - 1; test >= 0; test--) {
+        for (int test = static_cast<int>(visited.size()) - 1; test >= 0; test--) {
             {
                 std::unique_lock locker(mutex);
                 if (visited[test]) {
@@ -107,7 +114,10 @@ int main(int argc, char *argv[]) {
             Timer timer;
 
             Robots robots;
-            std::ifstream(config.agents_file + "/agents_" + std::to_string(agents_nums[test]) + ".csv") >> robots;
+            std::ifstream(config.agents_path + "/agents_" + std::to_string(test) + ".csv") >> robots;
+
+            TaskPool task_pool;
+            std::ifstream(config.tasks_path + "/tasks_" + std::to_string(test) + ".csv") >> task_pool;
 
             TestSystem test_system(robots, task_pool);
 

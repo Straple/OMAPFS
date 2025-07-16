@@ -4,11 +4,23 @@
 #include <string>
 
 enum class MapType : uint8_t {
-    RANDOM,
-    CITY,
-    GAME,
-    SORTATION,
-    WAREHOUSE,
+    BERLIN_1_256,
+    BERLIN_1_256_SMALL,
+
+    PARIS_1_256,
+    PARIS_1_256_SMALL,
+
+    RANDOM_256_10,
+    RANDOM_256_10_SMALL,
+
+    RANDOM_256_20,
+    RANDOM_256_20_SMALL,
+
+    SORTATION_LARGE,
+    SORTATOIN_SMALL,
+
+    WAREHOUSE_LARGE,
+    WAREHOUSE_SMALL,
 
     NUM
 };

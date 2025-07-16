@@ -7,22 +7,46 @@
 
 std::string map_type_to_string(MapType type) {
     const static std::array<std::string, static_cast<uint32_t>(MapType::NUM)> map = {
-            "RANDOM",
-            "CITY",
-            "GAME",
-            "SORTATION",
-            "WAREHOUSE",
+            "BERLIN_1_256",
+            "BERLIN_1_256_SMALL",
+
+            "PARIS_1_256",
+            "PARIS_1_256_SMALL",
+
+            "RANDOM_256_10",
+            "RANDOM_256_10_SMALL",
+
+            "RANDOM_256_20",
+            "RANDOM_256_20_SMALL",
+
+            "SORTATION_LARGE",
+            "SORTATOIN_SMALL",
+
+            "WAREHOUSE_LARGE",
+            "WAREHOUSE_SMALL",
     };
     return map.at(static_cast<uint32_t>(type));
 }
 
 MapType string_to_map_type(const std::string &str) {
     const static std::map<std::string, MapType> map = {
-            {"RANDOM", MapType::RANDOM},
-            {"CITY", MapType::CITY},
-            {"GAME", MapType::GAME},
-            {"SORTATION", MapType::SORTATION},
-            {"WAREHOUSE", MapType::WAREHOUSE},
+            {"BERLIN_1_256",MapType::BERLIN_1_256},
+            {"BERLIN_1_256_SMALL",MapType::BERLIN_1_256_SMALL},
+
+            {"PARIS_1_256",MapType::PARIS_1_256},
+            {"PARIS_1_256_SMALL",MapType::PARIS_1_256_SMALL},
+
+            {"RANDOM_256_10",MapType::RANDOM_256_10},
+            {"RANDOM_256_10_SMALL",MapType::RANDOM_256_10_SMALL},
+
+            {"RANDOM_256_20",MapType::RANDOM_256_20},
+            {"RANDOM_256_20_SMALL",MapType::RANDOM_256_20_SMALL},
+
+            {"SORTATION_LARGE",MapType::SORTATION_LARGE},
+            {"SORTATOIN_SMALL",MapType::SORTATOIN_SMALL},
+
+            {"WAREHOUSE_LARGE",MapType::WAREHOUSE_LARGE},
+            {"WAREHOUSE_SMALL",MapType::WAREHOUSE_SMALL},
     };
     return map.at(str);
 }
@@ -70,7 +94,7 @@ SchedulerType string_to_scheduler_type(const std::string &str) {
 // ==================================
 
 MapType &get_map_type() {
-    static MapType type = MapType::RANDOM;
+    static MapType type = MapType::NUM;
     return type;
 }
 

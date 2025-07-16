@@ -66,11 +66,11 @@ RuntimeConfig load_config(const std::string &config_file) {
     if (parsed.count("map_file")) {
         config.map_file = parsed["map_file"];
     }
-    if (parsed.count("tasks_file")) {
-        config.tasks_file = parsed["tasks_file"];
+    if (parsed.count("tasks_path")) {
+        config.tasks_path = parsed["tasks_path"];
     }
-    if (parsed.count("agents_file")) {
-        config.agents_file = parsed["agents_file"];
+    if (parsed.count("agents_path")) {
+        config.agents_path = parsed["agents_path"];
     }
     if (parsed.count("output_dir")) {
         config.output_dir = parsed["output_dir"];
@@ -100,8 +100,8 @@ void save_config(const RuntimeConfig &config, const std::string &config_file) {
     file << "scheduler_type = " << scheduler_type_to_string(config.scheduler_type) << "\n\n";
     file << "# TestSystem file paths\n";
     file << "map_file = " << config.map_file << "\n";
-    file << "tasks_file = " << config.tasks_file << "\n";
-    file << "agents_file = " << config.agents_file << "\n";
+    file << "tasks_path = " << config.tasks_path << "\n";
+    file << "agents_path = " << config.agents_path << "\n";
 
     file.close();
     std::cout << "Saved config to '" << config_file << "'" << std::endl;
@@ -117,6 +117,6 @@ void apply_runtime_config(const RuntimeConfig &config) {
     std::cout << "  Planner: " << planner_type_to_string(config.planner_type) << std::endl;
     std::cout << "  Scheduler: " << scheduler_type_to_string(config.scheduler_type) << std::endl;
     std::cout << "  Map file: " << config.map_file << std::endl;
-    std::cout << "  Tasks file: " << config.tasks_file << std::endl;
-    std::cout << "  Agents file: " << config.agents_file << std::endl;
+    std::cout << "  Tasks path: " << config.tasks_path << std::endl;
+    std::cout << "  Agents path: " << config.agents_path << std::endl;
 }
