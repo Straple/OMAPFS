@@ -7,7 +7,7 @@
 // Enhanced Priority Inheritance with BackTracking
 class EPIBT {
 protected:
-    Robots robots;
+    Robots& robots;
 
     TimePoint end_time;
 
@@ -66,7 +66,7 @@ protected:
     void build(uint32_t r);
 
 public:
-    EPIBT(Robots robots, TimePoint end_time, const std::vector<uint32_t> &operations);
+    EPIBT(Robots& robots, TimePoint end_time, const std::vector<uint32_t> &operations);
 
     void solve();
 

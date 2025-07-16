@@ -72,8 +72,8 @@ void EPIBT_LNS::try_build(uint32_t r) {
     }
 }
 
-EPIBT_LNS::EPIBT_LNS(Robots robots, TimePoint end_time, const std::vector<uint32_t> &operations)
-    : EPIBT(std::move(robots), end_time, operations) {
+EPIBT_LNS::EPIBT_LNS(Robots &robots, TimePoint end_time, const std::vector<uint32_t> &operations)
+    : EPIBT(robots, end_time, operations) {
 }
 
 void EPIBT_LNS::solve(uint64_t seed) {
