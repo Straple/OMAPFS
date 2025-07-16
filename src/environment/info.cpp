@@ -20,7 +20,7 @@ std::string map_type_to_string(MapType type) {
             "RANDOM_256_20_SMALL",
 
             "SORTATION_LARGE",
-            "SORTATOIN_SMALL",
+            "SORTATION_SMALL",
 
             "WAREHOUSE_LARGE",
             "WAREHOUSE_SMALL",
@@ -43,7 +43,7 @@ MapType string_to_map_type(const std::string &str) {
             {"RANDOM_256_20_SMALL",MapType::RANDOM_256_20_SMALL},
 
             {"SORTATION_LARGE",MapType::SORTATION_LARGE},
-            {"SORTATOIN_SMALL",MapType::SORTATOIN_SMALL},
+            {"SORTATION_SMALL",MapType::SORTATION_SMALL},
 
             {"WAREHOUSE_LARGE",MapType::WAREHOUSE_LARGE},
             {"WAREHOUSE_SMALL",MapType::WAREHOUSE_SMALL},
