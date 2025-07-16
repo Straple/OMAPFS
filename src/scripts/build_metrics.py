@@ -2,7 +2,8 @@ import pandas as pd
 import os
 from pathlib import Path
 
-INPUT_DIRS = ["solutions/"]
+INPUT_DIRS = ["solutions"]
+OUTPUT_FILENAME = 'metrics.csv'
 
 table = {
 }
@@ -10,8 +11,8 @@ table = {
 
 def process_dir(path):
     filename = path / "metrics.csv"
-    print(filename)
     if os.path.exists(filename):
+        print("process:", filename)
         df = pd.read_csv(filename)
         df = df.T
         df.columns = df.iloc[0]
@@ -32,10 +33,13 @@ def scan_directory(path):
 
 
 for dir in INPUT_DIRS:
+    if len(dir) != 0 and dir[-1] != '/' and dir[-1] != '\\':
+        dir += '/'
     scan_directory(dir)
 
 table = pd.DataFrame(data=table)
 table['agents num'] = table['agents num'].astype(int)
+table['steps num'] = table['steps num'].astype(int)
 table['finished tasks'] = table['finished tasks'].astype(int)
 table = table.sort_values(by=['map type', 'agents num', 'finished tasks'], ascending=[True, True, True])
-table.to_csv('metrics_2.csv', index=False)
+table.to_csv(OUTPUT_FILENAME, index=False)
