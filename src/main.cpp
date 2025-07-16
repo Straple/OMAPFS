@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     get_omap() = OperationsMap(get_graph(), get_operations());
 
     std::vector<uint32_t> agents_nums;
-    if (get_map_type() == MapType::SORTATION || get_map_type() == MapType::WAREHOUSE) {
+    if (get_map_type() == MapType::SORTATION || get_map_type() == MapType::WAREHOUSE || get_map_type() == MapType::CITY) {
         agents_nums = {
                 1000,
                 2000,
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
                 9000,
                 10000,
         };
-    } else if (get_map_type() == MapType::GAME || get_map_type() == MapType::CITY) {
+    } else if (get_map_type() == MapType::GAME) {
         agents_nums = {
                 500,
                 1000,
