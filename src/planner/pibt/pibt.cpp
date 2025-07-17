@@ -3,7 +3,6 @@
 #include <environment/heuristic_matrix.hpp>
 #include <utils/assert.hpp>
 
-#include <algorithm>
 #include <numeric>
 
 std::vector<std::array<uint32_t, PIBT_PLAN_DEPTH>> get_paths(Robot robot, DirectionType desired) {
@@ -143,7 +142,7 @@ uint32_t PIBT::get_used(uint32_t r, DirectionType desired) const {
     return answer;
 }
 
-PIBT::RetType PIBT::build(uint32_t r, uint32_t &counter) {
+PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
     if (counter % 4 == 0 && get_now() >= end_time) {
         return RetType::REJECTED;
     }
@@ -152,7 +151,7 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t &counter) {
     DirectionType old_desired = desires[r];
 
     std::vector<DirectionType> robot_desires;
-    for (DirectionType dir: {DirectionType::EAST, DirectionType::SOUTH, DirectionType::WEST, DirectionType::NORTH/*, DirectionType::NONE*/}) {
+    for (DirectionType dir: {DirectionType::EAST, DirectionType::SOUTH, DirectionType::WEST, DirectionType::NORTH /*, DirectionType::NONE*/}) {
         if (get_nodes_path(r, dir).back()) {
             robot_desires.push_back(dir);
         }
@@ -171,14 +170,14 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (visited[to_r] == visited_counter || counter > 1000) {
+            if (visited[to_r] == visited_counter || counter > 1000 || robots[to_r].priority < priority) {
                 continue;
             }
 
             remove_path(to_r);
             add_path(r);
 
-            RetType res = build(to_r, ++counter);
+            RetType res = build(to_r, priority, ++counter);
             if (res == RetType::ACCEPTED) {
                 return res;
             } else if (res == RetType::REJECTED) {
@@ -206,27 +205,6 @@ PIBT::PIBT(Robots &robots, TimePoint end_time) : robots(robots), end_time(end_ti
         std::stable_sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
             return robots[lhs].priority < robots[rhs].priority;
         });
-
-        std::vector<int32_t> weight(robots.size());
-
-        for (uint32_t i = 0; i < robots.size(); i++) {
-            weight[order[i]] = i;
-        }
-        int32_t max_weight = robots.size() + 1;
-
-        std::vector<double> robot_power(robots.size());
-        for (uint32_t r = 0; r < robots.size(); r++) {
-            double power = (max_weight - weight[r]) * 1.0 / max_weight;
-            if (robots[r].is_disable()) {
-                power = 0;
-            }
-            power = power * power;
-            robot_power[r] = power;
-        }
-
-        std::stable_sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
-            return std::tie(robot_power[lhs], lhs) > std::tie(robot_power[rhs], rhs);
-        });
     }
 
     {
@@ -252,7 +230,7 @@ void PIBT::solve() {
         if (visited[r] != visited_counter) {
             remove_path(r);
             uint32_t counter = 0;
-            if (build(r, counter) != RetType::ACCEPTED) {
+            if (build(r, robots[r].priority, counter) != RetType::ACCEPTED) {
                 add_path(r);
             }
         }

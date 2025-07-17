@@ -4,26 +4,6 @@
 #include <planner/epibt/operations.hpp>
 #include <utils/time.hpp>
 
-/*
-2714
-4095
-4473
-4838
-4504
-4307
-4123
-4057
-
-Rotate
-2134
-2498
-2411
-2223
-1956
-1501
-1264
-538
-*/
 class PIBT {
     Robots &robots;
 
@@ -67,7 +47,7 @@ class PIBT {
         REJECTED,// success + not accepted
     };
 
-    RetType build(uint32_t r, uint32_t &counter);
+    RetType build(uint32_t r, uint32_t priority, uint32_t &counter);
 
 public:
     PIBT(Robots &robots, TimePoint end_time);
