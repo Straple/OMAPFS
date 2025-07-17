@@ -1,22 +1,10 @@
 import os
 
-for map in ["BERLIN_1_256",
-            "BERLIN_1_256_SMALL",
-
-            "PARIS_1_256",
-            "PARIS_1_256_SMALL",
-
-            "RANDOM_256_10",
-            "RANDOM_256_10_SMALL",
-
-            "RANDOM_256_20",
-            "RANDOM_256_20_SMALL",
-
-            "SORTATION_LARGE",
-            "SORTATION_SMALL",
-
-            "WAREHOUSE_LARGE",
-            "WAREHOUSE_SMALL"]:
+for map in ["RANDOM",
+            "CITY",
+            "GAME",
+            "SORTATION",
+            "WAREHOUSE",]:
     steps_num = 5000
     if "SMALL" in map:
         steps_num = 1000
@@ -35,11 +23,11 @@ planner_type = EPIBT\n\
 scheduler_type = CONST\n\
 \n\
 # TestSystem file paths\n\
-map_file = tests_sillm/{map.lower()}/map.txt\n\
-tasks_path = tests_sillm/{map.lower()}/\n\
-agents_path = tests_sillm/{map.lower()}/\n\
+map_file = tests/{map.lower()}/map.txt\n\
+tasks_path = tests/{map.lower()}/\n\
+agents_path = tests/{map.lower()}/\n\
 steps_num = {steps_num}\n\
-output_dir = solutions2/{map.lower()}", file=file
+output_dir = solutions/{map.lower()}", file=file
         )
     ret = os.system("./bin/main tmp.config")
-    assert ret == 0, "invalid return code"
+    assert ret == 0, "invalid return code: " + str(ret)

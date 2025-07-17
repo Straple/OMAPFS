@@ -24,7 +24,7 @@
 int main(int argc, char *argv[]) {
     RuntimeConfig config;
 
-    std::cout << "Threads_num: " << THREADS_NUM_DEFAULT << std::endl;
+    std::cout << "Threads_num: " << THREADS_NUM << std::endl;
 
     if (argc >= 2) {
         std::string config_file = argv[1];
@@ -33,48 +33,6 @@ int main(int argc, char *argv[]) {
     } else {
         std::cout << "No config file specified, using default values" << std::endl;
     }
-    /*for(auto map_name : {"Berlin_1_256", "Berlin_1_256_small", "Paris_1_256", "Paris_1_256_small", "random_256_10", "random_256_10_small", "random_256_20", "random_256_20_small", "sortation_large", "sortation_small", "warehouse_large", "warehouse_small"}) {
-        std::string dir = "tests_sillm";
-        config.map_file = dir + "/" + map_name + "/" + map_name + ".map";
-
-        apply_runtime_config(config);
-
-        std::ifstream(config.map_file) >> get_map();
-
-        // environment
-        get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
-        get_graph() = Graph(get_map(), get_gg());
-        //get_hm() = HeuristicMatrix(get_graph());
-
-        for (uint32_t i = 0; i < 25; i++) {
-            for (uint32_t agents_num: {600, 10'000}) {
-                std::string filename = dir + "/" + map_name + "/" + map_name + "_" + std::to_string(i) + "_" + std::to_string(agents_num) + ".agents";
-                std::ifstream input(filename);
-                if (!input) {
-                    continue;
-                }
-                std::cout << filename << '\n';
-
-                uint32_t num = 0;
-                input >> num;
-                ASSERT(num == agents_num, "does not match agents num");
-
-                std::ofstream output(dir + "/" + map_name + "/agents_" + std::to_string(i) + ".csv");
-                output << "agent id,row,col\n";
-                for (uint32_t j = 0; j < num; j++) {
-                    uint32_t pos = 0;
-                    input >> pos;
-                    pos++;
-
-                    ASSERT(get_map().is_free(pos), "is not free");
-
-                    Position p(pos);
-                    output << j << ',' << p.get_row() << ',' << p.get_col() << '\n';
-                }
-            }
-        }
-    }
-    return 0;*/
     apply_runtime_config(config);
 
     std::ifstream(config.map_file) >> get_map();
@@ -143,6 +101,7 @@ int main(int argc, char *argv[]) {
                 std::ofstream output(test_dir + "metrics.csv");
                 output << "metric,value\n";
                 output << "map type," << map_type_to_string(config.map_type) << '\n';
+                output << "test id," << test << '\n';
                 output << "scheduler type," << scheduler_type_to_string(config.scheduler_type) << '\n';
                 output << "planner type," << planner_type_to_string(config.planner_type);
                 if (config.planner_type == PlannerType::EPIBT || config.planner_type == PlannerType::EPIBT_LNS || config.planner_type == PlannerType::PEPIBT_LNS) {
@@ -161,11 +120,11 @@ int main(int argc, char *argv[]) {
 
                 {
                     std::unique_lock locker(mutex);
-                    std::cout << "Done test " << test << ' ' << timer << '\n';
+                    std::cout << "Done test " << test << ' ' << timer << std::endl;
                 }
             }
         }
     });
 
-    std::cout << "\nDone" << std::endl;
+    std::cout << "===Done===" << std::endl;
 }

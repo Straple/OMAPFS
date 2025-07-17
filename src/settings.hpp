@@ -39,6 +39,8 @@ constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
 
 #define ENABLE_MULTILEVEL_LAUNCH
 
+// #define ENABLE_WRITE_SCHEDULE
+
 // выключить наследование операций EPIBT
 // #define ENABLE_EPIBT_INHERITANCE
 // TODO: выключить наследование операций EPIBT

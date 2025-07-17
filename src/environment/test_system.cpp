@@ -194,11 +194,13 @@ Answer TestSystem::simulate(uint32_t steps_num) {
         for (uint32_t r = 0; r < robots.size(); r++) {
             answer.robots[r].assigned_task.push_back(schedule[r]);
         }
+#ifdef ENABLE_WRITE_SCHEDULE
         answer.tasks.emplace_back();
         for (auto &[id, task]: task_pool) {
             answer.tasks[timestep][id] = task;
         }
         answer.validate_schedule(timestep);
+#endif
 
         // set new schedule
         for (uint32_t r = 0; r < robots.size(); r++) {
