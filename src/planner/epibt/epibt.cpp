@@ -18,7 +18,7 @@ bool EPIBT::validate_path(uint32_t r, uint32_t desired) const {
 uint32_t EPIBT::get_used(uint32_t r) const {
     uint32_t answer = -1;
 
-    auto &poses_path = get_omap().get_poses_path(robots[r].node, desires[r]);
+    const auto &poses_path = get_omap().get_poses_path(robots[r].node, desires[r]);
     for (uint32_t depth = 0; depth < EPIBT_DEPTH; depth++) {
         uint32_t to_pos = poses_path[depth];
         if (used_pos[to_pos][depth] != -1) {

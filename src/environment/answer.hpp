@@ -55,4 +55,7 @@ struct Answer {
     void write_log(std::ostream &output) const;
 
     void write_log(std::ostream &&output) const;
+
+    void write_agent() const;
 };
+

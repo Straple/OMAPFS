@@ -107,3 +107,10 @@ void Answer::write_log(std::ostream &output) const {
 void Answer::write_log(std::ostream &&output) const {
     write_log(output);
 }
+
+void Answer::write_agent() const{
+    uint32_t r = 0;
+    for(auto action : robots[r].actions){
+        std::cout << action_to_char(action);
+    }
+}

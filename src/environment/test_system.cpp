@@ -9,6 +9,8 @@
 
 #include <utils/randomizer.hpp>
 
+#include <planner/pibt/pibt.hpp>
+
 #include <planner/epibt/epibt.hpp>
 #include <planner/epibt/epibt_lns.hpp>
 #include <planner/epibt/operations.hpp>
@@ -100,8 +102,8 @@ std::vector<uint32_t> TestSystem::get_schedule() {
             if (robot.task_id == -1) {
                 while (true) {
                     uint32_t task_id = task_pool.gen_const_next_task(r, robots.size());
-                    if (robot.pos == Position(task_pool.at(task_id).targets[0])) {
-                        continue; // already here, skip bad task
+                    if (robot.pos.get_pos() == task_pool.at(task_id).targets[0]) {
+                        continue;// already here, skip bad task
                     }
                     schedule[r] = task_id;
                     break;
@@ -151,6 +153,10 @@ std::vector<ActionType> TestSystem::get_actions() {
         for (uint32_t r = 0; r < epibt_prev_operations.size(); r++) {
             epibt_prev_operations[r] = get_operation_next(epibt_prev_operations[r]);
         }
+    } else if (get_planner_type() == PlannerType::PIBT) {
+        PIBT solver(robots, end_time);
+        solver.solve();
+        actions = solver.get_actions();
     } else {
         FAILED_ASSERT("unexpected planner type");
     }

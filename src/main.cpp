@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
 
     launch_threads(THREADS_NUM, [&](uint32_t thr) {
         for (int test = static_cast<int>(visited.size()) - 1; test >= 0; test--) {
+            //for (int test = 0; test < visited.size(); test++) {
             {
                 std::unique_lock locker(mutex);
                 if (visited[test]) {
@@ -72,10 +73,18 @@ int main(int argc, char *argv[]) {
             Timer timer;
 
             Robots robots;
-            std::ifstream(config.agents_path + "/agents_" + std::to_string(test) + ".csv") >> robots;
+            if (config.agents_path.size() >= 4 && config.agents_path.substr(config.agents_path.size() - 4) == ".csv") {
+                std::ifstream(config.agents_path) >> robots;
+            } else {
+                std::ifstream(config.agents_path + "/agents_" + std::to_string(test) + ".csv") >> robots;
+            }
 
             TaskPool task_pool;
-            std::ifstream(config.tasks_path + "/tasks_" + std::to_string(test) + ".csv") >> task_pool;
+            if (config.tasks_path.size() >= 4 && config.tasks_path.substr(config.tasks_path.size() - 4) == ".csv") {
+                std::ifstream(config.tasks_path) >> task_pool;
+            } else {
+                std::ifstream(config.tasks_path + "/tasks_" + std::to_string(test) + ".csv") >> task_pool;
+            }
 
             TestSystem test_system(robots, task_pool);
 
@@ -105,8 +114,9 @@ int main(int argc, char *argv[]) {
                 output << "scheduler type," << scheduler_type_to_string(config.scheduler_type) << '\n';
                 output << "planner type," << planner_type_to_string(config.planner_type);
                 if (config.planner_type == PlannerType::EPIBT || config.planner_type == PlannerType::EPIBT_LNS || config.planner_type == PlannerType::PEPIBT_LNS) {
-                    output << "(" << EPIBT_DEPTH_VALUE << ")\n";
+                    output << "(" << EPIBT_DEPTH_VALUE << ")";
                 }
+                output << '\n';
                 output << "agents num," << robots.size() << '\n';
                 output << "steps num," << config.steps_num << '\n';
                 output << "finished tasks," << answer.finished_tasks.size() << '\n';
@@ -120,6 +130,7 @@ int main(int argc, char *argv[]) {
 
                 {
                     std::unique_lock locker(mutex);
+                    answer.write_agent();
                     std::cout << "Done test " << test << ' ' << timer << std::endl;
                 }
             }
