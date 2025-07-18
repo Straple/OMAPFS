@@ -170,7 +170,7 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (visited[to_r] == visited_counter || counter > 1000 || robots[to_r].priority < priority) {
+            if (visited[to_r] == visited_counter || robots[to_r].priority <= priority) {
                 continue;
             }
 
@@ -193,7 +193,9 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
     }
 
     desires[r] = old_desired;
+#ifdef ENABLE_PIBT_FLUSH_VISITED
     visited[r] = 0;
+#endif
     return RetType::FAILED;
 }
 

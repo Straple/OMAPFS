@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-INPUT_DIRS = ["solutions_test"]
+INPUT_DIRS = ["solutions"]
 OUTPUT_FILENAME = 'metrics.csv'
 
 table = {
@@ -55,7 +55,7 @@ total_table = pd.DataFrame(data={"map type": [], "throughput": []})
 for map_type, df in grouped:
     df['throughput'] = df['throughput'].astype(float)
     throughput = df['throughput'].sum() / len(df['throughput'])
-    print(map_type + ":", throughput)
+    #print(map_type + ":", throughput)
     total_table = pd.concat([pd.DataFrame({'map type': [map_type], 'throughput': [throughput]}), total_table], ignore_index=True)
 
 total_table = total_table.sort_values(by=['map type'], ascending=[True])
