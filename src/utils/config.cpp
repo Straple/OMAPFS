@@ -117,6 +117,12 @@ void apply_runtime_config(const RuntimeConfig &config) {
     get_graph_guidance_type() = config.graph_guidance_type;
 
     std::cout << "Applied runtime config:" << std::endl;
+    std::cout << "  Task: ";
+#ifdef ENABLE_ROTATE_MODEL
+    std::cout << "LMAPF-T\n";
+#else
+    std::cout << "LMAPF\n";
+#endif
     std::cout << "  Map: " << map_type_to_string(config.map_type) << '\n';
     std::cout << "  Planner: " << planner_type_to_string(config.planner_type) << '\n';
     std::cout << "  Scheduler: " << scheduler_type_to_string(config.scheduler_type) << '\n';

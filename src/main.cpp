@@ -38,8 +38,9 @@ int main(int argc, char *argv[]) {
 
     std::ifstream(config.map_file) >> get_map();
 
+    get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
     if (config.graph_guidance_type == GraphGuidanceType::DISABLE) {
-        get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
+
     } else if (config.graph_guidance_type == GraphGuidanceType::ENABLE) {
         if (get_map_type() == MapType::RANDOM) {
             get_guidance_map() = GuidanceMap(get_map_type(), get_map());
@@ -80,8 +81,7 @@ int main(int argc, char *argv[]) {
     }
 
     launch_threads(THREADS_NUM, [&](uint32_t thr) {
-        for (int test = static_cast<int>(visited.size()) - 1; test >= 0; test--) {
-            //for (int test = 0; test < visited.size(); test++) {
+        for (uint32_t test = 0; test < visited.size(); test++) {
             {
                 std::unique_lock locker(mutex);
                 if (visited[test]) {
@@ -129,6 +129,12 @@ int main(int argc, char *argv[]) {
             {
                 std::ofstream output(test_dir + "metrics.csv");
                 output << "metric,value\n";
+                output << "task type,";
+#ifdef ENABLE_ROTATE_MODEL
+                output << "LMAPF-T\n";
+#else
+                output << "LMAPF\n";
+#endif
                 output << "map type," << map_type_to_string(config.map_type) << '\n';
                 output << "test id," << test << '\n';
                 output << "scheduler type," << scheduler_type_to_string(config.scheduler_type) << '\n';
@@ -150,7 +156,7 @@ int main(int argc, char *argv[]) {
 
                 {
                     std::unique_lock locker(mutex);
-                    answer.write_agent();
+                    // answer.write_agent();
                     std::cout << "Done test " << test << ' ' << timer << std::endl;
                 }
             }

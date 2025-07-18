@@ -6,7 +6,7 @@ for map in ["RANDOM",
             "SORTATION",
             "WAREHOUSE",]:
     steps_num = 5000
-    if "SMALL" in map:
+    if map == "RANDOM":
         steps_num = 1000
 
     with open("tmp.config", 'w') as file:
@@ -22,12 +22,15 @@ planner_type = EPIBT\n\
 # Scheduler types: CONST, GREEDY\n\
 scheduler_type = CONST\n\
 \n\
+# Graph Guidance types: DISABLE, ENABLE\n\
+graph_guidance_type = ENABLE\n\
+\n\
 # TestSystem file paths\n\
 map_file = tests/{map.lower()}/map.txt\n\
-tasks_path = tests/{map.lower()}/\n\
+tasks_path = tests/{map.lower()}/tasks_one.csv\n\
 agents_path = tests/{map.lower()}/\n\
 steps_num = {steps_num}\n\
-output_dir = solutions/{map.lower()}", file=file
+output_dir = solutions_lmapf_gg/{map.lower()}", file=file
         )
     ret = os.system("./bin/main tmp.config")
     assert ret == 0, "invalid return code: " + str(ret)
