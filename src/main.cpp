@@ -63,9 +63,10 @@ int main(int argc, char *argv[]) {
     get_graph() = Graph(get_map(), get_gg());
     get_hm() = HeuristicMatrix(get_graph());
 
-    // epibt
-    init_operations();
-    get_omap() = OperationsMap(get_graph(), get_operations());
+    if (get_planner_type() == PlannerType::EPIBT || get_planner_type() == PlannerType::EPIBT_LNS || get_planner_type() == PlannerType::PEPIBT_LNS) {
+        init_operations();
+        get_omap() = OperationsMap(get_graph(), get_operations());
+    }
 
     std::filesystem::create_directories(config.output_path);
 
