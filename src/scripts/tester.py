@@ -23,14 +23,14 @@ planner_type = EPIBT\n\
 scheduler_type = CONST\n\
 \n\
 # Graph Guidance types: DISABLE, ENABLE\n\
-graph_guidance_type = ENABLE\n\
+graph_guidance_type = DISABLE\n\
 \n\
 # TestSystem file paths\n\
 map_file = tests/{map.lower()}/map.txt\n\
 tasks_path = tests/{map.lower()}/tasks_one.csv\n\
 agents_path = tests/{map.lower()}/\n\
 steps_num = {steps_num}\n\
-output_dir = solutions_lmapf_gg/{map.lower()}", file=file
+output_path = solutions_lmapf/{map.lower()}", file=file
         )
     ret = os.system("./bin/main tmp.config")
     assert ret == 0, "invalid return code: " + str(ret)

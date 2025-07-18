@@ -75,10 +75,10 @@ RuntimeConfig load_config(const std::string &config_file) {
     if (parsed.count("agents_path")) {
         config.agents_path = parsed["agents_path"];
     }
-    if (parsed.count("output_dir")) {
-        config.output_dir = parsed["output_dir"];
-        if (!config.output_dir.empty() && config.output_dir.back() != '/' && config.output_dir.back() != '\\') {
-            config.output_dir += '/';
+    if (parsed.count("output_path")) {
+        config.output_path = parsed["output_path"];
+        if (!config.output_path.empty() && config.output_path.back() != '/' && config.output_path.back() != '\\') {
+            config.output_path += '/';
         }
     }
 
@@ -130,5 +130,6 @@ void apply_runtime_config(const RuntimeConfig &config) {
     std::cout << "  Map file: " << config.map_file << '\n';
     std::cout << "  Tasks path: " << config.tasks_path << '\n';
     std::cout << "  Agents path: " << config.agents_path << '\n';
+    std::cout << "  Output path: " << config.output_path << '\n';
     std::cout.flush();
 }

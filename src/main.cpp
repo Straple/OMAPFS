@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     init_operations();
     get_omap() = OperationsMap(get_graph(), get_operations());
 
-    std::filesystem::create_directories(config.output_dir);
+    std::filesystem::create_directories(config.output_path);
 
     std::mutex mutex;
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
             TestSystem test_system(robots, task_pool);
 
-            std::string test_dir = config.output_dir + std::to_string(test) + "/";
+            std::string test_dir = config.output_path + std::to_string(test) + "/";
             std::filesystem::create_directories(test_dir);
 
             Answer answer = test_system.simulate(config.steps_num);
