@@ -1,5 +1,6 @@
 #include <environment/graph.hpp>
 #include <environment/graph_guidance.hpp>
+#include <environment/guidance_map.hpp>
 #include <environment/heuristic_matrix.hpp>
 #include <environment/info.hpp>
 #include <environment/map.hpp>
@@ -37,8 +38,27 @@ int main(int argc, char *argv[]) {
 
     std::ifstream(config.map_file) >> get_map();
 
-    // environment
-    get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
+    if (config.graph_guidance_type == GraphGuidanceType::DISABLE) {
+        get_gg() = GraphGuidance(get_map().get_rows(), get_map().get_cols());
+    } else if (config.graph_guidance_type == GraphGuidanceType::ENABLE) {
+        if (get_map_type() == MapType::RANDOM) {
+            get_guidance_map() = GuidanceMap(get_map_type(), get_map());
+            get_gg() = GraphGuidance(get_guidance_map());
+        } else if (get_map_type() == MapType::CITY) {
+            get_gg().set_city();
+        } else if (get_map_type() == MapType::GAME) {
+            get_gg().set_game();
+        } else if (get_map_type() == MapType::SORTATION) {
+            get_gg().set_sortation();
+        } else if (get_map_type() == MapType::WAREHOUSE) {
+            get_gg().set_warehouse();
+        } else {
+            FAILED_ASSERT("unexpected map type");
+        }
+    } else {
+        FAILED_ASSERT("unexpected graph guidance type");
+    }
+
     get_graph() = Graph(get_map(), get_gg());
     get_hm() = HeuristicMatrix(get_graph());
 

@@ -67,6 +67,22 @@ SchedulerType string_to_scheduler_type(const std::string &str) {
     return map.at(str);
 }
 
+std::string graph_guidance_type_to_string(GraphGuidanceType type) {
+    const static std::array<std::string, static_cast<uint32_t>(GraphGuidanceType::NUM)> map = {
+            "DISABLE",
+            "ENABLE",
+    };
+    return map.at(static_cast<uint32_t>(type));
+}
+
+GraphGuidanceType string_to_graph_guidance_type(const std::string &str) {
+    const static std::map<std::string, GraphGuidanceType> map = {
+            {"DISABLE", GraphGuidanceType::DISABLE},
+            {"ENABLE", GraphGuidanceType::ENABLE},
+    };
+    return map.at(str);
+}
+
 // ==================================
 
 MapType &get_map_type() {
@@ -81,5 +97,10 @@ PlannerType &get_planner_type() {
 
 SchedulerType &get_scheduler_type() {
     static SchedulerType type = SchedulerType::CONST;
+    return type;
+}
+
+GraphGuidanceType &get_graph_guidance_type() {
+    static GraphGuidanceType type = GraphGuidanceType::DISABLE;
     return type;
 }

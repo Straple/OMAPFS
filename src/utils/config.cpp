@@ -63,6 +63,9 @@ RuntimeConfig load_config(const std::string &config_file) {
     if (parsed.count("scheduler_type")) {
         config.scheduler_type = string_to_scheduler_type(parsed["scheduler_type"]);
     }
+    if (parsed.count("graph_guidance_type")) {
+        config.graph_guidance_type = string_to_graph_guidance_type(parsed["graph_guidance_type"]);
+    }
     if (parsed.count("map_file")) {
         config.map_file = parsed["map_file"];
     }
@@ -111,12 +114,15 @@ void apply_runtime_config(const RuntimeConfig &config) {
     get_map_type() = config.map_type;
     get_planner_type() = config.planner_type;
     get_scheduler_type() = config.scheduler_type;
+    get_graph_guidance_type() = config.graph_guidance_type;
 
     std::cout << "Applied runtime config:" << std::endl;
-    std::cout << "  Map: " << map_type_to_string(config.map_type) << std::endl;
-    std::cout << "  Planner: " << planner_type_to_string(config.planner_type) << std::endl;
-    std::cout << "  Scheduler: " << scheduler_type_to_string(config.scheduler_type) << std::endl;
-    std::cout << "  Map file: " << config.map_file << std::endl;
-    std::cout << "  Tasks path: " << config.tasks_path << std::endl;
-    std::cout << "  Agents path: " << config.agents_path << std::endl;
+    std::cout << "  Map: " << map_type_to_string(config.map_type) << '\n';
+    std::cout << "  Planner: " << planner_type_to_string(config.planner_type) << '\n';
+    std::cout << "  Scheduler: " << scheduler_type_to_string(config.scheduler_type) << '\n';
+    std::cout << "  Graph Guidance: " << graph_guidance_type_to_string(config.graph_guidance_type) << '\n';
+    std::cout << "  Map file: " << config.map_file << '\n';
+    std::cout << "  Tasks path: " << config.tasks_path << '\n';
+    std::cout << "  Agents path: " << config.agents_path << '\n';
+    std::cout.flush();
 }

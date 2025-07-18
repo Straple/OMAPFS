@@ -1,5 +1,6 @@
 #pragma once
 
+#include <environment/guidance_map.hpp>
 #include <environment/position.hpp>
 
 #include <array>
@@ -19,11 +20,30 @@ class GraphGuidance {
     uint32_t rows = 0;
     uint32_t cols = 0;
 
+    void set(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t dir, uint32_t action, uint32_t value);
+
+    void add(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t dir, uint32_t action, uint32_t value);
+
 public:
+    void set_default();
+
+    void set_grid();
+
+    void set_warehouse();
+
+    void set_sortation();
+
+    void set_game();
+
+    void set_city();
+
+    void set_walls();
 
     GraphGuidance() = default;
 
     GraphGuidance(uint32_t rows, uint32_t cols);
+
+    explicit GraphGuidance(const GuidanceMap &gmap);
 
     [[nodiscard]] uint32_t get(const Position &p, uint32_t action) const;
 

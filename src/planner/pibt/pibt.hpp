@@ -4,6 +4,12 @@
 #include <planner/epibt/operations.hpp>
 #include <utils/time.hpp>
 
+#ifdef ENABLE_ROTATE_MODEL
+#define PIBT_PLAN_DEPTH 3
+#else
+#define PIBT_PLAN_DEPTH 1
+#endif
+
 class PIBT {
     Robots &robots;
 
@@ -16,12 +22,6 @@ class PIBT {
     uint32_t visited_counter = 0;
 
     TimePoint end_time;
-
-#ifdef ENABLE_ROTATE_MODEL
-#define PIBT_PLAN_DEPTH 3
-#else
-#define PIBT_PLAN_DEPTH 1
-#endif
 
     // used_edge[edge][depth] = robot id
     std::vector<std::array<uint32_t, PIBT_PLAN_DEPTH>> used_edge;

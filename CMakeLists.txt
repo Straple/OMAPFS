@@ -14,20 +14,20 @@ set(EPIBT_DEPTH "2" CACHE STRING "Depth for EPIBT operations")
 set(THREADS_NUM_DEFAULT "8" CACHE STRING "Default number of threads")
 
 # Apply configuration
-if(ENABLE_ROTATE_MODEL)
+if (ENABLE_ROTATE_MODEL)
     add_definitions(-DENABLE_ROTATE_MODEL)
     message(STATUS "Building with ROTATION model (actions: F, R, C, w)")
-else()
+else ()
     message(STATUS "Building with NON-ROTATION model (actions: E, S, W, N, w)")
-endif()
+endif ()
 
-if(ENABLE_ASSERT)
+if (ENABLE_ASSERT)
     add_definitions(-DENABLE_ASSERT)
-endif()
+endif ()
 
-if(ENABLE_SCHEDULER_CHANGE_TASK)
+if (ENABLE_SCHEDULER_CHANGE_TASK)
     add_definitions(-DENABLE_SCHEDULER_CHANGE_TASK)
-endif()
+endif ()
 
 # Set compile-time constants
 add_definitions(-DEPIBT_DEPTH=${EPIBT_DEPTH})
