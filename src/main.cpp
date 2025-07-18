@@ -143,6 +143,12 @@ int main(int argc, char *argv[]) {
                     output << "(" << EPIBT_DEPTH_VALUE << ")";
                 }
                 output << '\n';
+                output << "graph guidance type,";
+                if (config.graph_guidance_type == GraphGuidanceType::ENABLE) {
+                    output << "enable\n";
+                } else {
+                    output << "disable\n";
+                }
                 output << "agents num," << robots.size() << '\n';
                 output << "steps num," << config.steps_num << '\n';
                 output << "finished tasks," << answer.finished_tasks.size() << '\n';
