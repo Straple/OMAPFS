@@ -14,12 +14,13 @@ enum class MapType : uint8_t {
 };
 
 enum class PlannerType : uint8_t {
-    PIBT,      // pibt
-    PIBT_TF,   // pibt + trafficflow
-    EPIBT,     // epibt
-    EPIBT_LNS, // epibt + lns
-    PEPIBT_LNS,// parallel epibt + lns
-    WPPL,      // windowed parallel pibt + lns
+    PIBT,       // pibt
+    CAUSAL_PIBT,// causal pibt
+    PIBT_TF,    // pibt + trafficflow
+    EPIBT,      // epibt
+    EPIBT_LNS,  // epibt + lns
+    PEPIBT_LNS, // parallel epibt + lns
+    WPPL,       // windowed parallel pibt + lns
 
     NUM
 };

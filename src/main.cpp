@@ -8,6 +8,9 @@
 #include <environment/task.hpp>
 #include <environment/test_system.hpp>
 
+#include <planner/causal_pibt/environment.hpp>
+#include <planner/causal_pibt/heuristics.h>
+
 #include <planner/epibt/operations.hpp>
 #include <planner/epibt/operations_map.hpp>
 
@@ -67,6 +70,35 @@ int main(int argc, char *argv[]) {
         init_operations();
         get_omap() = OperationsMap(get_graph(), get_operations());
     }
+
+#ifdef ENABLE_ROTATE_MODEL
+    if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
+        DefaultPlanner::SharedEnvironment env;
+        env.num_of_agents = 0;
+        env.rows = get_map().get_rows();
+        env.cols = get_map().get_cols();
+        env.map.assign(get_map().get_size() - 1, -1);
+        for (uint32_t pos = 1; pos < get_map().get_size(); pos++) {
+            env.map[pos - 1] = !get_map().is_free(pos);
+        }
+
+        {
+            DefaultPlanner::init_heuristics(&env);
+            launch_threads(THREADS_NUM, [&](uint32_t thr) {
+                for (uint32_t dst = thr; dst + 1 < get_map().get_size(); dst += THREADS_NUM) {
+                    for (uint32_t src = 0; src + 1 < get_map().get_size(); src++) {
+                        get_h(&env, src, dst);
+                    }
+                }
+            });
+            /*for (uint32_t src = 1; src < get_map().get_size(); src++) {
+                for (uint32_t dst = 1; dst < get_map().get_size(); dst++) {
+                    get_h(&env, src - 1, dst - 1);
+                }
+            }*/
+        }
+    }
+#endif
 
     std::filesystem::create_directories(config.output_path);
 

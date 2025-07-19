@@ -11,6 +11,8 @@
 
 #include <planner/pibt/pibt.hpp>
 
+#include <planner/causal_pibt/planner.h>
+
 #include <planner/epibt/epibt.hpp>
 #include <planner/epibt/epibt_lns.hpp>
 #include <planner/epibt/operations.hpp>
@@ -123,7 +125,8 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
-    TimePoint end_time = get_now() + Milliseconds(1000);
+    constexpr uint32_t timelimit = 10;
+    TimePoint end_time = get_now() + Milliseconds(timelimit);
 
 #ifndef ENABLE_EPIBT_INHERITANCE
     std::vector<uint32_t> epibt_prev_operations(robots.size());
@@ -157,7 +160,25 @@ std::vector<ActionType> TestSystem::get_actions() {
         PIBT solver(robots, end_time);
         solver.solve();
         actions = solver.get_actions();
-    } else {
+    }
+#ifdef ENABLE_ROTATE_MODEL
+    else if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
+        env.goal_locations.assign(robots.size(), {});
+        env.curr_states.assign(robots.size(), {});
+        for (uint32_t r = 0; r < robots.size(); r++) {
+            auto targets = task_pool.at(robots[r].task_id).targets;
+            for (uint32_t target: targets) {
+                env.goal_locations[r].push_back({target - 1, 0});
+            }
+            env.curr_states[r].timestep = timestep;
+            env.curr_states[r].location = robots[r].pos.get_pos() - 1;
+            env.curr_states[r].orientation = robots[r].pos.get_dir();
+        }
+        env.curr_timestep = timestep;
+        causal_pibt.plan(timelimit, actions, &env);
+    }
+#endif
+    else {
         FAILED_ASSERT("unexpected planner type");
     }
     return actions;
@@ -172,6 +193,20 @@ Answer TestSystem::simulate(uint32_t steps_num) {
     answer.steps_num = steps_num;
     answer.robots.resize(robots.size());
     answer.heatmap = std::vector(get_map().get_rows(), std::vector(get_map().get_cols(), std::array<uint64_t, ACTIONS_NUM + 1>()));
+
+#ifdef ENABLE_ROTATE_MODEL
+    if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
+        env.num_of_agents = robots.size();
+        env.rows = get_map().get_rows();
+        env.cols = get_map().get_cols();
+        env.map.assign(get_map().get_size() - 1, -1);
+        for (uint32_t pos = 1; pos < get_map().get_size(); pos++) {
+            env.map[pos - 1] = !get_map().is_free(pos);
+        }
+
+        causal_pibt.initialize(&env);
+    }
+#endif
 
     for (; timestep < steps_num; timestep++) {
         Timer step_timer;

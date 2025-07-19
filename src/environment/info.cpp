@@ -30,6 +30,7 @@ MapType string_to_map_type(const std::string &str) {
 std::string planner_type_to_string(PlannerType type) {
     const static std::array<std::string, static_cast<uint32_t>(PlannerType::NUM)> map = {
             "PIBT",
+            "CAUSAL_PIBT",
             "PIBT_TF",
             "EPIBT",
             "EPIBT_LNS",
@@ -42,6 +43,7 @@ std::string planner_type_to_string(PlannerType type) {
 PlannerType string_to_planner_type(const std::string &str) {
     const static std::map<std::string, PlannerType> map = {
             {"PIBT", PlannerType::PIBT},
+            {"CAUSAL_PIBT", PlannerType::CAUSAL_PIBT},
             {"PIBT_TF", PlannerType::PIBT_TF},
             {"EPIBT", PlannerType::EPIBT},
             {"EPIBT_LNS", PlannerType::EPIBT_LNS},
