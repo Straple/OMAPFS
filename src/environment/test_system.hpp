@@ -4,7 +4,7 @@
 #include <environment/robot.hpp>
 #include <environment/task.hpp>
 #include <planner/causal_pibt/environment.hpp>
-#include <planner/causal_pibt/planner.h>
+#include <planner/causal_pibt/planner.hpp>
 #include <scheduler/greedy/greedy_scheduler.hpp>
 
 #include <cstdint>

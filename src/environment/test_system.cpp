@@ -11,7 +11,7 @@
 
 #include <planner/pibt/pibt.hpp>
 
-#include <planner/causal_pibt/planner.h>
+#include <planner/causal_pibt/planner.hpp>
 
 #include <planner/epibt/epibt.hpp>
 #include <planner/epibt/epibt_lns.hpp>
@@ -125,8 +125,7 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
-    constexpr uint32_t timelimit = 10;
-    TimePoint end_time = get_now() + Milliseconds(timelimit);
+    TimePoint end_time = get_now() + Milliseconds(1000);
 
 #ifndef ENABLE_EPIBT_INHERITANCE
     std::vector<uint32_t> epibt_prev_operations(robots.size());
@@ -175,7 +174,7 @@ std::vector<ActionType> TestSystem::get_actions() {
             env.curr_states[r].orientation = robots[r].pos.get_dir();
         }
         env.curr_timestep = timestep;
-        causal_pibt.plan(timelimit, actions, &env);
+        causal_pibt.plan(end_time, actions, &env);
     }
 #endif
     else {

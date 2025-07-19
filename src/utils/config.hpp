@@ -20,15 +20,6 @@ struct RuntimeConfig {
     uint32_t steps_num = 1000;
 };
 
-// Compile-time settings (will be defined by CMake)
-#ifndef EPIBT_DEPTH
-#define EPIBT_DEPTH 3
-#endif
-
-#ifndef THREADS_NUM_DEFAULT
-#define THREADS_NUM_DEFAULT 8
-#endif
-
 RuntimeConfig load_config(const std::string &config_file = "config.json");
 
 void save_config(const RuntimeConfig &config, const std::string &config_file = "config.json");

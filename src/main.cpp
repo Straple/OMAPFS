@@ -9,7 +9,7 @@
 #include <environment/test_system.hpp>
 
 #include <planner/causal_pibt/environment.hpp>
-#include <planner/causal_pibt/heuristics.h>
+#include <planner/causal_pibt/heuristics.hpp>
 
 #include <planner/epibt/operations.hpp>
 #include <planner/epibt/operations_map.hpp>
@@ -87,15 +87,12 @@ int main(int argc, char *argv[]) {
             launch_threads(THREADS_NUM, [&](uint32_t thr) {
                 for (uint32_t dst = thr; dst + 1 < get_map().get_size(); dst += THREADS_NUM) {
                     for (uint32_t src = 0; src + 1 < get_map().get_size(); src++) {
-                        get_h(&env, src, dst);
+                        if (get_map().is_free(src + 1) && get_map().is_free(dst + 1)) {
+                            get_h(&env, src, dst);
+                        }
                     }
                 }
             });
-            /*for (uint32_t src = 1; src < get_map().get_size(); src++) {
-                for (uint32_t dst = 1; dst < get_map().get_size(); dst++) {
-                    get_h(&env, src - 1, dst - 1);
-                }
-            }*/
         }
     }
 #endif

@@ -47,6 +47,7 @@ file(GLOB SOURCES
         src/environment/*.cpp
         src/planner/*.cpp
         src/planner/pibt/*.cpp
+        src/planner/causal_pibt/*.cpp
         src/planner/epibt/*.cpp
         src/scheduler/greedy/*.cpp
         )
