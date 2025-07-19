@@ -44,13 +44,7 @@ namespace DefaultPlanner {
         int new_direction = direction;
         assert(forward != location);
 
-#ifndef NDEBUG
-        std::cout << "forward: " << forward << std::endl;
-#endif
         if (validateMove(location, forward, env)) {
-#ifndef NDEBUG
-            std::cout << "forward yes" << std::endl;
-#endif
             neighbors.emplace_back(std::make_pair(forward, new_direction));
         }
         //turn left
@@ -99,7 +93,6 @@ namespace DefaultPlanner {
         //forward
         assert(location >= 0 && location < ns->size());
         neighbors = ns->at(location);
-        return;
     }
 
     void getNeighborLocs(const Neighbors *ns, int neighbors[], int location) {

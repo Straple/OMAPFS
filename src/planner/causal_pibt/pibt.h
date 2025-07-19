@@ -1,13 +1,12 @@
 #pragma once
-
 #ifdef ENABLE_ROTATE_MODEL
+
+#include <environment/action_model.hpp>
 
 #include "TrajLNS.h"
 #include "Types.h"
 #include "heuristics.h"
 #include "utils.h"
-
-#include <environment/action_model.hpp>
 
 #include <list>
 #include <tuple>

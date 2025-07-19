@@ -5,7 +5,7 @@
 #include "Types.h"
 #include "search_node.h"
 #include "utils.h"
-#include <queue>
+#include "environment.hpp"
 
 namespace DefaultPlanner {
 

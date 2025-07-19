@@ -15,10 +15,6 @@
 
 namespace DefaultPlanner {
     // enum ADAPTIVE {RANDOM, CONGESTION, COUNT};
-    enum ADAPTIVE { RANDOM,
-                    CONGESTION,
-                    DEVIATION,
-                    COUNT };
 
     extern std::vector<HeuristicTable> global_heuristictable;
     extern Neighbors global_neighbors;
@@ -31,26 +27,6 @@ namespace DefaultPlanner {
 
         FW_Metric(int i, int d, int l) : id(i), deviation(d), last_replan_t(l){};
         FW_Metric(){};
-    };
-
-    struct FlowHeuristic {
-        HeuristicTable *h;
-        int target;
-        int origin;
-        pqueue_min_of open;
-        MemoryPool mem;
-
-
-        bool empty() {
-            return mem.generated() == 0;
-        }
-        void reset() {
-            // op_flows.clear();
-            // depths.clear();
-            // dists.clear();
-            open.clear();
-            mem.reset();
-        }
     };
 
     class TrajLNS {

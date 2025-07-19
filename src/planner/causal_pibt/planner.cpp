@@ -6,10 +6,11 @@
 #include "heuristics.h"
 #include "pibt.h"
 
-#include <utils/time.hpp>
+#include <environment/info.hpp>
+
+#include <random>
 
 namespace DefaultPlanner {
-
 
 
     /**
@@ -37,15 +38,11 @@ namespace DefaultPlanner {
             ids[i] = i;
         }
 
-        // initialise the heuristics tables containers
-        //init_heuristics(env);
-        mt1.seed(0);
-
         new (&trajLNS) TrajLNS(env, global_heuristictable, global_neighbors);
         trajLNS.init_mem();
 
         //assign intial priority to each agent
-        std::shuffle(ids.begin(), ids.end(), mt1);
+        std::shuffle(ids.begin(), ids.end(), std::mt19937(0));
         for (int i = 0; i < ids.size(); i++) {
             p[ids[i]] = ((double) (ids.size() - i)) / ((double) (ids.size() + 1));
         }
@@ -66,11 +63,7 @@ namespace DefaultPlanner {
      * Finally, it computes the actions for the agents using PIBT that follows the guide path heuristics and returns the actions.
      * Note that the default planner ignores the turning action costs, and post-processes turning actions as additional delays on top of original plan.
      */
-    void CausalPIBT::plan(int time_limit, std::vector<ActionType> &actions, SharedEnvironment *env) {
-        // calculate the time planner should stop optimsing traffic flows and return the plan.
-        TimePoint start_time = std::chrono::steady_clock::now();
-        //traffic flow assignment end time, leave PIBT_RUNTIME_PER_100_AGENTS ms per 100 agent and TRAFFIC_FLOW_ASSIGNMENT_END_TIME_TOLERANCE ms for computing pibt actions;
-        TimePoint end_time = start_time + std::chrono::milliseconds(time_limit);
+    void CausalPIBT::plan(TimePoint end_time, std::vector<ActionType> &actions, SharedEnvironment *env) {
 
         // recrod the initial location of each agent as dummy goals in case no goal is assigned to the agent.
         if (env->curr_timestep == 0) {
@@ -96,7 +89,6 @@ namespace DefaultPlanner {
                     }
                 }
             }
-
 
             // set the goal location of each agent
             if (env->goal_locations[i].empty()) {
@@ -141,20 +133,22 @@ namespace DefaultPlanner {
             }
         }
 
-        // compute the congestion minimised guide path for the agents that need guide path update
-        for (int i = 0; i < env->num_of_agents; i++) {
-            if (std::chrono::steady_clock::now() > end_time)
-                break;
-            if (require_guide_path[i]) {
-                if (!trajLNS.trajs[i].empty())
-                    remove_traj(trajLNS, i);
-                update_traj(trajLNS, i);
+        if (get_planner_type() == PlannerType::PIBT_TF) {
+            // compute the congestion minimised guide path for the agents that need guide path update
+            for (int i = 0; i < env->num_of_agents; i++) {
+                if (get_now() >= end_time)
+                    break;
+                if (require_guide_path[i]) {
+                    if (!trajLNS.trajs[i].empty())
+                        remove_traj(trajLNS, i);
+                    update_traj(trajLNS, i);
+                }
             }
-        }
 
-        // iterate and recompute the guide path to optimise traffic flow
-        std::unordered_set<int> updated;
-        frank_wolfe(trajLNS, updated, end_time);
+            // iterate and recompute the guide path to optimise traffic flow
+            std::unordered_set<int> updated;
+            frank_wolfe(trajLNS, updated, end_time);
+        }
 
         // sort agents based on the current priority
         std::sort(ids.begin(), ids.end(), [&](int a, int b) {

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef ENABLE_ROTATE_MODEL
 
 #include "Types.h"

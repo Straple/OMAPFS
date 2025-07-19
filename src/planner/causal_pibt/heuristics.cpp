@@ -96,7 +96,6 @@ namespace DefaultPlanner {
         return get_heuristic(global_heuristictable.at(target), env, source, &global_neighbors);
     }
 
-
     void init_dist_2_path(Dist2Path &dp, SharedEnvironment *env, Traj &path) {
         if (dp.dist2path.empty())
             dp.dist2path.resize(env->map.size(), d2p(0, -1, MAX_TIMESTEP, MAX_TIMESTEP));
@@ -116,19 +115,13 @@ namespace DefaultPlanner {
 
     std::pair<int, int> get_source_2_path(Dist2Path &dp, SharedEnvironment *env, int source, Neighbors *ns) {
         if (dp.dist2path[source].label == dp.label && dp.dist2path[source].cost < MAX_TIMESTEP) {
-            // std::cout<<dp.dist2path[source].first<<" "<<dp.dist2path[source].second<<std::endl;
-
             return std::make_pair(dp.dist2path[source].cost, dp.dist2path[source].togo);
         }
-
-
         std::vector<int> neighbors;
         int cost;
-
         while (!dp.open.empty()) {
             d2p curr = dp.open.front();
             dp.open.pop_front();
-
 
             getNeighborLocs(ns, neighbors, curr.id);
 
@@ -142,21 +135,16 @@ namespace DefaultPlanner {
                 dp.dist2path[next_location] = {dp.label, next_location, cost, curr.togo};
             }
             if (source == curr.id) {
-                // std::cout<<curr.second.first<<" "<<curr.second.second<<std::endl;
                 return std::make_pair(curr.cost, curr.togo);
             }
         }
-
         return std::make_pair(MAX_TIMESTEP, 0);
     }
 
     int get_dist_2_path(Dist2Path &dp, SharedEnvironment *env, int source, Neighbors *ns) {
-
         std::pair<int, int> dists = get_source_2_path(dp, env, source, ns);
-
         return dists.first + dists.second;
     }
-
 
 }// namespace DefaultPlanner
 

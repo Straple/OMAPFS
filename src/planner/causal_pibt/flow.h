@@ -16,7 +16,6 @@ namespace DefaultPlanner {
 
     void add_traj(TrajLNS &lns, int agent);
 
-
     void get_deviation(TrajLNS &lns);
 
     void update_fw_metrics(TrajLNS &lns);
@@ -30,7 +29,6 @@ namespace DefaultPlanner {
 
     //update traj and distance table for agent i
     void update_traj(TrajLNS &lns, int i);
-
 
 }// namespace DefaultPlanner
 #endif

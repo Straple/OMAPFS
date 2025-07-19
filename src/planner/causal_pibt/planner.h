@@ -4,9 +4,8 @@
 #include "TrajLNS.h"
 #include "Types.h"
 
-#include <random>
-
 #include <environment/action_model.hpp>
+#include <utils/time.hpp>
 
 namespace DefaultPlanner {
     class CausalPIBT {
@@ -24,13 +23,12 @@ namespace DefaultPlanner {
         std::vector<bool> require_guide_path;
         std::vector<int> dummy_goals;
         TrajLNS trajLNS;
-        std::mt19937 mt1;
 
     public:
 
         void initialize(SharedEnvironment *env);
 
-        void plan(int time_limit, std::vector<ActionType> &actions, SharedEnvironment *env);
+        void plan(TimePoint end_time, std::vector<ActionType> &actions, SharedEnvironment *env);
     };
 }// namespace DefaultPlanner
 

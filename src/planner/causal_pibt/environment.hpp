@@ -9,9 +9,9 @@
 namespace DefaultPlanner {
     class SharedEnvironment {
     public:
-        int num_of_agents;
-        int rows;
-        int cols;
+        int num_of_agents = 0;
+        int rows = 0;
+        int cols = 0;
         std::vector<int> map;
 
         // goal locations for each agent
@@ -21,7 +21,8 @@ namespace DefaultPlanner {
         int curr_timestep = 0;
         std::vector<State> curr_states;
 
-        SharedEnvironment() {}
+        SharedEnvironment() = default;
     };
 };// namespace DefaultPlanner
+
 #endif

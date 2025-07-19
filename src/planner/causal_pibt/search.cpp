@@ -3,7 +3,6 @@
 #include "search.h"
 
 namespace DefaultPlanner {
-    std::chrono::nanoseconds t;
     //a astar minimized the opposide traffic flow with existing traffic flow
 
     s_node astar(SharedEnvironment *env, std::vector<Int4> &flow,
