@@ -8,7 +8,6 @@ namespace DefaultPlanner {
     std::vector<HeuristicTable> global_heuristictable;
     Neighbors global_neighbors;
 
-
     void init_neighbor(SharedEnvironment *env) {
         global_neighbors.resize(env->rows * env->cols);
         for (int row = 0; row < env->rows; row++) {
@@ -30,7 +29,7 @@ namespace DefaultPlanner {
                 }
             }
         }
-    };
+    }
 
     void init_heuristics(SharedEnvironment *env) {
         if (global_heuristictable.size() == 0) {
@@ -49,7 +48,6 @@ namespace DefaultPlanner {
         ht.htable[goal_location] = 0;
         ht.open.push_back(root);// add root to open
     }
-
 
     int get_heuristic(HeuristicTable &ht, SharedEnvironment *env, int source, Neighbors *ns) {
         if (ht.htable[source] < MAX_TIMESTEP) return ht.htable[source];

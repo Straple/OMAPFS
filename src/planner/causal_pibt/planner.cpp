@@ -2,7 +2,6 @@
 
 #include "planner.h"
 #include "environment.hpp"
-#include "const.h"
 #include "flow.h"
 #include "heuristics.h"
 #include "pibt.h"
@@ -11,21 +10,7 @@
 
 namespace DefaultPlanner {
 
-    //default planner data
-    std::vector<int> decision;
-    std::vector<int> prev_decision;
-    std::vector<double> p;
-    std::vector<State> prev_states;
-    std::vector<State> next_states;
-    std::vector<int> ids;
-    std::vector<double> p_copy;
-    std::vector<bool> occupied;
-    std::vector<DCR> decided;
-    std::vector<bool> checked;
-    std::vector<bool> require_guide_path;
-    std::vector<int> dummy_goals;
-    TrajLNS trajLNS;
-    std::mt19937 mt1;
+
 
     /**
      * @brief Default planner initialization
@@ -35,27 +20,26 @@ namespace DefaultPlanner {
      *
      * The initialization function initializes the default planner data structures and heuristics tables.
      */
-    void initialize(int preprocess_time_limit, SharedEnvironment *env) {
+    void CausalPIBT::initialize(SharedEnvironment *env) {
         //initialise all required data structures
         assert(env->num_of_agents != 0);
-        p.resize(env->num_of_agents);
-        decision.resize(env->map.size(), -1);
-        prev_decision.resize(env->map.size(), -1);
-        prev_states.resize(env->num_of_agents);
+        p.assign(env->num_of_agents, 0);
+        decision.assign(env->map.size(), -1);
+        prev_decision.assign(env->map.size(), -1);
+        prev_states.assign(env->num_of_agents, {});
         next_states.resize(env->num_of_agents);
-        decided.resize(env->num_of_agents, DCR({-1, DONE::DONE}));
-        occupied.resize(env->map.size(), false);
-        checked.resize(env->num_of_agents, false);
-        ids.resize(env->num_of_agents);
+        decided.assign(env->num_of_agents, DCR({-1, DONE::DONE}));
+        occupied.assign(env->map.size(), false);
+        checked.assign(env->num_of_agents, false);
+        ids.assign(env->num_of_agents, {});
         require_guide_path.resize(env->num_of_agents, false);
         for (int i = 0; i < ids.size(); i++) {
             ids[i] = i;
         }
 
         // initialise the heuristics tables containers
-        init_heuristics(env);
+        //init_heuristics(env);
         mt1.seed(0);
-        srand(0);
 
         new (&trajLNS) TrajLNS(env, global_heuristictable, global_neighbors);
         trajLNS.init_mem();
@@ -82,7 +66,7 @@ namespace DefaultPlanner {
      * Finally, it computes the actions for the agents using PIBT that follows the guide path heuristics and returns the actions.
      * Note that the default planner ignores the turning action costs, and post-processes turning actions as additional delays on top of original plan.
      */
-    void plan(int time_limit, std::vector<ActionType> &actions, SharedEnvironment *env) {
+    void CausalPIBT::plan(int time_limit, std::vector<ActionType> &actions, SharedEnvironment *env) {
         // calculate the time planner should stop optimsing traffic flows and return the plan.
         TimePoint start_time = std::chrono::steady_clock::now();
         //traffic flow assignment end time, leave PIBT_RUNTIME_PER_100_AGENTS ms per 100 agent and TRAFFIC_FLOW_ASSIGNMENT_END_TIME_TOLERANCE ms for computing pibt actions;

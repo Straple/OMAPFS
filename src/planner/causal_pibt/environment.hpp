@@ -6,21 +6,22 @@
 #include <unordered_map>
 #include <vector>
 
-class SharedEnvironment {
-public:
-    int num_of_agents;
-    int rows;
-    int cols;
-    std::vector<int> map;
+namespace DefaultPlanner {
+    class SharedEnvironment {
+    public:
+        int num_of_agents;
+        int rows;
+        int cols;
+        std::vector<int> map;
 
-    // goal locations for each agent
-    // each task is a pair of <goal_loc, reveal_time>
-    std::vector<std::vector<std::pair<int, int>>> goal_locations;
+        // goal locations for each agent
+        // each task is a pair of <goal_loc, reveal_time>
+        std::vector<std::vector<std::pair<int, int>>> goal_locations;
 
-    int curr_timestep = 0;
-    std::vector<State> curr_states;
+        int curr_timestep = 0;
+        std::vector<State> curr_states;
 
-    SharedEnvironment() {}
-};
-
+        SharedEnvironment() {}
+    };
+};// namespace DefaultPlanner
 #endif

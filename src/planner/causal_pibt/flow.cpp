@@ -9,10 +9,6 @@
 #include <utils/time.hpp>
 
 namespace DefaultPlanner {
-
-    std::mt19937 g(0);
-
-
     //remove flow for each location's outgoing edge according to the traj
     void remove_traj(TrajLNS &lns, int agent) {
         lns.soc -= lns.trajs[agent].size() - 1;
