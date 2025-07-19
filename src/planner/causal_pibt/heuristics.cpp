@@ -1,6 +1,7 @@
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "heuristics.h"
+#include <planner/causal_pibt/heuristics.hpp>
+
 #include <queue>
 
 namespace DefaultPlanner {

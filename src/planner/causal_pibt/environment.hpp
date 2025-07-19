@@ -1,7 +1,7 @@
 #pragma once
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "States.h"
+#include <planner/causal_pibt/state.hpp>
 
 #include <unordered_map>
 #include <vector>

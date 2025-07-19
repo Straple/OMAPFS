@@ -1,6 +1,6 @@
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "pibt.h"
+#include <planner/causal_pibt/pibt.hpp>
 
 namespace DefaultPlanner {
 
@@ -43,12 +43,12 @@ namespace DefaultPlanner {
 
             int min_heuristic = get_gp_h(lns, curr_id, neighbor);
 
-            successors.emplace_back(neighbor, min_heuristic, -1, rand());
+            successors.emplace_back(neighbor, min_heuristic, -1, lns.rnd());
         }
 
         int wait_heuristic = get_gp_h(lns, curr_id, prev_loc);
 
-        successors.emplace_back(prev_loc, wait_heuristic, -1, rand());
+        successors.emplace_back(prev_loc, wait_heuristic, -1, lns.rnd());
 
 
         std::sort(successors.begin(), successors.end(),

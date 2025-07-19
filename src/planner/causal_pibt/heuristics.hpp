@@ -1,11 +1,11 @@
 #pragma once
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "TrajLNS.h"
-#include "Types.h"
-#include "search_node.h"
-#include "utils.h"
-#include "environment.hpp"
+#include <planner/causal_pibt/environment.hpp>
+#include <planner/causal_pibt/search_node.hpp>
+#include <planner/causal_pibt/traj_lns.hpp>
+#include <planner/causal_pibt/types.hpp>
+#include <planner/causal_pibt/utils.hpp>
 
 namespace DefaultPlanner {
 

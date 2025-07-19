@@ -1,10 +1,10 @@
 #pragma once
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "TrajLNS.h"
-#include "Types.h"
-#include "heuristics.h"
-#include "search.h"
+#include <planner/causal_pibt/heuristics.hpp>
+#include <planner/causal_pibt/search.hpp>
+#include <planner/causal_pibt/traj_lns.hpp>
+#include <planner/causal_pibt/types.hpp>
 
 #include <random>
 #include <unordered_set>

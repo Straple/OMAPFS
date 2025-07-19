@@ -1,6 +1,6 @@
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "utils.h"
+#include <planner/causal_pibt/utils.hpp>
 
 namespace DefaultPlanner {
     int get_d(int diff, const SharedEnvironment *env) {

@@ -1,10 +1,9 @@
 #pragma once
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "TrajLNS.h"
-#include "Types.h"
-
 #include <environment/action_model.hpp>
+#include <planner/causal_pibt/traj_lns.hpp>
+#include <planner/causal_pibt/types.hpp>
 #include <utils/time.hpp>
 
 namespace DefaultPlanner {
@@ -25,7 +24,6 @@ namespace DefaultPlanner {
         TrajLNS trajLNS;
 
     public:
-
         void initialize(SharedEnvironment *env);
 
         void plan(TimePoint end_time, std::vector<ActionType> &actions, SharedEnvironment *env);

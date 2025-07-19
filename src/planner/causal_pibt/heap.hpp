@@ -11,12 +11,12 @@
 //
 // Modified for search nodes used here. Mike
 
-#include "Memory.h"
-#include "Types.h"
-#include "search_node.h"
-#include "utils.h"
 #include <cassert>
 #include <iostream>
+#include <planner/causal_pibt/memory.hpp>
+#include <planner/causal_pibt/search_node.hpp>
+#include <planner/causal_pibt/types.hpp>
+#include <planner/causal_pibt/utils.hpp>
 
 namespace DefaultPlanner {
 

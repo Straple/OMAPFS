@@ -1,12 +1,10 @@
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "flow.h"
-
+#include <planner/causal_pibt/flow.hpp>
+#include <utils/time.hpp>
 
 #include <random>
 #include <unordered_set>
-
-#include <utils/time.hpp>
 
 namespace DefaultPlanner {
     //remove flow for each location's outgoing edge according to the traj
@@ -73,7 +71,7 @@ namespace DefaultPlanner {
     void update_fw_metrics(TrajLNS &lns) {
         for (int i = 0; i < lns.env->num_of_agents; i++) {
             lns.fw_metrics[i].id = i;
-            lns.fw_metrics[i].rand = rand();
+            lns.fw_metrics[i].rand = lns.rnd();
             lns.fw_metrics[i].deviation = 0;
             if (lns.traj_dists[i].empty() || lns.trajs[i].empty())
                 continue;

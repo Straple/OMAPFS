@@ -1,12 +1,10 @@
 #pragma once
-
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "Types.h"
+#include <planner/causal_pibt/types.hpp>
 
 namespace DefaultPlanner {
     int get_d(int diff, const SharedEnvironment *env);
-
 
     bool validateMove(int loc, int loc2, const SharedEnvironment *env);
 

@@ -1,6 +1,6 @@
 #ifdef ENABLE_ROTATE_MODEL
 
-#include "search.h"
+#include <planner/causal_pibt/search.hpp>
 
 namespace DefaultPlanner {
     //a astar minimized the opposide traffic flow with existing traffic flow

@@ -3,16 +3,15 @@
 
 #include <environment/action_model.hpp>
 
-#include "TrajLNS.h"
-#include "Types.h"
-#include "heuristics.h"
-#include "utils.h"
+#include <planner/causal_pibt/heuristics.hpp>
+#include <planner/causal_pibt/traj_lns.hpp>
+#include <planner/causal_pibt/types.hpp>
+#include <planner/causal_pibt/utils.hpp>
 
 #include <list>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
-
 
 namespace DefaultPlanner {
 
