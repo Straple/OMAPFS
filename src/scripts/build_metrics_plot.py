@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 # colors = ['lime', 'dodgerblue', 'orange', 'red', 'blueviolet', 'aqua', 'deeppink', 'brown']
 # colors = ['green', 'blue', 'orange', 'red', 'blueviolet', 'aqua', 'deeppink', 'brown']
 # plan_algos_name = ['EPIBT+LNS+GG', 'EPIBT+LNS', 'EPIBT+GG', 'EPIBT', 'PIBT+GG', 'PIBT', 'WPPL+GG', 'PIBT+traffic flow']
-# markers = ['o', 'v', 's', 'p', '*', 'x', 'D', 'P', 'o', 'v', 's', 'p', '*', 'x', 'D', 'P', 'o', 'v', 's', 'p', '*', 'x', 'D', 'P']
+markers = ['o', 'v', 's', 'p', '*', 'x', 'D', 'P']
 
 # color_palette = sns.color_palette("tab10", 8)
 # plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_palette)
@@ -25,8 +25,11 @@ print("maps:", maps)
 
 is_first = True
 
+planner_to_marker = dict()
+marker_it = 0
 
 def add_map(map_name, map_text, column):
+    global marker_it
     global is_first
     if not map_name in maps:
         return
@@ -46,12 +49,16 @@ def add_map(map_name, map_text, column):
     for planner_type in grouped.groups:
         df = grouped.get_group(planner_type)
 
+        if not planner_type in planner_to_marker:
+            planner_to_marker[planner_type] = markers[marker_it]
+            marker_it += 1
+
         if True:
             if len(maps) == 1:
                 ax = axes[1]
             else:
                 ax = axes[1][column]
-            ax.plot(df['agents num'], df['throughput'], alpha=1, label=planner_type)
+            ax.plot(df['agents num'], df['throughput'], alpha=1, label=planner_type, marker=planner_to_marker[planner_type])
             if is_first:
                 ax.set_ylabel('Throughput')
             ax.grid(True)
@@ -63,13 +70,13 @@ def add_map(map_name, map_text, column):
                 ax = axes[2]
             else:
                 ax = axes[2][column]
-            ax.plot(df['agents num'], df['avg step time (ms)'], alpha=1, label=planner_type)
+            ax.plot(df['agents num'], df['avg step time (ms)'], alpha=1, label=planner_type, marker=planner_to_marker[planner_type])
             ax.set_yscale('log')
             if is_first:
                 ax.set_ylabel('Decision Time (ms)')
             ax.grid(True)
             ax.set_xlabel('Number of Agents')
-            ax.set_ylim(0.1, 2000)
+            ax.set_ylim(0.5, 2000)
 
     if is_first:
         is_first = False
