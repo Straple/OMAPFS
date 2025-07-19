@@ -161,7 +161,7 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         if (to_r == -1) {
             add_path(r);
 #ifdef ENABLE_EPIBT_ROLLBACK
-            if (old_score + 1e-3 < cur_score) {
+            if (!enable_rollback || old_score + 1e-3 < cur_score) {
                 return RetType::ACCEPTED;
             } else {
                 remove_path(r);
@@ -174,7 +174,7 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (visited[to_r] == visited_counter || counter > 1000) {
+            if (visited[to_r] == visited_counter || counter > 5'000) {
                 continue;
             }
 
@@ -298,9 +298,17 @@ EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t>
 }
 
 void EPIBT::solve() {
-#ifdef ENABLE_MULTILEVEL_LAUNCH
+#ifdef ENABLE_EPIBT_MULTILEVEL_LAUNCH
     for (uint32_t it = 0; it < 3; it++) {
-        for (available_operation_depth = 1; available_operation_depth <= EPIBT_DEPTH_VALUE; available_operation_depth++) {
+        if (it) {
+            enable_rollback = true;
+        }
+#ifdef ENABLE_ROTATE_MODEL
+        available_operation_depth = 3;
+#else
+        available_operation_depth = 1;
+#endif
+        for (; available_operation_depth <= EPIBT_DEPTH_VALUE; available_operation_depth++) {
             std::sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
                 return get_smart_dist(lhs, desires[lhs]) < get_smart_dist(rhs, desires[rhs]);
             });
@@ -336,7 +344,8 @@ std::vector<ActionType> EPIBT::get_actions() const {
         const auto &op = get_operations()[desires[r]];
         answer[r] = op[0];
 
-        /*#ifdef ENABLE_ROTATE_MODEL
+#ifdef ENABLE_EPIBT_SMART_OPERATION_EXECUTION
+#ifdef ENABLE_ROTATE_MODEL
         if (robots[r].is_disable()) {
             continue;
         }
@@ -374,7 +383,8 @@ std::vector<ActionType> EPIBT::get_actions() const {
             // WWW
             update_answer({ActionType::WAIT, ActionType::ROTATE, ActionType::COUNTER_ROTATE});
         }
-#endif*/
+#endif
+#endif
     }
     return answer;
 }

@@ -5,12 +5,12 @@ project(omapfs)
 set(CMAKE_CXX_STANDARD 20)
 
 # Compile-time configuration options
-option(ENABLE_ROTATE_MODEL "Enable rotation model instead of directional model" OFF)
+option(ENABLE_ROTATE_MODEL "Enable rotation model instead of directional model" ON)
 option(ENABLE_ASSERT "Enable assertions" ON)
 option(ENABLE_SCHEDULER_CHANGE_TASK "Enable scheduler task changes" ON)
 
 # Configurable compile-time values
-set(EPIBT_DEPTH "2" CACHE STRING "Depth for EPIBT operations")
+set(EPIBT_DEPTH "3" CACHE STRING "Depth for EPIBT operations")
 set(THREADS_NUM_DEFAULT "32" CACHE STRING "Default number of threads")
 
 # Apply configuration

@@ -31,13 +31,15 @@
 constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
 
 /* TODO
- * 1) добавить GraphGuidanceBuilder, который строит GG для разных карт
- * 2) улучшить проверки в Answer
+ * 1) улучшить проверки в Answer
  */
 
-#define ENABLE_EPIBT_ROLLBACK
 
-#define ENABLE_MULTILEVEL_LAUNCH
+// #define ENABLE_EPIBT_ROLLBACK
+
+// #define ENABLE_EPIBT_MULTILEVEL_LAUNCH
+
+// #define ENABLE_EPIBT_SMART_OPERATION_EXECUTION
 
 // #define ENABLE_WRITE_SCHEDULE
 

@@ -69,8 +69,7 @@ def add_map(map_name, map_text, column):
                 ax.set_ylabel('Decision Time (ms)')
             ax.grid(True)
             ax.set_xlabel('Number of Agents')
-            ax.set_ylim(None, 1000)
-            # ax.set_xticks(agents_ticks)
+            ax.set_ylim(0.1, 2000)
 
     if is_first:
         is_first = False
@@ -102,4 +101,4 @@ if __name__ == '__main__':
     fig.legend(lines, labels, loc='lower center', ncol=4)
 
     plt.savefig("metrics_plot.pdf", format='pdf', dpi=800)
-    plt.show()
+    #plt.show()
