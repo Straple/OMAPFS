@@ -21,7 +21,7 @@ protected:
 
     uint32_t visited_counter = 1;
 
-    bool enable_rollback = false;
+    bool enable_rollback = true;
 
     std::vector<uint32_t> desires;
 

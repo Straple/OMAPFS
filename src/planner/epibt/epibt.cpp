@@ -300,9 +300,7 @@ EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t>
 void EPIBT::solve() {
 #ifdef ENABLE_EPIBT_MULTILEVEL_LAUNCH
     for (uint32_t it = 0; it < 3; it++) {
-        if (it) {
-            enable_rollback = true;
-        }
+        enable_rollback = it > 0; // TODO: нужно ли это?
 #ifdef ENABLE_ROTATE_MODEL
         available_operation_depth = 3;
 #else
