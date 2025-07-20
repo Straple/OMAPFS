@@ -25,7 +25,11 @@ protected:
 
     std::vector<uint32_t> desires;
 
+    std::vector<uint32_t> curr_visited;
+
     std::vector<uint32_t> visited;
+
+    std::vector<uint32_t> visited_num;
 
     std::vector<uint32_t> order;
 

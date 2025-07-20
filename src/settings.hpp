@@ -34,6 +34,9 @@ constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
  * 1) улучшить проверки в Answer
  */
 
+// включает хорошую политику посещения агентов
+// немного ухудшает скор, но делает время адекватным
+#define ENABLE_EPIBT_ALTERNATIVE_VISIT_POLICY
 
 // #define ENABLE_EPIBT_ROLLBACK
 

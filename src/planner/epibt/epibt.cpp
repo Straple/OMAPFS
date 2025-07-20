@@ -149,9 +149,14 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         return RetType::REJECTED;
     }
 
+    if (visited[r] != visited_counter) {
+        visited_num[r] = 0;
+    }
+    visited_num[r]++;
     visited[r] = visited_counter;
-    uint32_t old_desired = desires[r];
+    curr_visited[r] = visited_counter;
 
+    uint32_t old_desired = desires[r];
     for (uint32_t desired: robot_desires[r]) {
         if (get_operation_depth(desired) > available_operation_depth) {
             continue;
@@ -174,7 +179,11 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (visited[to_r] == visited_counter || counter > 5'000) {
+            if (curr_visited[to_r] == visited_counter ||
+#ifdef ENABLE_EPIBT_ALTERNATIVE_VISIT_POLICY
+                (visited[to_r] == visited_counter && visited_num[to_r] >= 10) ||
+#endif
+                counter > 5'000) {
                 continue;
             }
 
@@ -197,7 +206,7 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
     }
 
     desires[r] = old_desired;
-    visited[r] = 0;
+    curr_visited[r] = 0;
     return RetType::FAILED;
 }
 
@@ -211,7 +220,7 @@ void EPIBT::build(uint32_t r) {
 }
 
 EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t> &operations)
-    : robots(new_robots), end_time(end_time), desires(operations), visited(robots.size()) {
+    : robots(new_robots), end_time(end_time), desires(operations), visited(robots.size()), visited_num(robots.size()), curr_visited(robots.size()) {
 
     {
         order.resize(robots.size());
@@ -255,40 +264,36 @@ EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t>
     {
         smart_dist_dp.resize(robots.size(), std::vector<int64_t>(get_operations().size()));
 
-        launch_threads(THREADS_NUM, [&](uint32_t thr) {
-            for (uint32_t r = thr; r < robots.size(); r += THREADS_NUM) {
-                for (uint32_t desired = 0; desired < get_operations().size(); desired++) {
-                    if (!validate_path(r, desired)) {
-                        continue;
-                    }
-                    smart_dist_dp[r][desired] = get_smart_dist_IMPL(r, desired);
+        for (uint32_t r = 0; r < robots.size(); r++) {
+            for (uint32_t desired = 0; desired < get_operations().size(); desired++) {
+                if (!validate_path(r, desired)) {
+                    continue;
                 }
+                smart_dist_dp[r][desired] = get_smart_dist_IMPL(r, desired);
             }
-        });
+        }
     }
 
     // init robot_desires
     {
         robot_desires.resize(robots.size());
 
-        launch_threads(THREADS_NUM, [&](uint32_t thr) {
-            for (uint32_t r = thr; r < robots.size(); r += THREADS_NUM) {
-                // (priority, desired)
-                std::vector<std::pair<int64_t, uint32_t>> steps;
-                for (uint32_t desired = 1; desired < get_operations().size(); desired++) {
-                    if (!validate_path(r, desired)) {
-                        continue;
-                    }
-                    int64_t priority = get_smart_dist(r, desired);
-                    steps.emplace_back(priority, desired);
+        for (uint32_t r = 0; r < robots.size(); r++) {
+            // (priority, desired)
+            std::vector<std::pair<int64_t, uint32_t>> steps;
+            for (uint32_t desired = 1; desired < get_operations().size(); desired++) {
+                if (!validate_path(r, desired)) {
+                    continue;
                 }
-                std::reverse(steps.begin(), steps.end());
-                std::stable_sort(steps.begin(), steps.end());
-                for (auto [priority, desired]: steps) {
-                    robot_desires[r].push_back(desired);
-                }
+                int64_t priority = get_smart_dist(r, desired);
+                steps.emplace_back(priority, desired);
             }
-        });
+            std::reverse(steps.begin(), steps.end());
+            std::stable_sort(steps.begin(), steps.end());
+            for (auto [priority, desired]: steps) {
+                robot_desires[r].push_back(desired);
+            }
+        }
     }
 
     ASSERT(operations == desires, "invalid desires");
@@ -300,7 +305,7 @@ EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t>
 void EPIBT::solve() {
 #ifdef ENABLE_EPIBT_MULTILEVEL_LAUNCH
     for (uint32_t it = 0; it < 3; it++) {
-        enable_rollback = it > 0; // TODO: нужно ли это?
+        enable_rollback = it > 0;// TODO: нужно ли это?
 #ifdef ENABLE_ROTATE_MODEL
         available_operation_depth = 3;
 #else
@@ -320,7 +325,13 @@ void EPIBT::solve() {
                     break;
                 }
                 epibt_step++;
-                if (visited[r] != visited_counter) {
+                if (
+#ifdef ENABLE_EPIBT_ALTERNATIVE_VISIT_POLICY
+                        visited
+#else
+                        curr_visited
+#endif
+                                [r] != visited_counter) {
                     build(r);
                 }
             }

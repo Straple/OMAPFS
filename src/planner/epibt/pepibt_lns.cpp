@@ -14,12 +14,11 @@ void PEPIBT_LNS::solve(uint64_t seed) {
     // (score, actions, desires, time, epibt_steps, lns_steps)
     using ItemType = std::tuple<double, std::vector<ActionType>, std::vector<uint32_t>, uint32_t, uint32_t, uint32_t>;
 
-    constexpr uint32_t THR = THREADS_NUM;
-    std::vector<std::vector<ItemType>> results_pack(THR);
+    std::vector<std::vector<ItemType>> results_pack(THREADS_NUM);
 
     results_pack[0].emplace_back(main.get_score(), main.get_actions(), main.get_desires(), timer.get_ms(), main.get_epibt_steps(), main.get_lns_steps());
 
-    launch_threads(THR, [&](uint32_t thr) {
+    launch_threads(THREADS_NUM, [&](uint32_t thr) {
         Randomizer rnd(seed * (thr + 1) + 426136423);
         while (get_now() < end_time) {
             Timer timer;
@@ -31,7 +30,7 @@ void PEPIBT_LNS::solve(uint64_t seed) {
     });
 
     std::vector<ItemType> results;
-    for (uint32_t thr = 0; thr < THR; thr++) {
+    for (uint32_t thr = 0; thr < results_pack.size(); thr++) {
         for (auto &item: results_pack[thr]) {
             results.emplace_back(std::move(item));
         }
