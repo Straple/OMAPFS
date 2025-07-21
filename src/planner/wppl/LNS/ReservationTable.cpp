@@ -177,6 +177,7 @@ void ReservationTable::insertSoftConstraint2SIT(int location, int t_min, int t_m
 // TODO(rivers): deal with window size for all cases.
 void ReservationTable::updateSIT(int location)
 {
+    std::exit(9);
     assert(sit[location].empty());
     // length constraints for the goal location
     if (location == goal_location) // we need to divide the same intervals into 2 parts [0, length_min) and [length_min, length_max + 1)
@@ -275,7 +276,7 @@ void ReservationTable::updateSIT(int location)
                 }
             }
             if (constraint_table.path_table_for_CAT->goals[location] < MAX_TIMESTEP) // target conflict
-                insertSoftConstraint2SIT(location, constraint_table.path_table_for_CAT->goals[location], MAX_TIMESTEP + 1);
+                insertSoftConstraint2SIT(location, constraint_table.path_table_for_CAT->goals[location], MAX_TIMESTEP);
         }
         else // edge conflict
         {
@@ -316,7 +317,7 @@ void ReservationTable::updateSIT(int location)
                 insertSoftConstraint2SIT(location, t, t + 1);
         }
         if (constraint_table.cat_goals[location] < MAX_TIMESTEP)
-            insertSoftConstraint2SIT(location, constraint_table.cat_goals[location], MAX_TIMESTEP + 1);
+            insertSoftConstraint2SIT(location, constraint_table.cat_goals[location], MAX_TIMESTEP);
     }
 }
 

@@ -2,7 +2,11 @@ import pandas as pd
 import os
 from pathlib import Path
 
-INPUT_DIRS = ["solutions/lmapf-t"]
+INPUT_DIRS = [
+    #"tmp_solutions"
+    #"solutions/lmapf"
+    "solutions/lmapf-t"
+              ]
 OUTPUT_FILENAME = 'metrics.csv'
 REMOVE_ACTIONS = True
 

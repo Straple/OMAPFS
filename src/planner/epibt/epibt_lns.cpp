@@ -4,12 +4,8 @@
 #include <utils/assert.hpp>
 
 bool EPIBT_LNS::consider() {
-    return old_score - 1e-6 <= cur_score
-// old_score > cur_score
-#ifdef ENABLE_LNS_ANNEALING
-           || rnd.get_d() < std::exp(-((old_score - cur_score) / old_score) / temp)
-#endif
-            ;
+    return old_score - 1e-6 <= cur_score;
+    // || rnd.get_d() < std::exp(-((old_score - cur_score) / old_score) / temp)
 }
 
 EPIBT_LNS::RetType EPIBT_LNS::try_build(uint32_t r, uint32_t &counter) {

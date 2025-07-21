@@ -1,5 +1,6 @@
 #include <planner/wppl/util/HeuristicTable.h>
 
+#include <fstream>
 
 HeuristicTable::HeuristicTable(Environment *_env, const std::shared_ptr<std::vector<float>> &map_weights, bool consider_rotation) : env(*_env),
                                                                                                                                                           action_model(_env),

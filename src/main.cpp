@@ -8,7 +8,7 @@
 #include <environment/task.hpp>
 #include <environment/test_system.hpp>
 
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 #include <planner/causal_pibt/heuristics.hpp>
 
 #include <planner/epibt/operations.hpp>
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef ENABLE_ROTATE_MODEL
     if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
-        DefaultPlanner::SharedEnvironment env;
+        Environment env;
         env.num_of_agents = 0;
         env.rows = get_map().get_rows();
         env.cols = get_map().get_cols();
@@ -83,12 +83,12 @@ int main(int argc, char *argv[]) {
         }
 
         {
-            DefaultPlanner::init_heuristics(&env);
+            CausalPlanner::init_heuristics(&env);
             launch_threads(THREADS_NUM, [&](uint32_t thr) {
                 for (uint32_t dst = thr; dst + 1 < get_map().get_size(); dst += THREADS_NUM) {
                     for (uint32_t src = 0; src + 1 < get_map().get_size(); src++) {
                         if (get_map().is_free(src + 1) && get_map().is_free(dst + 1)) {
-                            get_h(&env, src, dst);
+                            CausalPlanner::get_h(&env, src, dst);
                         }
                     }
                 }

@@ -8,6 +8,21 @@ from PIL import Image
 from matplotlib.ticker import FixedFormatter
 from matplotlib.ticker import MaxNLocator
 
+PLANNERS = [#'EPIBT_LNS(3)', 'EPIBT_old(3)+mll+lns',
+            #'EPIBT_old(3)+mll+lns',
+            #'EPIBT(4)', 'EPIBT_old(4)',
+            #'EPIBT(3)', 'EPIBT(4)',
+            #'EPIBT(3)+rollback+mll',
+            #'EPIBT(4)+rollback+mll',
+
+            #'EPIBT_LNS(3)', 'EPIBT_LNS(3)-temperature'
+
+            #'EPIBT(3)', 'EPIBT_old(3)',
+            #'CAUSAL_PIBT', 'PIBT_TF',
+
+            #'PIBT', 'PIBT+revisit',
+            ]
+
 # plan_algos = ["EPIBT(1)", "EPIBT(2)", "EPIBT(3)"]
 # colors = ['lime', 'dodgerblue', 'orange', 'red', 'blueviolet', 'aqua', 'deeppink', 'brown']
 # colors = ['green', 'blue', 'orange', 'red', 'blueviolet', 'aqua', 'deeppink', 'brown']
@@ -18,7 +33,7 @@ markers = ['o', 'v', 's', 'p', '*', 'x', 'D', 'P']
 # plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_palette)
 
 data = pd.read_csv('metrics.csv', sep=',')
-data['avg step time (ms)'] = data['avg step time (ms)'].astype(int)
+#data['avg step time (ms)'] = data['avg step time (ms)'].astype(int)
 
 maps = set(data.groupby('map type').groups)
 print("maps:", maps)
@@ -47,10 +62,13 @@ def add_map(map_name, map_text, column):
         ax.set_yticks([])
 
     for planner_type in grouped.groups:
+        if len(PLANNERS) != 0 and not planner_type in PLANNERS:
+            continue
+
         df = grouped.get_group(planner_type)
 
         if not planner_type in planner_to_marker:
-            planner_to_marker[planner_type] = markers[marker_it]
+            planner_to_marker[planner_type] = markers[marker_it % len(markers)]
             marker_it += 1
 
         if True:
@@ -61,16 +79,15 @@ def add_map(map_name, map_text, column):
             ax.plot(df['agents num'], df['throughput'], alpha=1, label=planner_type, marker=planner_to_marker[planner_type])
             if is_first:
                 ax.set_ylabel('Throughput')
-            ax.grid(True)
-
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+            ax.grid(True)
 
         if True:
             if len(maps) == 1:
                 ax = axes[2]
             else:
                 ax = axes[2][column]
-            ax.plot(df['agents num'], df['avg step time (ms)'], alpha=1, label=planner_type, marker=planner_to_marker[planner_type])
+            ax.plot(df['agents num'], df['avg planner time (ms)'], alpha=1, label=planner_type, marker=planner_to_marker[planner_type])
             ax.set_yscale('log')
             if is_first:
                 ax.set_ylabel('Decision Time (ms)')
@@ -83,7 +100,7 @@ def add_map(map_name, map_text, column):
 
 
 if __name__ == '__main__':
-    fig, axes = plt.subplots(3, len(maps), figsize=(14, 10))
+    fig, axes = plt.subplots(3, len(maps), figsize=(14, 12))
 
     add_map('RANDOM', 'random-32-32-20\nSize: 32x32\n|V|=819', 0)
     add_map('CITY', 'Paris-1-256\nSize: 256x256\n|V|=47240', 1)
@@ -105,7 +122,7 @@ if __name__ == '__main__':
         else:
             break
     # print(labels)
-    fig.legend(lines, labels, loc='lower center', ncol=4)
+    fig.legend(lines, labels, loc='lower center', ncol=6)
 
     plt.savefig("metrics_plot.pdf", format='pdf', dpi=800)
     #plt.show()
