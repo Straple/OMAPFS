@@ -1,15 +1,17 @@
 #pragma once
 
 #include <environment/answer.hpp>
+#include <environment/environment.hpp>
 #include <environment/robot.hpp>
 #include <environment/task.hpp>
-#include <planner/causal_pibt/environment.hpp>
 #include <planner/causal_pibt/planner.hpp>
+#include <planner/wppl/wppl.hpp>
 #include <scheduler/greedy/greedy_scheduler.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
 class TestSystem {
 
@@ -19,15 +21,18 @@ class TestSystem {
 
     TaskPool task_pool;
 
-    GreedyScheduler scheduler;
-
     std::vector<uint32_t> finished_tasks;
 
     std::vector<uint32_t> epibt_prev_operations;
 
+    Environment env;
+
+    std::unique_ptr<GreedyScheduler> greedy_scheduler;
+
 #ifdef ENABLE_ROTATE_MODEL
-    DefaultPlanner::SharedEnvironment env;
-    DefaultPlanner::CausalPIBT causal_pibt;
+    std::unique_ptr<CausalPIBT> causal_pibt_planner;
+
+    std::unique_ptr<WPPL> wppl_planner;
 #endif
 
     void gen_random_agents();

@@ -115,10 +115,10 @@ std::vector<uint32_t> TestSystem::get_schedule() {
             }
         }
     } else if (get_scheduler_type() == SchedulerType::GREEDY) {
-        scheduler.update(timestep);
-        scheduler.rebuild_dp(get_now() + Milliseconds(500));
-        scheduler.solve(get_now() + Milliseconds(500));
-        schedule = scheduler.get_schedule();
+        greedy_scheduler->update(timestep);
+        greedy_scheduler->rebuild_dp(get_now() + Milliseconds(500));
+        greedy_scheduler->solve(get_now() + Milliseconds(500));
+        schedule = greedy_scheduler->get_schedule();
     }
     return schedule;
 }
@@ -161,20 +161,25 @@ std::vector<ActionType> TestSystem::get_actions() {
         actions = solver.get_actions();
     }
 #ifdef ENABLE_ROTATE_MODEL
-    else if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
+    else if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT || get_planner_type() == PlannerType::WPPL) {
         env.goal_locations.assign(robots.size(), {});
         env.curr_states.assign(robots.size(), {});
         for (uint32_t r = 0; r < robots.size(); r++) {
             auto targets = task_pool.at(robots[r].task_id).targets;
             for (uint32_t target: targets) {
-                env.goal_locations[r].push_back({target - 1, 0});
+                env.goal_locations[r].push_back(target - 1);
             }
             env.curr_states[r].timestep = timestep;
             env.curr_states[r].location = robots[r].pos.get_pos() - 1;
             env.curr_states[r].orientation = robots[r].pos.get_dir();
         }
         env.curr_timestep = timestep;
-        causal_pibt.plan(end_time, actions, &env);
+
+        if (get_planner_type() == PlannerType::WPPL) {
+            wppl_planner->plan(50, actions);
+        } else {
+            causal_pibt_planner->plan(end_time, actions, &env);
+        }
     }
 #endif
     else {
@@ -183,18 +188,15 @@ std::vector<ActionType> TestSystem::get_actions() {
     return actions;
 }
 
-TestSystem::TestSystem(Robots robots, TaskPool task_pool) : robots(std::move(robots)), task_pool(std::move(task_pool)), scheduler(this->robots, this->task_pool), epibt_prev_operations(this->robots.size()) {
+TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool) : robots(std::move(copy_robots)), task_pool(std::move(copy_task_pool)), epibt_prev_operations(this->robots.size()) {
     // gen_random_agents();
-}
 
-Answer TestSystem::simulate(uint32_t steps_num) {
-    Answer answer;
-    answer.steps_num = steps_num;
-    answer.robots.resize(robots.size());
-    answer.heatmap = std::vector(get_map().get_rows(), std::vector(get_map().get_cols(), std::array<uint64_t, ACTIONS_NUM + 1>()));
+    if (get_scheduler_type() == SchedulerType::GREEDY) {
+        greedy_scheduler = std::make_unique<GreedyScheduler>(robots, task_pool);
+    }
 
 #ifdef ENABLE_ROTATE_MODEL
-    if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
+    if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT || get_planner_type() == PlannerType::WPPL) {
         env.num_of_agents = robots.size();
         env.rows = get_map().get_rows();
         env.cols = get_map().get_cols();
@@ -202,10 +204,25 @@ Answer TestSystem::simulate(uint32_t steps_num) {
         for (uint32_t pos = 1; pos < get_map().get_size(); pos++) {
             env.map[pos - 1] = !get_map().is_free(pos);
         }
+    }
 
-        causal_pibt.initialize(&env);
+    if (get_planner_type() == PlannerType::PIBT_TF || get_planner_type() == PlannerType::CAUSAL_PIBT) {
+        causal_pibt_planner = std::make_unique<CausalPIBT>();
+        causal_pibt_planner->initialize(&env);
+    }
+
+    if (get_planner_type() == PlannerType::WPPL) {
+        wppl_planner = std::make_unique<WPPL>();
+        wppl_planner->initialize(&env);
     }
 #endif
+}
+
+Answer TestSystem::simulate(uint32_t steps_num) {
+    Answer answer;
+    answer.steps_num = steps_num;
+    answer.robots.resize(robots.size());
+    answer.heatmap = std::vector(get_map().get_rows(), std::vector(get_map().get_cols(), std::array<uint64_t, ACTIONS_NUM + 1>()));
 
     for (; timestep < steps_num; timestep++) {
         Timer step_timer;
