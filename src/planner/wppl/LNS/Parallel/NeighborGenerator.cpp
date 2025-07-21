@@ -59,7 +59,7 @@ namespace LNS {
 
         void NeighborGenerator::generate_parallel(const TimeLimiter &time_limiter) {
 // TODO(rivers): since here we use parallel, we need a random seed generator that support parallelization, that is why we only could use rand() but not rand(), but we can fix this later.
-#pragma omp parallel for
+//#pragma omp parallel for
             for (int i = 0; i < num_threads; i++) {
                 generate(time_limiter, i);
             }

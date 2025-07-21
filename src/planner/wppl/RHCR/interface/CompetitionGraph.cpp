@@ -14,7 +14,7 @@ namespace RHCR {
     // this contructor directly convert Grid to CompetitionGraph
     CompetitionGraph::CompetitionGraph(const DefaultPlanner::SharedEnvironment &env) {
         map_name = "TODO";//env.map_name;
-        std::exit(100);
+        std::exit(50);
 
         rows = env.rows;
         cols = env.cols;
@@ -72,22 +72,7 @@ namespace RHCR {
         std::cout << "*** PreProcessing map ***" << std::endl;
         auto pp_start = std::chrono::steady_clock::now();
         this->consider_rotation = consider_rotation;
-        std::string fname = map_name.substr(0, map_name.size() - 4);
-        std::string folder = file_storage_path;
-        if (folder[folder.size() - 1] != boost::filesystem::path::preferred_separator) {
-            folder += boost::filesystem::path::preferred_separator;
-        }
-        if (consider_rotation)
-            fname = folder + fname + "_rotation_heuristics_table.gz";
-        else
-            fname = folder + fname + "_heuristics_table.gz";
-        std::ifstream myfile(fname.c_str(), std::ios::binary | std::ios::in);
-        bool succ = false;
-        if (myfile.is_open()) {
-            succ = load_heuristics_table(myfile);
-            myfile.close();
-        }
-        if (!succ) {
+        {
             // use parallel execution here
             vector<int> idxs;
             int total = 0;
@@ -115,7 +100,7 @@ namespace RHCR {
 
             // }
 
-            int n_threads = omp_get_max_threads();
+            int n_threads = 1;//omp_get_max_threads();
             cout << "number of threads used for heuristic computation: " << n_threads << endl;
             int n_directions = 4;
             // maybe let's just use c way to speed up?
@@ -126,22 +111,21 @@ namespace RHCR {
             int ctr = 0;
             int step = 100;
             auto start = std::chrono::steady_clock::now();
-#pragma omp parallel for
+//#pragma omp parallel for
             for (int i = 0; i < idxs.size(); ++i) {
-                int thread_id = omp_get_thread_num();
+                int thread_id = 0;//omp_get_thread_num();
 
                 int idx = idxs[i];
                 int s_idx = thread_id * this->size() * n_directions;
                 compute_heuristics(idx, lengths + s_idx, visited + s_idx, queues + s_idx, heuristics[idx], n_directions);
 
-#pragma omp critical
+//#pragma omp critical
                 {
                     ++ctr;
                     if (ctr % step == 0) {
                         auto end = std::chrono::steady_clock::now();
                         double elapse = std::chrono::duration<double>(end - start).count();
                         double estimated_remain = elapse / ctr * (total - ctr);
-                        cout << ctr << "/" << total << " completed in " << elapse << "s. estimated time to finish all: " << estimated_remain << "s.  estimated total time: " << (estimated_remain + elapse) << "s." << endl;
                     }
                 }
             }
@@ -149,8 +133,6 @@ namespace RHCR {
             delete[] lengths;
             delete[] visited;
             delete[] queues;
-
-            save_heuristics_table(fname);
         }
 
         auto pp_end = std::chrono::steady_clock::now();
@@ -260,7 +242,7 @@ namespace RHCR {
         // NOTE(hj): currently, the heuristic table in the memory is still N*M size double-type.
         // TODO(hj): the same wierd bug in save_heuristics_table function also happens here! it seems that we are not allowed to create a too large array at a time, but who restrict this?
         // but heuristics table is also large, why it is allowed?
-        int n_threads = omp_get_max_threads();
+        int n_threads = 1;//omp_get_max_threads();
         auto buff = new unsigned short[N * n_threads];
         end = std::chrono::steady_clock::now();
         runtime = std::chrono::duration<double>(end - start).count();
@@ -275,7 +257,7 @@ namespace RHCR {
             }
             int batch_size = end_idx - start_idx;
             in.read((char *) buff, sizeof(unsigned short) * N * batch_size);
-#pragma omp parallel for
+//#pragma omp parallel for
             for (int i = start_idx; i < end_idx; ++i) {
                 for (int j = 0; j < N; ++j) {
                     int idx = i - start_idx;

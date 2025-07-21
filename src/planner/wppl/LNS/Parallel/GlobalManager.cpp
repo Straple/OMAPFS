@@ -25,7 +25,7 @@ GlobalManager::GlobalManager(
     window_size_for_CT(window_size_for_CT), window_size_for_CAT(window_size_for_CAT), window_size_for_PATH(window_size_for_PATH),
     screen(screen), agent_infos(agent_infos), has_disabled_agents(has_disabled_agents) {
 
-    num_threads=omp_get_max_threads();
+    num_threads=1;//omp_get_max_threads();
 
     // for (auto w: *map_weights){
     //     if (w!=1){
@@ -94,7 +94,7 @@ void GlobalManager::reset() {
         // call reset of neighbor_generator
         neighbor_generator->reset();
     } else {
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for (auto & neighbor_generator: neighbor_generators) {
             neighbor_generator->reset();
         }
@@ -106,7 +106,7 @@ void GlobalManager::reset() {
     }
 
     // call reset of local_optimizers
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (auto & local_optimizer: local_optimizers) {
         local_optimizer->reset();
     }
@@ -231,6 +231,7 @@ bool GlobalManager::run(TimeLimiter & time_limiter) {
 }
 
 bool GlobalManager::_run_async(TimeLimiter & time_limiter) {
+    //std::exit(99);
 
     initial_sum_of_costs=0;
     sum_of_costs=0;
@@ -259,7 +260,7 @@ bool GlobalManager::_run_async(TimeLimiter & time_limiter) {
 
     // synchonize to local optimizer
     ONLYDEV(g_timer.record_p("init_loc_opt_update_s");)
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int i=0;i<num_threads;++i) {
         local_optimizers[i]->update(init_neighbor);
     }
@@ -289,9 +290,9 @@ bool GlobalManager::_run_async(TimeLimiter & time_limiter) {
     //std::cout<<"num_threads: "<<num_threads<<" "<<neighbor_generators.size()<<std::endl;
 
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int i=0;i<num_threads;++i) {
-        int thread_id=omp_get_thread_num();
+        //int thread_id=omp_get_thread_num();
         int ctr=0;
 
         while (true) {
@@ -330,7 +331,7 @@ bool GlobalManager::_run_async(TimeLimiter & time_limiter) {
             // cout<<"optimized"<<endl;
 
             // 3. update path table, statistics & maybe adjust strategies
-            #pragma omp critical
+            //#pragma omp critical
             {
                 // for (int i=0;i<1;++i) {
                     // if (time_limiter.timeout())
@@ -433,7 +434,7 @@ bool GlobalManager::_run(TimeLimiter & time_limiter) {
     update(init_neighbor,false);
     // synchonize to local optimizer
     ONLYDEV(g_timer.record_p("init_loc_opt_update_s");)
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int i=0;i<num_threads;++i) {
         local_optimizers[i]->update(init_neighbor);
     }
@@ -480,7 +481,7 @@ bool GlobalManager::_run(TimeLimiter & time_limiter) {
         // in the single-thread setting, local_optimizer directly modify paths
         // but we should first recover the path table, then redo it after all local optimizers finishes.
         g_timer.record_p("loc_opt_s");
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for (auto i=0;i<neighbor_generator->neighbors.size();++i) {
             // cout<<i<<" "<<neighbor_generator.neighbors[i]->agents.size()<<endl;
             auto & neighbor_ptr = neighbor_generator->neighbors[i];
@@ -520,7 +521,7 @@ bool GlobalManager::_run(TimeLimiter & time_limiter) {
 
             // synchonize to local optimizer
             ONLYDEV(g_timer.record_p("loc_opt_update_s");)
-            #pragma omp parallel for
+            //#pragma omp parallel for
             for (int i=0;i<num_threads;++i) {
                 local_optimizers[i]->update(neighbor);
             }

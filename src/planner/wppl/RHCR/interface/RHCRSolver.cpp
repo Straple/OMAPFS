@@ -88,11 +88,12 @@ namespace RHCR {
     }
 
     void RHCRSolver::update_goal_locations(const DefaultPlanner::SharedEnvironment &env) {
+        std::exit(80);
         for (int i = 0; i < num_of_drives; ++i) {
             goal_locations[i].clear();
             for (int j = 0; j < env.goal_locations[i].size(); ++j) {
                 // we require path of at least length one, even the start and the goal are the same.
-                goal_locations[i].emplace_back(env.goal_locations[i][j].first, max(env.goal_locations[i][j].second - timestep, 1));
+                goal_locations[i].emplace_back(env.goal_locations[i][j], max(env.goal_locations[i][j]/*.second*/ - timestep, 1));
             }
         }
     }

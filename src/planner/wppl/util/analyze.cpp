@@ -1,5 +1,5 @@
 #include <nlohmann/json.hpp>
-#include <planner/wppl/common.h>
+#include <planner/wppl/util/common.h>
 
 int get_orient_idx(string o) {
     if (o == "E") return 0;

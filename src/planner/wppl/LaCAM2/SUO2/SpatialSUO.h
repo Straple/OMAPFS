@@ -28,7 +28,7 @@ namespace SUO2 {
                                        window(_window),
                                        h_weight(_h_weight) {
 
-                n_threads = omp_get_max_threads();
+                n_threads = 1;//omp_get_max_threads();
 
                 planners = new Spatial::AStar *[n_threads];
                 for (int tid = 0; tid < n_threads; ++tid) {

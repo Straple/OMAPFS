@@ -7,9 +7,9 @@
 #include <planner/wppl/LaCAM2/instance.hpp>
 #include <planner/wppl/LaCAM2/planner.hpp>
 #include <planner/wppl/LaCAM2/slow_executor.hpp>
-#include <planner/wppl/common.h>
 #include <planner/wppl/util/CompetitionActionModel.h>
 #include <planner/wppl/util/HeuristicTable.h>
+#include <planner/wppl/util/common.h>
 #include <random>
 
 namespace LaCAM2 {

@@ -93,7 +93,7 @@ namespace LNS {
     void LNSSolver::plan(const DefaultPlanner::SharedEnvironment &env, int time_limit) {
         // TODO(rivers): make it configurable.
         //double time_limit=read_param_json<double>(config,"cutoffTime");
-        TimeLimiter time_limiter((time_limit - 50) * 0.001, env);
+        TimeLimiter time_limiter(time_limit * 0.001, env);
 
         ONLYDEV(g_timer.record_p("_plan_s");)
 
@@ -108,19 +108,10 @@ namespace LNS {
                 ++disabled_agent_count;
             }
             starts.emplace_back(execution_paths[i].back().location, -1, execution_paths[i].back().orientation);
-            // if ((*agent_infos)[i].disabled) {
-            //     goals.emplace_back(env.curr_states[i].location,-1,-1);
-            // } else {
-
-            //if(!env.goal_locations[i].empty()) {
             if (!(i < env.goal_locations.size() && !env.goal_locations[i].empty())) {
                 std::cout << "is empty" << std::endl;
             }
-            goals.emplace_back(env.goal_locations[i][0].first, -1, -1);
-            //}
-            //else{
-            //    cout << "here" << std::endl;
-            //}
+            goals.emplace_back(env.goal_locations[i][0], -1, -1);
         }
 
         ONLYDEV(std::cout << "disabled_agents:" << disabled_agent_count << std::endl;)
@@ -148,7 +139,7 @@ namespace LNS {
                     for (int j = 0; j < planning_paths[i].size(); ++j) {
                         precomputed_paths[i].emplace_back(planning_paths[i][j]);
                         // we could break if we arrive at goal eariler here.
-                        if (j > 1 && planning_paths[i][j].location == env.goal_locations[i][0].first) {
+                        if (j > 1 && planning_paths[i][j].location == env.goal_locations[i][0]) {
                             break;
                         }
                     }
@@ -273,13 +264,13 @@ namespace LNS {
             bool goal_arrived = false;
             for (int j = 0; j < planning_paths[i].size(); ++j) {
                 lns->agents[i].path.nodes.emplace_back(planning_paths[i][j].location, planning_paths[i][j].orientation);
-                if (planning_paths[i][j].location == env.goal_locations[i][0].first) {
+                if (planning_paths[i][j].location == env.goal_locations[i][0]) {
                     goal_arrived = true;
                     // break;
                 }
             }
             // TODO(rivers): it is not correct on weighted maps
-            lns->agents[i].path.path_cost = lns->agents[i].getEstimatedPathLength(lns->agents[i].path, env.goal_locations[i][0].first, HT);
+            lns->agents[i].path.path_cost = lns->agents[i].getEstimatedPathLength(lns->agents[i].path, env.goal_locations[i][0], HT);
             // cout<<"agent "<<i<<": ";
             // for (int j=0;j<lns->agents[i].path.size();++j){
             //     cout<<lacam2_solver->paths[i][j].location<<" ";
@@ -493,7 +484,7 @@ namespace LNS {
                 actions.push_back(get_action_from_states(execution_paths[i][executed_step], execution_paths[i][executed_step + 1]));
 
                 // assume perfect execution
-                if (execution_paths[i][executed_step + 1].location == env.goal_locations[i][0].first) {
+                if (execution_paths[i][executed_step + 1].location == env.goal_locations[i][0]) {
                     ++num_task_completed;
                 }
             }

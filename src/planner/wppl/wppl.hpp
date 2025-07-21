@@ -20,19 +20,14 @@
 #include <planner/wppl/LNS/LNSSolver.h>
 #include <planner/wppl/LaCAM2/LaCAM2Solver.hpp>
 
-class SmartMAPFPlanner {
+class WPPL {
 public:
-    DefaultPlanner::SharedEnvironment *env;
+    DefaultPlanner::SharedEnvironment *env = nullptr;
 
-    SmartMAPFPlanner(DefaultPlanner::SharedEnvironment *env) : env(env){};
-    SmartMAPFPlanner() { env = new DefaultPlanner::SharedEnvironment(); };
-    virtual ~SmartMAPFPlanner() { delete env; };
-
-
-    virtual void initialize(int preprocess_time_limit);
+    void initialize(DefaultPlanner::SharedEnvironment* new_env);
 
     // return next states for all agents
-    virtual void plan(int time_limit, std::vector<ActionType> &plan);
+    void plan(int time_limit, std::vector<ActionType> &plan);
 
     // Start kit dummy implementation
     std::list<pair<int, int>> single_agent_plan(int start, int start_direct, int end);

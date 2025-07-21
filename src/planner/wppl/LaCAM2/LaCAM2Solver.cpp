@@ -92,7 +92,7 @@ namespace LaCAM2 {
         for (int i = 0; i < env.num_of_agents; ++i) {
             starts.emplace_back(env.curr_states[i].location, env.curr_states[i].orientation);
             assert(env.goal_locations[i].size() > 0);
-            int goal_location = env.goal_locations[i][0].first;
+            int goal_location = env.goal_locations[i][0];
             auto &agent_info = (*agent_infos)[i];
             if (disable_corner_target_agents) {
                 int g_x = goal_location % env.cols;
@@ -567,7 +567,7 @@ namespace LaCAM2 {
                 actions.push_back(get_action_from_states(paths[i][timestep], paths[i][timestep + 1]));
 
                 // assume perfect execution
-                if (paths[i][timestep + 1].location == env.goal_locations[i][0].first) {
+                if (paths[i][timestep + 1].location == env.goal_locations[i][0]) {
                     ++num_task_completed;
                 }
             }

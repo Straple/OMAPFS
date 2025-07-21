@@ -29,7 +29,7 @@ namespace SUO2 {
 
             std::vector<float> distance(env.num_of_agents, 0);
             for (int i = 0; i < env.num_of_agents; ++i) {
-                distance[i] = HT->get(env.curr_states[i].location, env.curr_states[i].orientation, env.goal_locations[i][0].first);
+                distance[i] = HT->get(env.curr_states[i].location, env.curr_states[i].orientation, env.goal_locations[i][0]);
             }
 
             // we need to sort agents first
@@ -54,14 +54,14 @@ namespace SUO2 {
 
                     std::vector<std::pair<int, State *>> goal_states;
 // TODO(rivers): we need to make sure omp actually uses the number of threads we want
-#pragma omp parallel for schedule(static, 1)
+//#pragma omp parallel for schedule(static, 1)
                     for (int i = start_idx; i < end_idx; ++i) {
-                        int tid = omp_get_thread_num();
+                        int tid = 0;//omp_get_thread_num();
                         auto planner = planners[tid];
                         int agent_idx = orders[i];
                         int start_pos = env.curr_states[agent_idx].location;
                         int start_orient = env.curr_states[agent_idx].orientation;
-                        int goal_pos = env.goal_locations[agent_idx][0].first;
+                        int goal_pos = env.goal_locations[agent_idx][0];
 
                         auto &old_path = paths[agent_idx];
 
@@ -76,7 +76,7 @@ namespace SUO2 {
                         planner->add_path_cost(old_path, vertex_collision_cost);
 
 
-#pragma omp critical
+//#pragma omp critical
                         {
                             goal_states.emplace_back(agent_idx, goal_state);
                         }
@@ -92,9 +92,9 @@ namespace SUO2 {
                         update_path(p.first, p.second);
                     }
 
-#pragma omp parallel for schedule(static, 1)
+//#pragma omp parallel for schedule(static, 1)
                     for (int i = start_idx; i < end_idx; ++i) {
-                        int tid = omp_get_thread_num();
+                        int tid = 0;//omp_get_thread_num();
                         auto planner = planners[tid];
                         planner->update_cost_map(deltas);
                     }

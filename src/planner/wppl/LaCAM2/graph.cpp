@@ -18,7 +18,7 @@ Graph::~Graph()
 
 Graph::Graph(const DefaultPlanner::SharedEnvironment & env): V(Vertices()), width(env.cols), height(env.rows) {
   U = Vertices(width * height, nullptr);
-  std::cout<<"graph size "<<U.size()<<std::endl;
+  //std::cout<<"graph size "<<U.size()<<std::endl;
 
   // create vertices
   for (int i = 0; i < height; i++) {

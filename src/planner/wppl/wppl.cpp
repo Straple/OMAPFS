@@ -1,12 +1,15 @@
 #ifndef NO_ROT
 
-#include "MAPFPlanner.h"
-#include "RHCR/interface/CompetitionGraph.h"
-#include "boost/format.hpp"
-#include "util/Analyzer.h"
-#include "util/HeuristicTable.h"
-#include "util/MyCommon.h"
-#include "util/TimeLimiter.h"
+#include <boost/format.hpp>
+
+#include <planner/wppl/RHCR/interface/CompetitionGraph.h>
+#include <planner/wppl/util/HeuristicTable.h>
+#include <planner/wppl/util/MyCommon.h>
+#include <planner/wppl/util/TimeLimiter.h>
+#include <planner/wppl/wppl.hpp>
+
+#include <environment/info.hpp>
+
 #include <random>
 
 struct AstarNode {
@@ -29,21 +32,21 @@ struct cmp {
     }
 };
 
-void SmartMAPFPlanner::load_configs() {
+void WPPL::load_configs() {
     // load configs
-    exit(100);
-    string config_path = "TODO";//"configs/" + env->map_name.substr(0, env->map_name.find_last_of(".")) + ".json";
+    string config_path = "src/planner/wppl/configs/";
+    std::string map_name = map_type_to_string(get_map_type());
+    for (auto &c: map_name) {
+        c = std::tolower(c);
+    }
+    config_path += map_name + ".json";
+
     std::ifstream f(config_path);
     try {
         config = nlohmann::json::parse(f);
 
-        char *env_weight_path = getenv("MAP_WEIGHT_PATH");
-        if (env_weight_path != NULL) {
-            config["map_weights_path"] = env_weight_path;
-            std::cout << "load weight from " << env_weight_path << std::endl;
-        }
+        //std::cout << config << std::endl;
 
-        std::cout << config << std::endl;
         config["lifelong_solver_name"] = read_conditional_value(config, "lifelong_solver_name", env->num_of_agents);
         config["map_weights_path"] = read_conditional_value(config, "map_weights_path", env->num_of_agents);
 
@@ -69,7 +72,9 @@ void SmartMAPFPlanner::load_configs() {
 
         string s = config.dump();
         std::replace(s.begin(), s.end(), ',', '|');
-        config["details"] = s;
+        // config["details"] = s;
+
+        //std::cout << config << std::endl;
     } catch (nlohmann::json::parse_error error) {
         std::cout << "Failed to load " << config_path << std::endl;
         std::cout << "Message: " << error.what() << std::endl;
@@ -77,7 +82,7 @@ void SmartMAPFPlanner::load_configs() {
     }
 }
 
-RHCR::MAPFSolver *SmartMAPFPlanner::rhcr_build_mapf_solver(nlohmann::json &config, RHCR::CompetitionGraph &graph) {
+RHCR::MAPFSolver *WPPL::rhcr_build_mapf_solver(nlohmann::json &config, RHCR::CompetitionGraph &graph) {
     // build single agent solver
     string solver_name = read_param_json<string>(config, "single_agent_solver");
     RHCR::SingleAgentSolver *path_planner;
@@ -128,7 +133,7 @@ RHCR::MAPFSolver *SmartMAPFPlanner::rhcr_build_mapf_solver(nlohmann::json &confi
     }
 }
 
-void SmartMAPFPlanner::rhcr_config_solver(std::shared_ptr<RHCR::RHCRSolver> &solver, nlohmann::json &config) {
+void WPPL::rhcr_config_solver(std::shared_ptr<RHCR::RHCRSolver> &solver, nlohmann::json &config) {
     solver->outfile = read_param_json<string>(config, "output");
     solver->screen = read_param_json<int>(config, "screen");
     solver->log = read_param_json<bool>(config, "log");
@@ -156,7 +161,7 @@ void SmartMAPFPlanner::rhcr_config_solver(std::shared_ptr<RHCR::RHCRSolver> &sol
     srand(solver->seed);
 }
 
-std::string SmartMAPFPlanner::load_map_weights(string weights_path) {
+std::string WPPL::load_map_weights(string weights_path) {
     // TODO(rivers): make weights float
     // we have at least 5 weights for a location: right,down,left,up,stay
     map_weights = std::make_shared<std::vector<float>>(env->rows * env->cols * 5, 1);
@@ -187,8 +192,9 @@ std::string SmartMAPFPlanner::load_map_weights(string weights_path) {
     return suffix;
 }
 
-void SmartMAPFPlanner::initialize(int preprocess_time_limit) {
-    cout << "planner initialization begins" << endl;
+void WPPL::initialize(DefaultPlanner::SharedEnvironment *new_env) {
+    env = new_env;
+    //cout << "planner initialization begins" << endl;
     load_configs();
 
     ONLYDEV(
@@ -199,7 +205,7 @@ void SmartMAPFPlanner::initialize(int preprocess_time_limit) {
 
     max_execution_steps = read_param_json<int>(config, "max_execution_steps", 1000000);
 
-    std::cout << "max execution steps: " << max_execution_steps << std::endl;
+    //std::cout << "max execution steps: " << max_execution_steps << std::endl;
 
     std::string weights_path = read_param_json<std::string>(config, "map_weights_path");
     std::string suffix = load_map_weights(weights_path);
@@ -208,15 +214,16 @@ void SmartMAPFPlanner::initialize(int preprocess_time_limit) {
 
     // TODO(hj): memory management is a disaster here...
     if (lifelong_solver_name == "RHCR") {
+        exit(-1);
         auto graph = new RHCR::CompetitionGraph(*env);
-        exit(100);
-        graph->preprocessing(consider_rotation, "TODO"/*env->file_storage_path*/);
+        graph->preprocessing(consider_rotation, "TODO" /*env->file_storage_path*/);
         auto mapf_solver = rhcr_build_mapf_solver(config["RHCR"], *graph);
         rhcr_solver = std::make_shared<RHCR::RHCRSolver>(*graph, *mapf_solver, env);
         rhcr_config_solver(rhcr_solver, config["RHCR"]);
         rhcr_solver->initialize(*env);
         cout << "RHCRSolver initialized" << endl;
     } else if (lifelong_solver_name == "LaCAM2") {
+        exit(-1);
         if (!read_param_json<bool>(config["LaCAM2"], "consider_rotation")) {
             std::cout << "In LaCAM2, must consider rotation when compiled with NO_ROT unset" << std::endl;
             exit(-1);
@@ -251,9 +258,9 @@ void SmartMAPFPlanner::initialize(int preprocess_time_limit) {
         lacam2_solver->initialize(*env);
         lns_solver = std::make_shared<LNS::LNSSolver>(heuristics, env, map_weights, config["LNS"], lacam2_solver, max_task_completed);
         lns_solver->initialize(*env);
-        cout << "LNSSolver initialized" << endl;
+        //cout << "LNSSolver initialized" << endl;
     } else if (lifelong_solver_name == "DUMMY") {
-        cout << "using dummy solver" << endl;
+        exit(-1);
     } else {
         cout << "unknown lifelong solver name" << lifelong_solver_name << endl;
         exit(-1);
@@ -264,7 +271,7 @@ void SmartMAPFPlanner::initialize(int preprocess_time_limit) {
 
 
 // plan using simple A* that ignores the time dimension
-void SmartMAPFPlanner::plan(int time_limit, vector<ActionType> &actions) {
+void WPPL::plan(int time_limit, vector<ActionType> &actions) {
     // NOTE we need to return within time_limit, but we can exploit this time duration as much as possible
 
     // check if we need to restart a plan task (thread)
@@ -353,7 +360,7 @@ void SmartMAPFPlanner::plan(int time_limit, vector<ActionType> &actions) {
     return;
 }
 
-list<pair<int, int>> SmartMAPFPlanner::single_agent_plan(int start, int start_direct, int end) {
+list<pair<int, int>> WPPL::single_agent_plan(int start, int start_direct, int end) {
     list<pair<int, int>> path;
     priority_queue<AstarNode *, vector<AstarNode *>, cmp> open_list;
     unordered_map<int, AstarNode *> all_nodes;
@@ -400,7 +407,7 @@ list<pair<int, int>> SmartMAPFPlanner::single_agent_plan(int start, int start_di
 }
 
 
-int SmartMAPFPlanner::getManhattanDistance(int loc1, int loc2) {
+int WPPL::getManhattanDistance(int loc1, int loc2) {
     int loc1_x = loc1 / env->cols;
     int loc1_y = loc1 % env->cols;
     int loc2_x = loc2 / env->cols;
@@ -408,7 +415,7 @@ int SmartMAPFPlanner::getManhattanDistance(int loc1, int loc2) {
     return abs(loc1_x - loc2_x) + abs(loc1_y - loc2_y);
 }
 
-bool SmartMAPFPlanner::validateMove(int loc, int loc2) {
+bool WPPL::validateMove(int loc, int loc2) {
     int loc_x = loc / env->cols;
     int loc_y = loc % env->cols;
 
@@ -422,7 +429,7 @@ bool SmartMAPFPlanner::validateMove(int loc, int loc2) {
     return true;
 }
 
-list<pair<int, int>> SmartMAPFPlanner::getNeighbors(int location, int direction) {
+list<pair<int, int>> WPPL::getNeighbors(int location, int direction) {
     list<pair<int, int>> neighbors;
     //forward
     int candidates[4] = {location + 1, location + env->cols, location - 1, location - env->cols};
