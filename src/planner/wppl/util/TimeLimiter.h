@@ -11,7 +11,7 @@ public:
     steady_clock::time_point start_time;
     double time_limit;
 
-    TimeLimiter(double _time_limit, const DefaultPlanner::SharedEnvironment& env): time_limit(_time_limit) {
+    TimeLimiter(double _time_limit, const Environment& env): time_limit(_time_limit) {
         //reset_start_time();
         start_time = get_now();
     }

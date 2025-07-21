@@ -1,13 +1,16 @@
 #pragma once
-#include <algorithm>
-#include <boost/filesystem.hpp>
-#include <boost/format.hpp>
-#include <ctime>
-#include <fstream>
-#include <nlohmann/json.hpp>
-#include <planner/causal_pibt/environment.hpp>
+
+#include <environment/environment.hpp>
 #include <planner/wppl/LNS/common.h>
 #include <planner/wppl/util/Dev.h>
+
+#include <nlohmann/json.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
+
+#include <algorithm>
+#include <ctime>
+#include <fstream>
 
 class Analyzer {
 public:
@@ -118,7 +121,7 @@ public:
     void snapshot(
             const string &fp_prefix,
             int timestep,
-            const std::vector<DefaultPlanner::Path> &paths);
+            const std::vector<RobotPath> &paths);
 };
 
 extern Analyzer analyzer;

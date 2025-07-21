@@ -1,14 +1,14 @@
 #pragma once
+
+#include <environment/environment.hpp>
 #include <planner/wppl/RHCR/main/BasicGraph.h>
-//#include "Grid.h>
-#include <planner/causal_pibt/environment.hpp>
 
 namespace RHCR {
 
     class CompetitionGraph : public BasicGraph {
         // for simplicity, just make everything public. but attributes or functions start with _ are supposed to use privately in general cases.
     public:
-        CompetitionGraph(const DefaultPlanner::SharedEnvironment &env);
+        CompetitionGraph(const Environment &env);
         // a dummy function.
         bool load_map(string fname);
         // preprocessing the map, e.g., computing heuristics for later planning.

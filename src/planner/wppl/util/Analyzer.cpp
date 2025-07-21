@@ -3,7 +3,7 @@
 void Analyzer::snapshot(
         const string &fp_prefix,
         int timestep,
-        const std::vector<DefaultPlanner::Path> &paths) {
+        const std::vector<RobotPath> &paths) {
 
     string fp = fp_prefix + "_" + std::to_string(timestep) + ".ppath";
 

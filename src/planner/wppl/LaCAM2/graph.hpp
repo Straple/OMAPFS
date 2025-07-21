@@ -1,6 +1,6 @@
 #pragma once
 #include <planner/wppl/LaCAM2/utils.hpp>
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 
 namespace LaCAM2 {
 
@@ -60,7 +60,7 @@ struct Graph {
   Graph();
   Graph(const std::string& filename);  // taking map filename
   // for competition
-  Graph(const DefaultPlanner::SharedEnvironment & env);
+  Graph(const Environment & env);
   ~Graph();
 
   uint size() const;  // the number of vertices

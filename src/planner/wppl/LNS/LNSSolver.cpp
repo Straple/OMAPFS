@@ -12,7 +12,7 @@ namespace LNS {
 
     LNSSolver::LNSSolver(
             const std::shared_ptr<HeuristicTable> &HT,
-            DefaultPlanner::SharedEnvironment *env,
+            Environment *env,
             std::shared_ptr<std::vector<float>> &map_weights,
             nlohmann::json &config,
             std::shared_ptr<LaCAM2::LaCAM2Solver> &lacam2_solver,
@@ -28,7 +28,7 @@ namespace LNS {
                                       max_task_completed(max_task_completed){};
 
 
-    void LNSSolver::initialize(const DefaultPlanner::SharedEnvironment &env) {
+    void LNSSolver::initialize(const Environment &env) {
         // obstacle_stats_tree = std::make_shared<StatsTree>(env.cols,env.rows);
 
         // for (int pos=0;pos<env.map.size();++pos) {
@@ -55,7 +55,7 @@ namespace LNS {
         execution_window = read_param_json<int>(config, "execution_window");// TODO(rivers): read from config & initialized in constructor
     }
 
-    int get_neighbor_orientation(const DefaultPlanner::SharedEnvironment *env, int loc1, int loc2) {
+    int get_neighbor_orientation(const Environment *env, int loc1, int loc2) {
 
         // 0:east, 1:south, 2:west, 3:north
 
@@ -82,15 +82,15 @@ namespace LNS {
         return -1;
     }
 
-    std::vector<DefaultPlanner::State> subvector(std::vector<DefaultPlanner::State> &v, int start, int end) {
-        std::vector<DefaultPlanner::State> ret;
+    std::vector<State> subvector(std::vector<State> &v, int start, int end) {
+        std::vector<State> ret;
         for (int i = start; i < end; ++i) {
             ret.push_back(v[i]);
         }
         return ret;
     }
 
-    void LNSSolver::plan(const DefaultPlanner::SharedEnvironment &env, int time_limit) {
+    void LNSSolver::plan(const Environment &env, int time_limit) {
         // TODO(rivers): make it configurable.
         //double time_limit=read_param_json<double>(config,"cutoffTime");
         TimeLimiter time_limiter(time_limit * 0.001, env);
@@ -99,8 +99,8 @@ namespace LNS {
 
         ONLYDEV(g_timer.record_p("plan_s");)
 
-        std::vector<DefaultPlanner::State> starts;
-        std::vector<DefaultPlanner::State> goals;
+        std::vector<State> starts;
+        std::vector<State> goals;
 
         int disabled_agent_count = 0;
         for (int i = 0; i < env.num_of_agents; ++i) {
@@ -129,7 +129,7 @@ namespace LNS {
 
                 // TODO(rivers): we should avoid copy here. we may use deque for paths.
                 ONLYDEV(g_timer.record_p("copy_paths_1_s");)
-                vector<DefaultPlanner::Path> precomputed_paths;
+                vector<RobotPath> precomputed_paths;
                 precomputed_paths.resize(env.num_of_agents);
                 for (int i = 0; i < env.num_of_agents; ++i) {
                     if (planning_paths[i][0].location != execution_paths[i].back().location || planning_paths[i][0].orientation != execution_paths[i].back().orientation) {
@@ -362,7 +362,7 @@ namespace LNS {
         )
     }
 
-    void LNSSolver::observe(const DefaultPlanner::SharedEnvironment &env) {
+    void LNSSolver::observe(const Environment &env) {
         // for (int i=0;i<env.num_of_agents;++i) {
         //     paths[i].clear();
         // }
@@ -406,7 +406,7 @@ namespace LNS {
         ONLYDEV(g_timer.record_d("observe_s", "observe_e", "observe");)
     }
 
-    void LNSSolver::get_step_actions(const DefaultPlanner::SharedEnvironment &env, vector<ActionType> &actions) {
+    void LNSSolver::get_step_actions(const Environment &env, vector<ActionType> &actions) {
         ONLYDEV(g_timer.record_p("get_step_actions_s");)
 
         assert(actions.empty());

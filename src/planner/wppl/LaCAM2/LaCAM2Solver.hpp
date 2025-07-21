@@ -18,15 +18,15 @@ namespace LaCAM2 {
 
     public:
         // [start] the following lines should be abstracted away.
-        std::vector<DefaultPlanner::Path> paths;
+        std::vector<RobotPath> paths;
         CompetitionActionModelWithRotate action_model;
         std::mt19937 *MT;// seed for randomness
         bool need_replan = true;
         int total_feasible_timestep = 0;
         int timestep = 0;
-        void initialize(const DefaultPlanner::SharedEnvironment &env);
-        void plan(const DefaultPlanner::SharedEnvironment &env, std::vector<DefaultPlanner::Path> *precomputed_paths = nullptr, std::vector<DefaultPlanner::State> *starts = nullptr, std::vector<DefaultPlanner::State> *goals = nullptr);
-        void get_step_actions(const DefaultPlanner::SharedEnvironment &env, vector<ActionType> &actions);
+        void initialize(const Environment &env);
+        void plan(const Environment &env, std::vector<RobotPath> *precomputed_paths = nullptr, std::vector<State> *starts = nullptr, std::vector<State> *goals = nullptr);
+        void get_step_actions(const Environment &env, vector<ActionType> &actions);
         // ActionType get_action_from_states(const State & state, const State & next_state);
         // [end]
 
@@ -60,16 +60,16 @@ namespace LaCAM2 {
 
         nlohmann::json config;
 
-        Instance build_instance(const DefaultPlanner::SharedEnvironment &env, std::vector<DefaultPlanner::Path> *precomputed_paths = nullptr);
+        Instance build_instance(const Environment &env, std::vector<RobotPath> *precomputed_paths = nullptr);
 
         float get_action_cost(int pst, int ost, int ped, int oed);
         float eval_solution(const Instance &instance, const Solution &solution);
 
         int get_neighbor_orientation(int loc1, int loc2);
 
-        void solution_convert(const DefaultPlanner::SharedEnvironment &env, Solution &solution, std::vector<DefaultPlanner::Path> &paths);
+        void solution_convert(const Environment &env, Solution &solution, std::vector<RobotPath> &paths);
 
-        LaCAM2Solver(const std::shared_ptr<HeuristicTable> &HT, DefaultPlanner::SharedEnvironment *env, std::shared_ptr<std::vector<float>> &map_weights, int max_agents_in_use, bool disable_corner_target_agents,
+        LaCAM2Solver(const std::shared_ptr<HeuristicTable> &HT, Environment *env, std::shared_ptr<std::vector<float>> &map_weights, int max_agents_in_use, bool disable_corner_target_agents,
                      int max_task_completed,
                      nlohmann::json &config) : HT(HT),
                                                map_weights(map_weights),
@@ -83,7 +83,7 @@ namespace LaCAM2 {
             use_external_executor = read_param_json<bool>(config, "use_external_executor");
             planning_window = read_param_json<int>(config, "planning_window");
             execution_window = read_param_json<int>(config, "execution_window");
-            disable_agent_goals = read_param_json<bool>(config, "disable_agent_goals");
+            disable_agent_goals = "NONE";//read_param_json<bool>(config, "disable_agent_goals");
         };
 
         ~LaCAM2Solver() {
@@ -91,7 +91,7 @@ namespace LaCAM2 {
         };
 
 
-        void clear(const DefaultPlanner::SharedEnvironment &env) {
+        void clear(const Environment &env) {
             int num_of_agents = paths.size();
 
             paths.clear();
@@ -118,9 +118,9 @@ namespace LaCAM2 {
             // initialize(env);
         }
 
-        void disable_agents(const DefaultPlanner::SharedEnvironment &env);
+        void disable_agents(const Environment &env);
 
-        ActionType get_action_from_states(const DefaultPlanner::State &state, const DefaultPlanner::State &next_state) {
+        ActionType get_action_from_states(const State &state, const State &next_state) {
 #ifndef NO_ROT
             // assert(state.timestep+1==next_state.timestep);
 

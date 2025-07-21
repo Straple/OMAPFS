@@ -10,7 +10,7 @@ namespace LNS {
     int RANDOM_WALK_STEPS = 100000;
 
 
-    Instance::Instance(const DefaultPlanner::SharedEnvironment &env) {
+    Instance::Instance(const Environment &env) {
         // load map
         num_of_rows = env.rows;
         num_of_cols = env.cols;
@@ -33,7 +33,7 @@ namespace LNS {
         }
     }
 
-    void Instance::set_starts_and_goals(const DefaultPlanner::SharedEnvironment &env) {
+    void Instance::set_starts_and_goals(const Environment &env) {
         for (int i = 0; i < num_of_agents; ++i) {
             start_locations[i] = env.curr_states[i].location;
             start_orientations[i] = env.curr_states[i].orientation;
@@ -41,7 +41,7 @@ namespace LNS {
         }
     }
 
-    void Instance::set_starts_and_goals(const std::vector<DefaultPlanner::State> &starts, const std::vector<DefaultPlanner::State> &goals) {
+    void Instance::set_starts_and_goals(const std::vector<State> &starts, const std::vector<State> &goals) {
         for (int i = 0; i < num_of_agents; ++i) {
             start_locations[i] = starts[i].location;
             start_orientations[i] = starts[i].orientation;

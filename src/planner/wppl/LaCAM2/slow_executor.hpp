@@ -1,24 +1,24 @@
 #pragma once
-#include <planner/causal_pibt/state.hpp>
+#include <environment/state.hpp>
 #include <planner/wppl/LNS/common.h>
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 
 namespace LaCAM2 {
 
 class SlowExecutor {
 public:
 
-    const DefaultPlanner::SharedEnvironment * env;
-    const vector<DefaultPlanner::State> * curr_states;
-    const vector<DefaultPlanner::State> * planned_next_states;
-    vector<DefaultPlanner::State> * next_states;
+    const Environment * env;
+    const vector<State> * curr_states;
+    const vector<State> * planned_next_states;
+    vector<State> * next_states;
 
-    SlowExecutor(const DefaultPlanner::SharedEnvironment * _env):env(_env){};
+    SlowExecutor(const Environment * _env):env(_env){};
 
     /*
      * we need to check if everyone is oriented, if so, all agents forward togather.
      */ 
-    void execute(const vector<DefaultPlanner::State> * _curr_states, const vector<DefaultPlanner::State> * _planned_next_states, vector<DefaultPlanner::State> * _next_states) {
+    void execute(const vector<State> * _curr_states, const vector<State> * _planned_next_states, vector<State> * _next_states) {
         assert(_curr_states->size()==_planned_next_states->size());
         assert(_curr_states->size()==_next_states->size());
 

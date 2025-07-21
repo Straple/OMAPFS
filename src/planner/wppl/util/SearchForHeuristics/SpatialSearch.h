@@ -1,5 +1,5 @@
 #pragma once
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 #include <planner/wppl/util/SearchForHeuristics/DataStructure.h>
 #include <planner/wppl/util/SearchForHeuristics/SpatialState.h>
 
@@ -11,7 +11,7 @@ namespace RIVERS {
 
         public:
             SpatialAStar(
-                    const DefaultPlanner::SharedEnvironment &env, int n_orients, const std::vector<float> &weights) : env(env), n_orients(n_orients), weights(weights) {
+                    const Environment &env, int n_orients, const std::vector<float> &weights) : env(env), n_orients(n_orients), weights(weights) {
                 max_states = env.rows * env.cols * n_orients;
                 n_states = 0;
                 open_list = new OpenList(max_states);
@@ -54,7 +54,7 @@ namespace RIVERS {
             int max_successors;
             State *successors;
 
-            const DefaultPlanner::SharedEnvironment &env;
+            const Environment &env;
             const std::vector<float> &weights;
 
             void clear_successors() {

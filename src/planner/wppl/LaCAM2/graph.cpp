@@ -16,7 +16,7 @@ Graph::~Graph()
 }
 
 
-Graph::Graph(const DefaultPlanner::SharedEnvironment & env): V(Vertices()), width(env.cols), height(env.rows) {
+Graph::Graph(const Environment & env): V(Vertices()), width(env.cols), height(env.rows) {
   U = Vertices(width * height, nullptr);
   //std::cout<<"graph size "<<U.size()<<std::endl;
 

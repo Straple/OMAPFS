@@ -1,19 +1,19 @@
 #pragma once
-#include <memory>
+
+#include <environment/environment.hpp>
+#include <planner/wppl/LNS/Parallel/GlobalManager.h>
+#include <planner/wppl/LNS/common.h>
+#include <planner/wppl/LaCAM2/LaCAM2Solver.hpp>
 #include <planner/wppl/LaCAM2/executor.hpp>
+#include <planner/wppl/LaCAM2/instance.hpp>
 #include <planner/wppl/LaCAM2/slow_executor.hpp>
 #include <planner/wppl/util/CompetitionActionModel.h>
 #include <planner/wppl/util/HeuristicTable.h>
-#include <random>
-
-#include <planner/causal_pibt/environment.hpp>
-#include <planner/wppl/LNS/common.h>
-
-#include <planner/wppl/LNS/Parallel/GlobalManager.h>
-#include <planner/wppl/LaCAM2/LaCAM2Solver.hpp>
-#include <planner/wppl/LaCAM2/instance.hpp>
 #include <planner/wppl/util/StatsTree.h>
+
+#include <memory>
 #include <queue>
+#include <random>
 #include <unordered_set>
 
 namespace LNS {
@@ -29,10 +29,10 @@ namespace LNS {
         int total_feasible_timestep = 0;
         int timestep = 0;
         // int executed_plan_step = -1;
-        void initialize(const DefaultPlanner::SharedEnvironment &env);
-        void observe(const DefaultPlanner::SharedEnvironment &env);
-        void plan(const DefaultPlanner::SharedEnvironment &env, int time_limit);
-        void get_step_actions(const DefaultPlanner::SharedEnvironment &env, vector<ActionType> &actions);
+        void initialize(const Environment &env);
+        void observe(const Environment &env);
+        void plan(const Environment &env, int time_limit);
+        void get_step_actions(const Environment &env, vector<ActionType> &actions);
         // ActionType get_action_from_states(const State & state, const State & next_state);
         // [end]
 
@@ -55,8 +55,8 @@ namespace LNS {
 
         double max_plan_time = 0;
 
-        std::vector<DefaultPlanner::Path> planning_paths;
-        std::vector<DefaultPlanner::Path> execution_paths;
+        std::vector<RobotPath> planning_paths;
+        std::vector<RobotPath> execution_paths;
         int executed_step = 0;
         bool need_new_execution_paths = false;
         int execution_window;// TODO: read it from config
@@ -67,7 +67,7 @@ namespace LNS {
 
         LNSSolver(
                 const std::shared_ptr<HeuristicTable> &HT,
-                DefaultPlanner::SharedEnvironment *env,
+                Environment *env,
                 std::shared_ptr<std::vector<float>> &map_weights,// map weights
                 nlohmann::json &config,
                 std::shared_ptr<LaCAM2::LaCAM2Solver> &lacam2_solver,
@@ -77,7 +77,7 @@ namespace LNS {
             delete MT;
         };
 
-        ActionType get_action_from_states(const DefaultPlanner::State &state, const DefaultPlanner::State &next_state) {
+        ActionType get_action_from_states(const State &state, const State &next_state) {
 #ifndef NO_ROT
             assert(state.timestep + 1 == next_state.timestep);
 
@@ -110,7 +110,7 @@ namespace LNS {
 #endif
         }
 
-        void modify_goals(vector<int> &goals, const DefaultPlanner::SharedEnvironment &env) {
+        void modify_goals(vector<int> &goals, const Environment &env) {
             vector<bool> taken(env.map.size(), false);
             for (auto &goal: goals) {
                 if (!taken[goal]) {
@@ -124,7 +124,7 @@ namespace LNS {
             }
         }
 
-        int find_new_goal(int old_goal, const vector<bool> &taken, const DefaultPlanner::SharedEnvironment &env) {
+        int find_new_goal(int old_goal, const vector<bool> &taken, const Environment &env) {
             std::queue<int> q;
             vector<bool> visited(env.map.size(), false);
             int start = old_goal;

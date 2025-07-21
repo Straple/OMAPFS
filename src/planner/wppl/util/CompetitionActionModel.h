@@ -1,11 +1,9 @@
 #pragma once
-#include <string>
-//#include <planner/wppl/Grid.h>
-#include <planner/causal_pibt/environment.hpp>
-#include <planner/causal_pibt/state.hpp>
-//#include <planner/wppl/Logger.h>
+
+#include <environment/environment.hpp>
 #include <environment/action_model.hpp>
 
+#include <string>
 #include <list>
 
 #ifndef NO_ROT
@@ -16,28 +14,28 @@ public:
     std::list<std::tuple<std::string, int, int, int>> errors;
 
     CompetitionActionModelWithRotate(){};
-    CompetitionActionModelWithRotate(DefaultPlanner::SharedEnvironment *env) : env(env), rows(env->rows), cols(env->cols) {
+    CompetitionActionModelWithRotate(Environment *env) : env(env), rows(env->rows), cols(env->cols) {
         moves[0] = 1;
         moves[1] = cols;
         moves[2] = -1;
         moves[3] = -cols;
     };
 
-    bool is_valid(const std::vector<DefaultPlanner::State> &prev, const std::vector<ActionType> &action);
+    bool is_valid(const std::vector<State> &prev, const std::vector<ActionType> &action);
     void set_logger(/*Logger* logger*/) {
         //this->logger = logger;
     }
 
-    std::vector<DefaultPlanner::State> result_states(const std::vector<DefaultPlanner::State> &prev, const std::vector<ActionType> &action) {
-        std::vector<DefaultPlanner::State> next(prev.size());
+    std::vector<State> result_states(const std::vector<State> &prev, const std::vector<ActionType> &action) {
+        std::vector<State> next(prev.size());
         for (size_t i = 0; i < prev.size(); i++) {
             next[i] = result_state(prev[i], action[i]);
         }
         return next;
     };
 
-    std::vector<DefaultPlanner::State> get_state_neighbors(const DefaultPlanner::State &curr, bool no_forward) {
-        std::vector<DefaultPlanner::State> neighbors;
+    std::vector<State> get_state_neighbors(const State &curr, bool no_forward) {
+        std::vector<State> neighbors;
 
         int x = curr.location % env->cols;
         int y = curr.location / env->cols;
@@ -57,8 +55,8 @@ public:
         return neighbors;
     }
 
-    std::vector<DefaultPlanner::State> get_loc_neighbors(const DefaultPlanner::State &curr, bool move_orient = true) {
-        std::vector<DefaultPlanner::State> neighbors;
+    std::vector<State> get_loc_neighbors(const State &curr, bool move_orient = true) {
+        std::vector<State> neighbors;
 
         int x = curr.location % env->cols;
         int y = curr.location / env->cols;
@@ -82,19 +80,19 @@ public:
                 continue;
             }
 
-            neighbors.push_back(DefaultPlanner::State(new_location, curr.timestep + 1, new_orientation));
+            neighbors.push_back(State(new_location, curr.timestep + 1, new_orientation));
         }
 
         return neighbors;
     }
 
-    DefaultPlanner::SharedEnvironment *env = nullptr;
+    Environment *env = nullptr;
     int rows;
     int cols;
     int moves[4];
     //Logger* logger = nullptr;
 
-    DefaultPlanner::State result_state(const DefaultPlanner::State &prev, ActionType action, bool check = false) {
+    State result_state(const State &prev, ActionType action, bool check = false) {
         int new_location = prev.location;
         int new_orientation = prev.orientation;
         if (action == ActionType::FORWARD) {
@@ -109,12 +107,12 @@ public:
                 if ((x == env->cols - 1 && prev.orientation == 0) || (y == env->rows - 1 && prev.orientation == 1) || (x == 0 && prev.orientation == 2) || (y == 0 && prev.orientation == 3)) {
                     // std::cout<<"cannot forward: "<<(x==env->cols-1 && prev.orientation==0)<< (y==env->rows-1 && prev.orientation==1) << (x==0 && prev.orientation==2) << (y==0 )<<endl;
                     // std::cout<<"pos"<<x<<","<<y<<endl;
-                    return DefaultPlanner::State(-1, prev.timestep + 1, new_orientation = prev.orientation);
+                    return State(-1, prev.timestep + 1, new_orientation = prev.orientation);
                 }
 
                 // if in the map but blocked
                 if (env->map[new_location]) {
-                    return DefaultPlanner::State(-1, prev.timestep + 1, new_orientation = prev.orientation);
+                    return State(-1, prev.timestep + 1, new_orientation = prev.orientation);
                 }
             }
         } else if (action == ActionType::ROTATE) {
@@ -126,7 +124,7 @@ public:
                 new_orientation = 3;
         }
 
-        return DefaultPlanner::State(new_location, prev.timestep + 1, new_orientation);
+        return State(new_location, prev.timestep + 1, new_orientation);
     }
 };
 
@@ -136,7 +134,7 @@ public:
     list<std::tuple<std::string, int, int, int>> errors;
 
     CompetitionActionModelWithRotate(){};
-    CompetitionActionModelWithRotate(DefaultPlanner::SharedEnvironment *env) : env(env), rows(env->rows), cols(env->cols) {
+    CompetitionActionModelWithRotate(Environment *env) : env(env), rows(env->rows), cols(env->cols) {
         moves[ActionType::R] = 1;
         moves[ActionType::D] = cols;
         moves[ActionType::L] = -1;
@@ -144,19 +142,19 @@ public:
         moves[ActionType::WAIT] = 0;
     };
 
-    // bool is_valid(const std::vector<DefaultPlanner::State>& prev, const std::vector<ActionType> & action);
+    // bool is_valid(const std::vector<State>& prev, const std::vector<ActionType> & action);
     void set_logger(Logger *logger) { this->logger = logger; }
 
-    std::vector<DefaultPlanner::State> result_states(const std::vector<DefaultPlanner::State> &prev, const std::vector<ActionType> &action) {
-        std::vector<DefaultPlanner::State> next(prev.size());
+    std::vector<State> result_states(const std::vector<State> &prev, const std::vector<ActionType> &action) {
+        std::vector<State> next(prev.size());
         for (size_t i = 0; i < prev.size(); i++) {
             next[i] = result_state(prev[i], action[i]);
         }
         return next;
     };
 
-    std::vector<DefaultPlanner::State> get_loc_neighbors(const DefaultPlanner::State &curr, bool move_orient = true) {
-        std::vector<DefaultPlanner::State> neighbors;
+    std::vector<State> get_loc_neighbors(const State &curr, bool move_orient = true) {
+        std::vector<State> neighbors;
 
         int x = curr.location % env->cols;
         int y = curr.location / env->cols;
@@ -180,40 +178,40 @@ public:
                 continue;
             }
 
-            neighbors.push_back(DefaultPlanner::State(new_location, curr.timestep + 1, new_orientation));
+            neighbors.push_back(State(new_location, curr.timestep + 1, new_orientation));
         }
 
         return neighbors;
     }
 
-    DefaultPlanner::SharedEnvironment *env = nullptr;
+    Environment *env = nullptr;
     int rows;
     int cols;
     int moves[5];
     Logger *logger = nullptr;
 
-    DefaultPlanner::State result_state(const DefaultPlanner::State &prev, ActionType action) {
+    State result_state(const State &prev, ActionType action) {
         // NOTE(rivers): we don't care about orientation, just keep it intact for now.
 
         int new_location = prev.location;
         int new_orientation = prev.orientation;
 
         if (action == ActionType::NA) {
-            // std::cout<<"have action NA in result DefaultPlanner::State"<<std::endl;
+            // std::cout<<"have action NA in result State"<<std::endl;
         } else {
             new_location = new_location + moves[action];
         }
 
-        return DefaultPlanner::State(new_location, prev.timestep + 1, new_orientation);
+        return State(new_location, prev.timestep + 1, new_orientation);
     }
 
-    bool is_valid(const std::vector<DefaultPlanner::State> &prev, const std::vector<ActionType> &actions) {
+    bool is_valid(const std::vector<State> &prev, const std::vector<ActionType> &actions) {
         if (prev.size() != actions.size()) {
             errors.push_back(make_tuple("incorrect std::vector size", -1, -1, prev[0].timestep + 1));
             return false;
         }
 
-        std::vector<DefaultPlanner::State> next = result_states(prev, actions);
+        std::vector<State> next = result_states(prev, actions);
         unordered_map<int, int> vertex_occupied;
         unordered_map<pair<int, int>, int> edge_occupied;
 

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <planner/wppl/LNS/common.h>
-#include <planner/causal_pibt/environment.hpp>
-#include <planner/causal_pibt/state.hpp>
+#include <environment/environment.hpp>
 
 #include <cassert>
 #include <iostream>
@@ -18,18 +17,18 @@ namespace LaCAM2 {
         // loc->agent
         std::unordered_map<int, int> reservation_table;
         std::vector<bool> executed;
-        const std::vector<DefaultPlanner::State> *curr_states;
-        const std::vector<DefaultPlanner::State> *planned_next_states;
-        std::vector<DefaultPlanner::State> *next_states;
+        const std::vector<State> *curr_states;
+        const std::vector<State> *planned_next_states;
+        std::vector<State> *next_states;
 
-        Executor(const DefaultPlanner::SharedEnvironment *_env) : rows(_env->rows), cols(_env->cols){};
+        Executor(const Environment *_env) : rows(_env->rows), cols(_env->cols){};
         Executor(int _rows, int _cols) : rows(_rows), cols(_cols){};
 
         /*
      * NOTE(hj): currently we only consider one step
      * planned_next_states has no orientation    
      */
-        void execute(const std::vector<DefaultPlanner::State> *_curr_states, const std::vector<DefaultPlanner::State> *_planned_next_states, std::vector<DefaultPlanner::State> *_next_states) {
+        void execute(const std::vector<State> *_curr_states, const std::vector<State> *_planned_next_states, std::vector<State> *_next_states) {
             assert(_curr_states->size() == _planned_next_states->size());
             assert(_curr_states->size() == _next_states->size());
 

@@ -12,7 +12,7 @@
 namespace RHCR {
 
     // this contructor directly convert Grid to CompetitionGraph
-    CompetitionGraph::CompetitionGraph(const DefaultPlanner::SharedEnvironment &env) {
+    CompetitionGraph::CompetitionGraph(const Environment &env) {
         map_name = "TODO";//env.map_name;
         std::exit(50);
 

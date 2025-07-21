@@ -2,14 +2,15 @@
 
 #include <iostream>
 #include <map>
+#include <unordered_map>
 
-bool CompetitionActionModelWithRotate::is_valid(const std::vector<DefaultPlanner::State> &prev, const std::vector<ActionType> &actions) {
+bool CompetitionActionModelWithRotate::is_valid(const std::vector<State> &prev, const std::vector<ActionType> &actions) {
     if (prev.size() != actions.size()) {
         errors.push_back(std::make_tuple("incorrect std::vector size", -1, -1, prev[0].timestep + 1));
         return false;
     }
 
-    std::vector<DefaultPlanner::State> next = result_states(prev, actions);
+    std::vector<State> next = result_states(prev, actions);
     std::unordered_map<int, int> vertex_occupied;
     std::map<std::pair<int, int>, int> edge_occupied;
 

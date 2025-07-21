@@ -8,7 +8,7 @@ namespace LaCAM2 {
             const std::vector<std::pair<uint, int>> &goal_indexes,
             std::vector<AgentInfo> &agent_infos,
             int planning_window,
-            std::vector<DefaultPlanner::Path> *_precomputed_paths) : G(G),
+            std::vector<RobotPath> *_precomputed_paths) : G(G),
                                                                      starts(agent_infos.size()),
                                                                      goals(agent_infos.size()),
                                                                      N(agent_infos.size()),
@@ -26,7 +26,7 @@ namespace LaCAM2 {
         }
     }
 
-    void Instance::set_starts_and_goals(std::vector<DefaultPlanner::State> *starts_ptr, std::vector<DefaultPlanner::State> *goals_ptr) {
+    void Instance::set_starts_and_goals(std::vector<State> *starts_ptr, std::vector<State> *goals_ptr) {
         auto &starts = *starts_ptr;
         auto &goals = *goals_ptr;
 

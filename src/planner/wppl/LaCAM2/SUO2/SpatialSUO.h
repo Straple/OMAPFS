@@ -1,9 +1,10 @@
 #pragma once
-#include <omp.h>
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 #include <planner/wppl/LaCAM2/SUO2/CostMap.h>
 #include <planner/wppl/LaCAM2/SUO2/SpatialSearch.h>
 #include <planner/wppl/util/HeuristicTable.h>
+
+#include <omp.h>
 
 namespace SUO2 {
 
@@ -12,7 +13,7 @@ namespace SUO2 {
         class SUO {
         public:
             SUO(
-                    const DefaultPlanner::SharedEnvironment &_env,
+                    const Environment &_env,
                     const std::vector<float> &_weights,
                     std::shared_ptr<HeuristicTable> &_HT,
                     float _vertex_collision_cost,
@@ -47,7 +48,7 @@ namespace SUO2 {
             int n_threads;
             Spatial::AStar **planners;
 
-            const DefaultPlanner::SharedEnvironment &env;
+            const Environment &env;
             const std::vector<float> &weights;
             std::shared_ptr<HeuristicTable> HT;
 

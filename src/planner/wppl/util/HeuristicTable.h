@@ -1,26 +1,25 @@
 #pragma once
-//#include "common.h"
+
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
-#include <chrono>
-#include <omp.h>
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 #include <planner/wppl/util/CompetitionActionModel.h>
 #include <planner/wppl/util/Dev.h>
 #include <planner/wppl/util/SearchForHeuristics/SpatialSearch.h>
 #include <planner/wppl/util/Timer.h>
-// #include "bshoshany/BS_thread_pool.hpp"
 
 #include <cfloat>
+#include <chrono>
+#include <omp.h>
 
 #define MAX_HEURISTIC FLT_MAX / 16
 
 class HeuristicTable {
 public:
-    const DefaultPlanner::SharedEnvironment &env;
+    const Environment &env;
     CompetitionActionModelWithRotate action_model;
     // loc1, loc2
     float *main_heuristics;
@@ -35,7 +34,7 @@ public:
 
     std::shared_ptr<std::vector<float>> map_weights;
 
-    HeuristicTable(DefaultPlanner::SharedEnvironment *_env, const std::shared_ptr<std::vector<float>> &map_weights, bool consider_rotation = true);
+    HeuristicTable(Environment *_env, const std::shared_ptr<std::vector<float>> &map_weights, bool consider_rotation = true);
     ~HeuristicTable();
 
     // weights is an array of [loc_size*n_orientations]

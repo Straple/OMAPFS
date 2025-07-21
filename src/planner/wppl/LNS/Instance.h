@@ -1,7 +1,6 @@
 #pragma once
 
-#include <planner/causal_pibt/environment.hpp>
-#include <planner/causal_pibt/state.hpp>
+#include <environment/environment.hpp>
 #include <planner/wppl/LNS/common.h>
 
 namespace LNS {
@@ -17,11 +16,11 @@ namespace LNS {
         Instance() = default;
         Instance(const string &map_fname, const string &agent_fname,
                  int num_of_agents = 0, int num_of_rows = 0, int num_of_cols = 0, int num_of_obstacles = 0, int warehouse_width = 0);
-        Instance(const DefaultPlanner::SharedEnvironment &env);
+        Instance(const Environment &env);
 
 
-        void set_starts_and_goals(const DefaultPlanner::SharedEnvironment &env);
-        void set_starts_and_goals(const std::vector<DefaultPlanner::State> &starts, const std::vector<DefaultPlanner::State> &goals);
+        void set_starts_and_goals(const Environment &env);
+        void set_starts_and_goals(const std::vector<State> &starts, const std::vector<State> &goals);
 
         void printAgents() const;
         string getMapFile() const { return map_fname; };

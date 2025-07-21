@@ -348,9 +348,9 @@ namespace LaCAM2 {
 
 
             // we need map no rotation action to rotation action here and create the new configuration for the next step.
-            std::vector<DefaultPlanner::State> curr_states;
-            std::vector<DefaultPlanner::State> planned_next_states;
-            std::vector<DefaultPlanner::State> next_states;
+            std::vector<State> curr_states;
+            std::vector<State> planned_next_states;
+            std::vector<State> next_states;
 
             curr_states.reserve(N);
             planned_next_states.reserve(N);

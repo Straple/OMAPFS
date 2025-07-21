@@ -4,8 +4,8 @@
 
 #include <ctime>
 #include <environment/action_model.hpp>
+#include <environment/environment.hpp>
 #include <nlohmann/json.hpp>
-#include <planner/causal_pibt/environment.hpp>
 #include <planner/wppl/RHCR/interface/CompetitionGraph.h>
 #include <planner/wppl/RHCR/interface/RHCRSolver.h>
 #include <planner/wppl/RHCR/main/ECBS.h>
@@ -22,9 +22,9 @@
 
 class WPPL {
 public:
-    DefaultPlanner::SharedEnvironment *env = nullptr;
+    Environment *env = nullptr;
 
-    void initialize(DefaultPlanner::SharedEnvironment* new_env);
+    void initialize(Environment *new_env);
 
     // return next states for all agents
     void plan(int time_limit, std::vector<ActionType> &plan);
@@ -67,10 +67,10 @@ public:
 
 class MAPFPlanner {
 public:
-    DefaultPlanner::SharedEnvironment *env;
+    Environment *env;
 
-    MAPFPlanner(DefaultPlanner::SharedEnvironment *env) : env(env){};
-    MAPFPlanner() { env = new DefaultPlanner::SharedEnvironment(); };
+    MAPFPlanner(Environment *env) : env(env){};
+    MAPFPlanner() { env = new Environment(); };
     virtual ~MAPFPlanner() { delete env; };
 
 

@@ -26,7 +26,7 @@ namespace LaCAM2 {
         }
     }
 
-    void LaCAM2Solver::initialize(const DefaultPlanner::SharedEnvironment &env) {
+    void LaCAM2Solver::initialize(const Environment &env) {
         paths.resize(env.num_of_agents);
         agent_infos = std::make_shared<std::vector<AgentInfo>>(env.num_of_agents);
         for (int i = 0; i < env.num_of_agents; ++i) {
@@ -37,8 +37,8 @@ namespace LaCAM2 {
         G = std::make_shared<Graph>(env);
     }
 
-    void LaCAM2Solver::disable_agents(const DefaultPlanner::SharedEnvironment &env) {
-
+    void LaCAM2Solver::disable_agents(const Environment &env) {
+        std::exit(20);
         std::string strategy = read_param_json<std::string>(config, "disable_agent_strategy");
 
         int disabled_agents_num;
@@ -84,7 +84,7 @@ namespace LaCAM2 {
         std::cout << "strategy: " << strategy << " #disabled agents: " << disabled_agents_num << std::endl;
     }
 
-    Instance LaCAM2Solver::build_instance(const DefaultPlanner::SharedEnvironment &env, std::vector<DefaultPlanner::Path> *precomputed_paths) {
+    Instance LaCAM2Solver::build_instance(const Environment &env, std::vector<RobotPath> *precomputed_paths) {
         auto starts = vector<std::pair<uint, int>>();
         auto goals = vector<std::pair<uint, int>>();
 
@@ -196,7 +196,7 @@ namespace LaCAM2 {
         return cost;
     }
 
-    void LaCAM2Solver::plan(const DefaultPlanner::SharedEnvironment &env, std::vector<DefaultPlanner::Path> *precomputed_paths, std::vector<DefaultPlanner::State> *starts, std::vector<DefaultPlanner::State> *goals) {
+    void LaCAM2Solver::plan(const Environment &env, std::vector<RobotPath> *precomputed_paths, std::vector<State> *starts, std::vector<State> *goals) {
         ONLYDEV(g_timer.record_p("lacam2_plan_pre_s");)
         // std::cout<<"random :"<<get_random_int(MT,0,100)<<std::endl;
 
@@ -250,7 +250,7 @@ namespace LaCAM2 {
             bool use_swap = false;// TODO: we need try use_swap
             bool use_orient_in_heuristic = read_param_json<bool>(config, "use_orient_in_heuristic");
 
-            vector<DefaultPlanner::Path> precomputed_paths;
+            vector<RobotPath> precomputed_paths;
             if (read_param_json<int>(config["SUO"], "iterations") > 0) {
                 ONLYDEV(g_timer.record_p("suo_init_s");)
                 SUO2::Spatial::SUO suo(
@@ -482,7 +482,7 @@ namespace LaCAM2 {
         // total_feasible_timestep+=1;
     }
 
-    void LaCAM2Solver::solution_convert(const DefaultPlanner::SharedEnvironment &env, Solution &solution, std::vector<DefaultPlanner::Path> &_paths) {
+    void LaCAM2Solver::solution_convert(const Environment &env, Solution &solution, std::vector<RobotPath> &_paths) {
 
         int num_steps = 0;
 
@@ -492,7 +492,7 @@ namespace LaCAM2 {
 
         auto &curr_config = solution[0];
 
-        std::vector<DefaultPlanner::State> curr_states;
+        std::vector<State> curr_states;
         for (int aid = 0; aid < N; ++aid) {
             curr_states.emplace_back(curr_config.locs[aid]->index, 0, curr_config.orients[aid]);
             _paths[aid].push_back(curr_states[aid]);
@@ -503,8 +503,8 @@ namespace LaCAM2 {
         for (int i = 1; i < solution.size(); ++i) {
             auto &next_config = solution[i];
             while (true) {
-                std::vector<DefaultPlanner::State> planned_next_states;
-                std::vector<DefaultPlanner::State> next_states;
+                std::vector<State> planned_next_states;
+                std::vector<State> next_states;
 
                 planned_next_states.reserve(N);
                 next_states.reserve(N);
@@ -547,7 +547,7 @@ namespace LaCAM2 {
         }
     }
 
-    void LaCAM2Solver::get_step_actions(const DefaultPlanner::SharedEnvironment &env, vector<ActionType> &actions) {
+    void LaCAM2Solver::get_step_actions(const Environment &env, vector<ActionType> &actions) {
         // check empty
         assert(actions.empty());
 

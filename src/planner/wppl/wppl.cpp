@@ -192,7 +192,7 @@ std::string WPPL::load_map_weights(string weights_path) {
     return suffix;
 }
 
-void WPPL::initialize(DefaultPlanner::SharedEnvironment *new_env) {
+void WPPL::initialize(Environment *new_env) {
     env = new_env;
     //cout << "planner initialization begins" << endl;
     load_configs();

@@ -1,17 +1,20 @@
-#include <chrono>
-#include <environment/action_model.hpp>
-#include <nlohmann/json.hpp>
-#include <planner/causal_pibt/state.hpp>
 #include <planner/wppl/RHCR/interface/RHCRSolver.h>
+
+#include <environment/action_model.hpp>
+#include <environment/state.hpp>
+
+#include <nlohmann/json.hpp>
+
+#include <chrono>
 #include <thread>
 
 namespace RHCR {
 
-    State convert_state_type(const DefaultPlanner::State &state) {
+    State convert_state_type(const ::State &state) {
         return {state.location, state.timestep, state.orientation};
     }
 
-    vector<State> convert_states_type(const vector<DefaultPlanner::State> &states) {
+    vector<State> convert_states_type(const vector<::State> &states) {
         vector<State> new_states;
         for (int i = 0; i < states.size(); ++i) {
             // TODO: rvalue and move constructor?
@@ -79,7 +82,7 @@ namespace RHCR {
         // }
     }
 
-    void RHCRSolver::initialize(const DefaultPlanner::SharedEnvironment &env) {
+    void RHCRSolver::initialize(const Environment &env) {
         exit(100);
         graph.preprocessing(consider_rotation, "TODO" /*env.file_storage_path*/);
         initialize_solvers();
@@ -87,18 +90,18 @@ namespace RHCR {
         timestep = 0;
     }
 
-    void RHCRSolver::update_goal_locations(const DefaultPlanner::SharedEnvironment &env) {
+    void RHCRSolver::update_goal_locations(const Environment &env) {
         std::exit(80);
         for (int i = 0; i < num_of_drives; ++i) {
             goal_locations[i].clear();
             for (int j = 0; j < env.goal_locations[i].size(); ++j) {
                 // we require path of at least length one, even the start and the goal are the same.
-                goal_locations[i].emplace_back(env.goal_locations[i][j], max(env.goal_locations[i][j]/*.second*/ - timestep, 1));
+                goal_locations[i].emplace_back(env.goal_locations[i][j], max(env.goal_locations[i][j] /*.second*/ - timestep, 1));
             }
         }
     }
 
-    void RHCRSolver::plan(const DefaultPlanner::SharedEnvironment &env) {
+    void RHCRSolver::plan(const Environment &env) {
         // sleep for test purpose
         // std::this_thread::sleep_for (std::chrono::milliseconds(1000));
 
@@ -144,7 +147,7 @@ namespace RHCR {
         }
     }
 
-    void RHCRSolver::get_step_actions(const DefaultPlanner::SharedEnvironment &env, vector<ActionType> &actions) {
+    void RHCRSolver::get_step_actions(const Environment &env, vector<ActionType> &actions) {
         // check empty
         assert(actions.empty());
 

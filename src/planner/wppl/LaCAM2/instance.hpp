@@ -6,7 +6,7 @@
 
 #include <planner/wppl/LaCAM2/graph.hpp>
 #include <planner/wppl/LaCAM2/utils.hpp>
-#include <planner/causal_pibt/state.hpp>
+#include <environment/state.hpp>
 #include <planner/wppl/LNS/common.h>
 #include <planner/wppl/RHCR/main/States.h>
 
@@ -32,7 +32,7 @@ struct Instance {
   const uint N;   // number of agents
   std::vector<AgentInfo> & agent_infos;
   int planning_window=-1;
-  std::vector<DefaultPlanner::Path> * precomputed_paths;
+  std::vector<RobotPath> * precomputed_paths;
 
   // // for testing
   // Instance(const std::string& map_filename,
@@ -50,11 +50,11 @@ struct Instance {
     const std::vector<std::pair<uint,int> >& goal_indexes,
     std::vector<AgentInfo> & agent_infos,
     int planning_window=-1,
-    std::vector<DefaultPlanner::Path> * precomputed_paths=nullptr
+    std::vector<RobotPath> * precomputed_paths=nullptr
   );
   ~Instance() {}
 
-  void set_starts_and_goals(std::vector<DefaultPlanner::State> * starts, std::vector<DefaultPlanner::State> * goals);
+  void set_starts_and_goals(std::vector<State> * starts, std::vector<State> * goals);
 
   // simple feasibility check of instance
   bool is_valid(const int verbose = 0) const;
