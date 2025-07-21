@@ -11,7 +11,7 @@ option(ENABLE_SCHEDULER_CHANGE_TASK "Enable scheduler task changes" ON)
 
 # Configurable compile-time values
 set(EPIBT_DEPTH "3" CACHE STRING "Depth for EPIBT operations")
-set(THREADS_NUM_DEFAULT "32" CACHE STRING "Default number of threads")
+set(THREADS_NUM_DEFAULT "10" CACHE STRING "Default number of threads")
 
 # Apply configuration
 if (ENABLE_ROTATE_MODEL)
@@ -36,21 +36,43 @@ add_definitions(-DTHREADS_NUM_DEFAULT=${THREADS_NUM_DEFAULT})
 message(STATUS "EPIBT_DEPTH set to: ${EPIBT_DEPTH}")
 message(STATUS "Default threads: ${THREADS_NUM_DEFAULT}")
 
+find_package(OpenMP REQUIRED)
 find_package(Threads REQUIRED)
 
 include_directories("src")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
+# Find Boost
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+#SET(Boost_USE_STATIC_LIBS ON)
+# iostreams
+find_package(Boost 1.49.0 REQUIRED COMPONENTS program_options system filesystem log log_setup iostreams)
+
+include_directories(${Boost_INCLUDE_DIRS})
+
 file(GLOB SOURCES
         src/utils/*.cpp
         src/environment/*.cpp
+
         src/planner/*.cpp
         src/planner/pibt/*.cpp
         src/planner/causal_pibt/*.cpp
         src/planner/epibt/*.cpp
+
+        src/planner/wppl/*.cpp
+        src/planner/wppl/LaCAM2/*.cpp
+        src/planner/wppl/LaCAM2/SUO2/*.cpp
+        src/planner/wppl/LNS/*.cpp
+        src/planner/wppl/LNS/Parallel/*.cpp
+        src/planner/wppl/RHCR/interface/*.cpp
+        src/planner/wppl/RHCR/main/*.cpp
+        src/planner/wppl/util/*.cpp
+
         src/scheduler/greedy/*.cpp
         )
 
 add_executable(main src/main.cpp ${SOURCES})
 target_link_libraries(main Threads::Threads)
+target_link_libraries(main ${Boost_LIBRARIES})
+target_link_libraries(main OpenMP::OpenMP_CXX)
