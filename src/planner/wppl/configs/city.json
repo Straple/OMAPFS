@@ -87,7 +87,7 @@
                     "n_agents": 1000000,
                     "value": "early_time"
                 }
-            ],
+            ]
         }
     },
     "LaCAM2": {
@@ -110,7 +110,7 @@
                 "n_agents": 1000000,
                 "value": "short_dist"
             }
-        ],
+        ]
     },
     "PIBT": {
         "prior_type": "early_time"
