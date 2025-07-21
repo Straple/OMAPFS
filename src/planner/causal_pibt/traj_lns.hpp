@@ -12,7 +12,7 @@
 #include <random>
 #include <set>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     struct FW_Metric {
         int id = 0;
         int deviation = 0;
@@ -25,7 +25,7 @@ namespace DefaultPlanner {
 
     class TrajLNS {
     public:
-        SharedEnvironment *env;
+        Environment *env;
         std::vector<int> tasks;
 
         TimePoint start_time;
@@ -53,10 +53,10 @@ namespace DefaultPlanner {
 
         void init_mem();
 
-        TrajLNS(SharedEnvironment *env, std::vector<HeuristicTable> &heuristics, Neighbors &neighbors);
+        TrajLNS(Environment *env, std::vector<HeuristicTable> &heuristics, Neighbors &neighbors);
 
         TrajLNS();
     };
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

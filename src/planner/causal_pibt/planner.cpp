@@ -1,6 +1,6 @@
 #ifdef ENABLE_ROTATE_MODEL
 
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 #include <planner/causal_pibt/flow.hpp>
 #include <planner/causal_pibt/heuristics.hpp>
 #include <planner/causal_pibt/pibt.hpp>
@@ -10,12 +10,12 @@
 
 #include <random>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     extern std::vector<HeuristicTable> global_heuristictable;
     extern Neighbors global_neighbors;
-};// namespace DefaultPlanner
+};// namespace CausalPlanner
 
-using namespace DefaultPlanner;
+using namespace CausalPlanner;
 
 /**
  * @brief Default planner initialization
@@ -25,7 +25,7 @@ using namespace DefaultPlanner;
  *
  * The initialization function initializes the default planner data structures and heuristics tables.
  */
-void CausalPIBT::initialize(SharedEnvironment *env) {
+void CausalPIBT::initialize(Environment *env) {
     //initialise all required data structures
     assert(env->num_of_agents != 0);
     p.assign(env->num_of_agents, 0);
@@ -67,7 +67,7 @@ void CausalPIBT::initialize(SharedEnvironment *env) {
      * Finally, it computes the actions for the agents using PIBT that follows the guide path heuristics and returns the actions.
      * Note that the default planner ignores the turning action costs, and post-processes turning actions as additional delays on top of original plan.
      */
-void CausalPIBT::plan(TimePoint end_time, std::vector<ActionType> &actions, SharedEnvironment *env) {
+void CausalPIBT::plan(TimePoint end_time, std::vector<ActionType> &actions, Environment *env) {
 
     // recrod the initial location of each agent as dummy goals in case no goal is assigned to the agent.
     if (env->curr_timestep == 0) {
@@ -86,7 +86,7 @@ void CausalPIBT::plan(TimePoint end_time, std::vector<ActionType> &actions, Shar
         //initialise the shortest distance heuristic table for the goal location of the agent
         if (get_now() < end_time) {
             for (int j = 0; j < env->goal_locations[i].size(); j++) {
-                int goal_loc = env->goal_locations[i][j].first;
+                int goal_loc = env->goal_locations[i][j];
                 if (trajLNS.heuristics.at(goal_loc).empty()) {
                     init_heuristic(trajLNS.heuristics[goal_loc], env, goal_loc);
                     count++;
@@ -99,7 +99,7 @@ void CausalPIBT::plan(TimePoint end_time, std::vector<ActionType> &actions, Shar
             trajLNS.tasks[i] = dummy_goals.at(i);
             p[i] = p_copy[i];
         } else {
-            trajLNS.tasks[i] = env->goal_locations[i].front().first;
+            trajLNS.tasks[i] = env->goal_locations[i].front();
         }
 
         // check if the agent need a guide path update, when the agent has no guide path or the guide path does not end at the goal location

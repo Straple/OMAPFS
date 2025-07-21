@@ -4,12 +4,12 @@
 
 #include <queue>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
 
     std::vector<HeuristicTable> global_heuristictable;
     Neighbors global_neighbors;
 
-    void init_neighbor(SharedEnvironment *env) {
+    void init_neighbor(Environment *env) {
         global_neighbors.resize(env->rows * env->cols);
         for (int row = 0; row < env->rows; row++) {
             for (int col = 0; col < env->cols; col++) {
@@ -32,14 +32,14 @@ namespace DefaultPlanner {
         }
     }
 
-    void init_heuristics(SharedEnvironment *env) {
+    void init_heuristics(Environment *env) {
         if (global_heuristictable.size() == 0) {
             global_heuristictable.resize(env->map.size());
             init_neighbor(env);
         }
     }
 
-    void init_heuristic(HeuristicTable &ht, SharedEnvironment *env, int goal_location) {
+    void init_heuristic(HeuristicTable &ht, Environment *env, int goal_location) {
         // initialize my_heuristic, but have error on malloc: Region cookie corrupted for region
         ht.htable.clear();
         ht.htable.resize(env->map.size(), MAX_TIMESTEP);
@@ -50,7 +50,7 @@ namespace DefaultPlanner {
         ht.open.push_back(root);// add root to open
     }
 
-    int get_heuristic(HeuristicTable &ht, SharedEnvironment *env, int source, Neighbors *ns) {
+    int get_heuristic(HeuristicTable &ht, Environment *env, int source, Neighbors *ns) {
         if (ht.htable[source] < MAX_TIMESTEP) return ht.htable[source];
 
         std::vector<int> neighbors;
@@ -85,7 +85,7 @@ namespace DefaultPlanner {
         return MAX_TIMESTEP;
     }
 
-    int get_h(SharedEnvironment *env, int source, int target) {
+    int get_h(Environment *env, int source, int target) {
         if (global_heuristictable.empty()) {
             init_heuristics(env);
         }
@@ -97,7 +97,7 @@ namespace DefaultPlanner {
         return get_heuristic(global_heuristictable.at(target), env, source, &global_neighbors);
     }
 
-    void init_dist_2_path(Dist2Path &dp, SharedEnvironment *env, Traj &path) {
+    void init_dist_2_path(Dist2Path &dp, Environment *env, Traj &path) {
         if (dp.dist2path.empty())
             dp.dist2path.resize(env->map.size(), d2p(0, -1, MAX_TIMESTEP, MAX_TIMESTEP));
 
@@ -114,7 +114,7 @@ namespace DefaultPlanner {
         }
     }
 
-    std::pair<int, int> get_source_2_path(Dist2Path &dp, SharedEnvironment *env, int source, Neighbors *ns) {
+    std::pair<int, int> get_source_2_path(Dist2Path &dp, Environment *env, int source, Neighbors *ns) {
         if (dp.dist2path[source].label == dp.label && dp.dist2path[source].cost < MAX_TIMESTEP) {
             return std::make_pair(dp.dist2path[source].cost, dp.dist2path[source].togo);
         }
@@ -142,11 +142,11 @@ namespace DefaultPlanner {
         return std::make_pair(MAX_TIMESTEP, 0);
     }
 
-    int get_dist_2_path(Dist2Path &dp, SharedEnvironment *env, int source, Neighbors *ns) {
+    int get_dist_2_path(Dist2Path &dp, Environment *env, int source, Neighbors *ns) {
         std::pair<int, int> dists = get_source_2_path(dp, env, source, ns);
         return dists.first + dists.second;
     }
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

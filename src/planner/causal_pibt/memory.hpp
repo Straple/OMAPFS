@@ -6,7 +6,7 @@
 
 #include <planner/causal_pibt/search_node.hpp>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
 
     class MemoryPool {
         //every location in the map has a node with id equal to the location
@@ -44,5 +44,5 @@ namespace DefaultPlanner {
         bool ready = false;
     };
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 #endif

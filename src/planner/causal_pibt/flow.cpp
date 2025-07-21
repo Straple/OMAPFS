@@ -6,7 +6,7 @@
 #include <random>
 #include <unordered_set>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     //remove flow for each location's outgoing edge according to the traj
     void remove_traj(TrajLNS &lns, int agent) {
         lns.soc -= lns.trajs[agent].size() - 1;
@@ -150,6 +150,6 @@ namespace DefaultPlanner {
         update_dist_2_path(lns, i);
     }
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

@@ -2,7 +2,7 @@
 
 #include <planner/causal_pibt/pibt.hpp>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
 
     int get_gp_h(TrajLNS &lns, int ai, int target) {
         int min_heuristic;
@@ -121,7 +121,7 @@ namespace DefaultPlanner {
         return ActionType::WAIT;
     }
 
-    ActionType getAction(State &prev, int next_loc, SharedEnvironment *env) {
+    ActionType getAction(State &prev, int next_loc, Environment *env) {
         if (prev.location == next_loc) {
             return ActionType::WAIT;
         }
@@ -178,6 +178,6 @@ namespace DefaultPlanner {
         return false;
     }
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

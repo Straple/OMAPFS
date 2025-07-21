@@ -9,7 +9,7 @@
 #include <random>
 #include <unordered_set>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
 
     //remove flow for each location's outgoing edge according to the traj
     void remove_traj(TrajLNS &lns, int agent);
@@ -30,5 +30,5 @@ namespace DefaultPlanner {
     //update traj and distance table for agent i
     void update_traj(TrajLNS &lns, int i);
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 #endif

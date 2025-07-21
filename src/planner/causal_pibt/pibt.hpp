@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
 
     int get_gp_h(TrajLNS &lns, int ai, int target);
 
@@ -26,9 +26,9 @@ namespace DefaultPlanner {
 
     ActionType getAction(State &prev, State &next);
 
-    ActionType getAction(State &prev, int next_loc, SharedEnvironment *env);
+    ActionType getAction(State &prev, int next_loc, Environment *env);
 
     bool moveCheck(int id, std::vector<bool> &checked,
                    std::vector<DCR> &decided, std::vector<ActionType> &actions, std::vector<int> &prev_decision);
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 #endif

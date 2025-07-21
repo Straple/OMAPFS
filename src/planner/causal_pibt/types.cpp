@@ -2,7 +2,7 @@
 
 #include <planner/causal_pibt/types.hpp>
 
-using namespace DefaultPlanner;
+using namespace CausalPlanner;
 
 PIBT_C::PIBT_C(int location, int heuristic, int orientation, int tie_breaker)
     : location(location), heuristic(heuristic), orientation(orientation), tie_breaker(tie_breaker) {

@@ -2,12 +2,12 @@
 
 #include <planner/causal_pibt/traj_lns.hpp>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     extern std::vector<HeuristicTable> global_heuristictable;
     extern Neighbors global_neighbors;
-};// namespace DefaultPlanner
+};// namespace CausalPlanner
 
-using namespace DefaultPlanner;
+using namespace CausalPlanner;
 
 FW_Metric::FW_Metric(int i, int d, int l)
     : id(i), deviation(d), last_replan_t(l) {
@@ -17,7 +17,7 @@ void TrajLNS::init_mem() {
     mem.init(env->map.size());
 }
 
-TrajLNS::TrajLNS(SharedEnvironment *env, std::vector<HeuristicTable> &heuristics, Neighbors &neighbors)
+TrajLNS::TrajLNS(Environment *env, std::vector<HeuristicTable> &heuristics, Neighbors &neighbors)
     : env(env),
       trajs(env->num_of_agents),
       tasks(env->num_of_agents),

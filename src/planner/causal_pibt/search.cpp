@@ -2,10 +2,10 @@
 
 #include <planner/causal_pibt/search.hpp>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     //a astar minimized the opposide traffic flow with existing traffic flow
 
-    s_node astar(SharedEnvironment *env, std::vector<Int4> &flow,
+    s_node astar(Environment *env, std::vector<Int4> &flow,
                  HeuristicTable &ht, Traj &traj,
                  MemoryPool &mem, int start, int goal, Neighbors *ns) {
         mem.reset();
@@ -159,6 +159,6 @@ namespace DefaultPlanner {
 
         return *goal_node;
     }
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

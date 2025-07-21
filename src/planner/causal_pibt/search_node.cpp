@@ -2,7 +2,7 @@
 
 #include <planner/causal_pibt/search_node.hpp>
 
-using namespace DefaultPlanner;
+using namespace CausalPlanner;
 
 s_node::s_node(int id, int g, int h, int op_flow, int depth) : id(id), g(g), h(h), op_flow(op_flow), depth(depth) {}
 

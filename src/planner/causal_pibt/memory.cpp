@@ -4,7 +4,7 @@
 
 #include <utils/assert.hpp>
 
-using namespace DefaultPlanner;
+using namespace CausalPlanner;
 
 MemoryPool::MemoryPool() {
     size = 0;

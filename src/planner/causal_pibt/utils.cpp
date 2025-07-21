@@ -2,15 +2,15 @@
 
 #include <planner/causal_pibt/utils.hpp>
 
-namespace DefaultPlanner {
-    int get_d(int diff, const SharedEnvironment *env) {
+namespace CausalPlanner {
+    int get_d(int diff, const Environment *env) {
 
         return (diff == 1) ? 0 : (diff == -1)  ? 2
                          : (diff == env->cols) ? 1
                                                : 3;
     }
 
-    bool validateMove(int loc, int loc2, const SharedEnvironment *env) {
+    bool validateMove(int loc, int loc2, const Environment *env) {
         int loc_x = loc / env->cols;
         int loc_y = loc % env->cols;
 
@@ -26,7 +26,7 @@ namespace DefaultPlanner {
         return true;
     }
 
-    int manhattanDistance(int loc, int loc2, const SharedEnvironment *env) {
+    int manhattanDistance(int loc, int loc2, const Environment *env) {
         int loc_x = loc / env->cols;
         int loc_y = loc % env->cols;
         int loc2_x = loc2 / env->cols;
@@ -34,7 +34,7 @@ namespace DefaultPlanner {
         return abs(loc_x - loc2_x) + abs(loc_y - loc2_y);
     }
 
-    void getNeighbors(const SharedEnvironment *env, std::vector<std::pair<int, int>> &neighbors, int location,
+    void getNeighbors(const Environment *env, std::vector<std::pair<int, int>> &neighbors, int location,
                       int direction) {
         neighbors.clear();
         //forward
@@ -62,7 +62,7 @@ namespace DefaultPlanner {
         neighbors.emplace_back(std::make_pair(location, direction));//wait
     }
 
-    void getNeighbors_nowait(const SharedEnvironment *env, std::vector<std::pair<int, int>> &neighbors, int location,
+    void getNeighbors_nowait(const Environment *env, std::vector<std::pair<int, int>> &neighbors, int location,
                              int direction) {
         neighbors.clear();
         //forward
@@ -107,6 +107,6 @@ namespace DefaultPlanner {
                 neighbors[i] = -1;
         }
     }
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

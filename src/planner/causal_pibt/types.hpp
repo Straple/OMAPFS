@@ -1,7 +1,7 @@
 #pragma once
 #ifdef ENABLE_ROTATE_MODEL
 
-#include <planner/causal_pibt/environment.hpp>
+#include <environment/environment.hpp>
 
 #include <cassert>
 #include <climits>
@@ -14,7 +14,7 @@
 
 #define MAX_TIMESTEP INT_MAX / 2
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     enum DONE {
         NOT_DONE,
         DONE
@@ -95,6 +95,6 @@ namespace DefaultPlanner {
 
     typedef std::vector<std::vector<int>> Neighbors;
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

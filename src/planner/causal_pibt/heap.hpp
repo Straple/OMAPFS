@@ -18,7 +18,7 @@
 #include <planner/causal_pibt/types.hpp>
 #include <planner/causal_pibt/utils.hpp>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
 
 
     struct min_q {
@@ -241,6 +241,6 @@ namespace DefaultPlanner {
     typedef pqueue<s_node, cmp_less_f, min_q> pqueue_min_f;
 
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 
 #endif

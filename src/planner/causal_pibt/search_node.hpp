@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-namespace DefaultPlanner {
+namespace CausalPlanner {
     struct s_node {
         int label = 0;
         int id = -1;//also location, -1 indicated not generated yet.
@@ -73,5 +73,5 @@ namespace DefaultPlanner {
         bool operator()(const s_node &lhs, const s_node &rhs) const;
     };
 
-}// namespace DefaultPlanner
+}// namespace CausalPlanner
 #endif
