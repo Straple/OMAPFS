@@ -12,35 +12,35 @@
         },
         {
             "n_agents": 200,
-            "value": "src/planner/wppl/weights/random_weight_101.weights"
+            "value": "src/planner/wppl/weights/random_weight_101.txt"
         },
 		{
 		  "n_agents": 300,
-		  "value": "src/planner/wppl/weights/random_weight_101.weights"
+		  "value": "src/planner/wppl/weights/random_weight_101.txt"
 		},
         {
           "n_agents": 400,
-          "value": "src/planner/wppl/weights/random_weight_040.weights"
+          "value": "src/planner/wppl/weights/random_weight_040.txt"
         },
         {
             "n_agents": 500,
-            "value": "src/planner/wppl/weights/random_weight_040.weights"
+            "value": "src/planner/wppl/weights/random_weight_040.txt"
         },
         {
             "n_agents": 600,
-            "value": "src/planner/wppl/weights/random_weight_050.weights"
+            "value": "src/planner/wppl/weights/random_weight_050.txt"
         },
         {
             "n_agents": 700,
-            "value": "src/planner/wppl/weights/random_weight_050.weights"
+            "value": "src/planner/wppl/weights/random_weight_050.txt"
         },
         {
             "n_agents": 800,
-            "value": "src/planner/wppl/weights/random_weight_050.weights"
+            "value": "src/planner/wppl/weights/random_weight_050.txt"
         },
         {
             "n_agents": 1000000,
-            "value": "src/planner/wppl/weights/random_800_uncompressed_weights_with_wait_5000_steps.weights"
+            "value": "src/planner/wppl/weights/random_800_uncompressed_weights_with_wait_5000_steps.txt"
         }
     ],
     "max_execution_steps": [
@@ -132,9 +132,6 @@
                     "value": "early_time"
                 }
             ],
-            "disable_agent_strategy": "tabu_locs",
-            "disable_agent_goals": true,
-            "tabu_locs_fp": "src/planner/wppl/weights/random_600_tabu_locs.txt"
         }
     },
     "LaCAM2": {
@@ -158,9 +155,6 @@
                 "value": "early_time"
             }
         ],
-        "disable_agent_strategy": "uniform",
-        "disable_agent_goals": true,
-        "tabu_locs_fp": "src/planner/wppl/weights/random_600_tabu_locs.txt"
     },
     "PIBT": {
         "prior_type": "early_time"

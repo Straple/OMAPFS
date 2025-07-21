@@ -8,7 +8,7 @@
     "map_weights_path": [
         {
             "n_agents": 100000,
-            "value": "src/planner/wppl/weights/paris_weight_014.weights"
+            "value": "src/planner/wppl/weights/paris_weight_014.txt"
         }
     ],
     "max_agents_in_use": [
@@ -88,9 +88,6 @@
                     "value": "early_time"
                 }
             ],
-            "disable_agent_strategy": "uniform",
-            "disable_agent_goals": true,
-            "tabu_locs_fp": ""
         }
     },
     "LaCAM2": {
@@ -114,9 +111,6 @@
                 "value": "short_dist"
             }
         ],
-        "disable_agent_strategy": "uniform",
-        "disable_agent_goals": true,
-        "tabu_locs_fp": ""
     },
     "PIBT": {
         "prior_type": "early_time"
