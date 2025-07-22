@@ -9,9 +9,9 @@
 #include <scheduler/greedy/greedy_scheduler.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 class TestSystem {
 
@@ -44,7 +44,7 @@ class TestSystem {
     std::vector<ActionType> get_actions();
 
 public:
-    TestSystem(Robots robots, TaskPool task_pool);
+    TestSystem(Robots robots, TaskPool task_pool, std::shared_ptr<HeuristicTable> wppl_heuristic_table);
 
     Answer simulate(uint32_t steps_num);
 };

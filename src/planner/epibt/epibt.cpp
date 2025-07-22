@@ -144,8 +144,8 @@ void EPIBT::remove_path(uint32_t r) {
     update_score(r, desires[r], -1);
 }
 
-EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
-    if (counter % 4 == 0 && get_now() >= end_time) {
+EPIBT::RetType EPIBT::build_impl(uint32_t r) {
+    if (recursion_counter % 4 == 0 && get_now() >= end_time) {
         return RetType::REJECTED;
     }
 
@@ -179,18 +179,18 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (curr_visited[to_r] == visited_counter ||
-#ifdef ENABLE_EPIBT_ALTERNATIVE_VISIT_POLICY
-                (visited[to_r] == visited_counter && visited_num[to_r] >= 10) ||
-#endif
-                counter > 5'000) {
+            if (curr_visited[to_r] == visited_counter ||                        // если мы уже построили его сейчас
+                (visited[to_r] == visited_counter && visited_num[to_r] >= 10) ||// ограничение на количество посещений <= 10
+                robots[to_r].priority <= inheritance_priority                   // не идем в агента более высокого приоритета
+            ) {
                 continue;
             }
 
             remove_path(to_r);
             add_path(r);
 
-            RetType res = build(to_r, ++counter);
+            recursion_counter++;
+            RetType res = build_impl(to_r);
             if (res == RetType::ACCEPTED) {
                 return res;
             } else if (res == RetType::REJECTED) {
@@ -211,10 +211,11 @@ EPIBT::RetType EPIBT::build(uint32_t r, uint32_t &counter) {
 }
 
 void EPIBT::build(uint32_t r) {
+    recursion_counter = 0;
+    inheritance_priority = robots[r].priority;
     old_score = cur_score;
     remove_path(r);
-    uint32_t counter = 0;
-    if (build(r, counter) != RetType::ACCEPTED) {
+    if (build_impl(r) != RetType::ACCEPTED) {
         add_path(r);
     }
 }
@@ -324,14 +325,7 @@ void EPIBT::solve() {
                 if (get_now() >= end_time) {
                     break;
                 }
-                epibt_step++;
-                if (
-#ifdef ENABLE_EPIBT_ALTERNATIVE_VISIT_POLICY
-                        visited
-#else
-                        curr_visited
-#endif
-                                [r] != visited_counter) {
+                if (visited[r] != visited_counter) {
                     build(r);
                 }
             }
@@ -396,8 +390,4 @@ std::vector<ActionType> EPIBT::get_actions() const {
 #endif
     }
     return answer;
-}
-
-uint32_t EPIBT::get_epibt_steps() const {
-    return epibt_step;
 }

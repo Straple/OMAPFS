@@ -15,11 +15,13 @@ protected:
 
     double old_score = 0;
 
-    uint32_t epibt_step = 0;
-
     uint32_t available_operation_depth = -1;
 
     uint32_t visited_counter = 1;
+
+    uint32_t recursion_counter = 0;
+
+    uint32_t inheritance_priority = 0;
 
     bool enable_rollback = true;
 
@@ -67,7 +69,7 @@ protected:
         REJECTED,// success + not accepted
     };
 
-    RetType build(uint32_t r, uint32_t &counter);
+    RetType build_impl(uint32_t r);
 
     void build(uint32_t r);
 
@@ -81,6 +83,4 @@ public:
     [[nodiscard]] std::vector<uint32_t> get_desires() const;
 
     [[nodiscard]] std::vector<ActionType> get_actions() const;
-
-    [[nodiscard]] uint32_t get_epibt_steps() const;
 };

@@ -176,7 +176,7 @@ std::vector<ActionType> TestSystem::get_actions() {
         env.curr_timestep = timestep;
 
         if (get_planner_type() == PlannerType::WPPL) {
-            wppl_planner->plan(50, actions);
+            wppl_planner->plan(1000, actions);
         } else {
             causal_pibt_planner->plan(end_time, actions, &env);
         }
@@ -188,7 +188,7 @@ std::vector<ActionType> TestSystem::get_actions() {
     return actions;
 }
 
-TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool) : robots(std::move(copy_robots)), task_pool(std::move(copy_task_pool)), epibt_prev_operations(this->robots.size()) {
+TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool, std::shared_ptr<HeuristicTable> wppl_heuristic_table) : robots(std::move(copy_robots)), task_pool(std::move(copy_task_pool)), epibt_prev_operations(this->robots.size()) {
     // gen_random_agents();
 
     if (get_scheduler_type() == SchedulerType::GREEDY) {
@@ -213,7 +213,7 @@ TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool) : robots(std
 
     if (get_planner_type() == PlannerType::WPPL) {
         wppl_planner = std::make_unique<WPPL>();
-        wppl_planner->initialize(&env);
+        wppl_planner->initialize(&env, wppl_heuristic_table);
     }
 #endif
 }
