@@ -126,7 +126,7 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
-    constexpr uint32_t PLANNER_TIME_LIMIT = 50;
+    constexpr uint32_t PLANNER_TIME_LIMIT = 1000;
     TimePoint end_time = get_now() + Milliseconds(PLANNER_TIME_LIMIT);
 
 #ifndef ENABLE_EPIBT_INHERITANCE
