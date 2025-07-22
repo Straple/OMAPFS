@@ -15,6 +15,7 @@
 
 #include <planner/epibt/epibt.hpp>
 #include <planner/epibt/epibt_lns.hpp>
+#include <planner/epibt/epibt_lns_old.hpp>
 #include <planner/epibt/operations.hpp>
 #include <planner/epibt/operations_map.hpp>
 #include <planner/epibt/pepibt_lns.hpp>
@@ -125,7 +126,8 @@ std::vector<uint32_t> TestSystem::get_schedule() {
 
 std::vector<ActionType> TestSystem::get_actions() {
     std::vector<ActionType> actions;
-    TimePoint end_time = get_now() + Milliseconds(1000);
+    constexpr uint32_t PLANNER_TIME_LIMIT = 50;
+    TimePoint end_time = get_now() + Milliseconds(PLANNER_TIME_LIMIT);
 
 #ifndef ENABLE_EPIBT_INHERITANCE
     std::vector<uint32_t> epibt_prev_operations(robots.size());
@@ -141,15 +143,19 @@ std::vector<ActionType> TestSystem::get_actions() {
         }
     } else if (get_planner_type() == PlannerType::EPIBT_LNS) {
         EPIBT_LNS solver(robots, end_time, epibt_prev_operations);
-        solver.solve(42);
+        solver.solve(rnd.get());
         actions = solver.get_actions();
         epibt_prev_operations = solver.get_desires();
         for (uint32_t r = 0; r < epibt_prev_operations.size(); r++) {
             epibt_prev_operations[r] = get_operation_next(epibt_prev_operations[r]);
         }
+    } else if (get_planner_type() == PlannerType::EPIBT_LNS_OLD) {
+        EPIBT_LNS_OLD solver(robots, end_time);
+        solver.solve(rnd.get());
+        actions = solver.get_actions();
     } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
         PEPIBT_LNS solver(robots, end_time, epibt_prev_operations);
-        solver.solve(42);
+        solver.solve(rnd.get());
         actions = solver.get_actions();
         epibt_prev_operations = solver.get_desires();
         for (uint32_t r = 0; r < epibt_prev_operations.size(); r++) {
@@ -176,7 +182,7 @@ std::vector<ActionType> TestSystem::get_actions() {
         env.curr_timestep = timestep;
 
         if (get_planner_type() == PlannerType::WPPL) {
-            wppl_planner->plan(1000, actions);
+            wppl_planner->plan(PLANNER_TIME_LIMIT, actions);
         } else {
             causal_pibt_planner->plan(end_time, actions, &env);
         }

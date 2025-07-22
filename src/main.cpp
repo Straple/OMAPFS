@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     get_graph() = Graph(get_map(), get_gg());
     get_hm() = HeuristicMatrix(get_graph());
 
-    if (get_planner_type() == PlannerType::EPIBT || get_planner_type() == PlannerType::EPIBT_LNS || get_planner_type() == PlannerType::PEPIBT_LNS) {
+    if (get_planner_type() == PlannerType::EPIBT || get_planner_type() == PlannerType::EPIBT_LNS || get_planner_type() == PlannerType::EPIBT_LNS_OLD || get_planner_type() == PlannerType::PEPIBT_LNS) {
         init_operations();
         get_omap() = OperationsMap(get_graph(), get_operations());
     }
@@ -97,9 +97,9 @@ int main(int argc, char *argv[]) {
     }
 
     std::shared_ptr<HeuristicTable> wppl_heuristic_table;
-    WPPL planner;
     Environment env;
-    if (get_planner_type() == PlannerType::WPPL){
+    if (get_planner_type() == PlannerType::WPPL) {
+        WPPL planner;
         env.num_of_agents = 0;
         env.rows = get_map().get_rows();
         env.cols = get_map().get_cols();

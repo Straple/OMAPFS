@@ -34,6 +34,7 @@ std::string planner_type_to_string(PlannerType type) {
             "PIBT_TF",
             "EPIBT",
             "EPIBT_LNS",
+            "EPIBT_LNS_OLD",
             "PEPIBT_LNS",
             "WPPL",
     };
@@ -47,6 +48,7 @@ PlannerType string_to_planner_type(const std::string &str) {
             {"PIBT_TF", PlannerType::PIBT_TF},
             {"EPIBT", PlannerType::EPIBT},
             {"EPIBT_LNS", PlannerType::EPIBT_LNS},
+            {"EPIBT_LNS_OLD", PlannerType::EPIBT_LNS_OLD},
             {"PEPIBT_LNS", PlannerType::PEPIBT_LNS},
             {"WPPL", PlannerType::WPPL},
     };

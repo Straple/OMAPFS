@@ -7,6 +7,7 @@
 #include <planner/causal_pibt/planner.hpp>
 #include <planner/wppl/wppl.hpp>
 #include <scheduler/greedy/greedy_scheduler.hpp>
+#include <utils/randomizer.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -28,6 +29,8 @@ class TestSystem {
     Environment env;
 
     std::unique_ptr<GreedyScheduler> greedy_scheduler;
+
+    Randomizer rnd;
 
 #ifdef ENABLE_ROTATE_MODEL
     std::unique_ptr<CausalPIBT> causal_pibt_planner;
