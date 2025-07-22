@@ -24,7 +24,7 @@ class WPPL {
 public:
     Environment *env = nullptr;
 
-    void initialize(Environment *new_env);
+    std::shared_ptr<HeuristicTable> initialize(Environment *new_env, std::shared_ptr<HeuristicTable> shared_heuristic_table);
 
     // return next states for all agents
     void plan(int time_limit, std::vector<ActionType> &plan);

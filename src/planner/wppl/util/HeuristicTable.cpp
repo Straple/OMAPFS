@@ -56,7 +56,7 @@ void HeuristicTable::compute_weighted_heuristics() {
     //DEV_DEBUG("[start] Compute heuristics.");
     ONLYDEV(g_timer.record_p("heu/compute_start");)
 
-    int n_threads = 1;//omp_get_max_threads();
+    int n_threads = omp_get_max_threads();
     // BS::thread_pool pool(n_threads);
 
     // int n_threads=pool.get_thread_count();
@@ -73,23 +73,22 @@ void HeuristicTable::compute_weighted_heuristics() {
     int step = 100;
     auto start = std::chrono::steady_clock::now();
 
-//#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1)
     for (int loc_idx = 0; loc_idx < loc_size; ++loc_idx) {
-        int thread_id = 0;//omp_get_thread_num();
+        int thread_id = omp_get_thread_num();
 
         int s_idx = thread_id * n_orientations * state_size;
 
         _compute_weighted_heuristics(loc_idx, values + s_idx, planners[thread_id]);
 
-
-//#pragma omp critical
+#pragma omp critical
         {
             ++ctr;
             if (ctr % step == 0) {
                 auto end = std::chrono::steady_clock::now();
                 double elapse = std::chrono::duration<double>(end - start).count();
                 double estimated_remain = elapse / ctr * (loc_size - ctr);
-                // cout << ctr << "/" << loc_size << " completed in " << elapse << "s. estimated time to finish all: " << estimated_remain << "s.  estimated total time: " << (estimated_remain + elapse) << "s." << endl;
+                cout << ctr << "/" << loc_size << " completed in " << elapse << "s. estimated time to finish all: " << estimated_remain << "s.  estimated total time: " << (estimated_remain + elapse) << "s." << endl;
             }
         }
 

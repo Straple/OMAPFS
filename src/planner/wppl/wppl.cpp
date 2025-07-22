@@ -192,7 +192,7 @@ std::string WPPL::load_map_weights(string weights_path) {
     return suffix;
 }
 
-void WPPL::initialize(Environment *new_env) {
+std::shared_ptr<HeuristicTable> WPPL::initialize(Environment *new_env, std::shared_ptr<HeuristicTable> shared_heuristic_table) {
     env = new_env;
     //cout << "planner initialization begins" << endl;
     load_configs();
@@ -245,20 +245,22 @@ void WPPL::initialize(Environment *new_env) {
             std::cout << "In LNS, must not consider rotation when compiled with NO_ROT unset" << std::endl;
             exit(-1);
         }
-        auto heuristics = std::make_shared<HeuristicTable>(env, map_weights, true);
-        heuristics->preprocess(suffix);
-        //heuristics->preprocess();
+        if(!shared_heuristic_table) {
+            shared_heuristic_table = std::make_shared<HeuristicTable>(env, map_weights, true);
+            shared_heuristic_table->preprocess(suffix);
+        }
         int max_agents_in_use = read_param_json<int>(config, "max_agents_in_use", -1);
         if (max_agents_in_use == -1) {
             max_agents_in_use = env->num_of_agents;
         }
         bool disable_corner_target_agents = read_param_json<bool>(config, "disable_corner_target_agents", false);
         int max_task_completed = read_param_json<int>(config, "max_task_completed", 1000000);
-        auto lacam2_solver = std::make_shared<LaCAM2::LaCAM2Solver>(heuristics, env, map_weights, max_agents_in_use, disable_corner_target_agents, max_task_completed, config["LNS"]["LaCAM2"]);
+        auto lacam2_solver = std::make_shared<LaCAM2::LaCAM2Solver>(shared_heuristic_table, env, map_weights, max_agents_in_use, disable_corner_target_agents, max_task_completed, config["LNS"]["LaCAM2"]);
         lacam2_solver->initialize(*env);
-        lns_solver = std::make_shared<LNS::LNSSolver>(heuristics, env, map_weights, config["LNS"], lacam2_solver, max_task_completed);
+        lns_solver = std::make_shared<LNS::LNSSolver>(shared_heuristic_table, env, map_weights, config["LNS"], lacam2_solver, max_task_completed);
         lns_solver->initialize(*env);
         //cout << "LNSSolver initialized" << endl;
+        return shared_heuristic_table;
     } else if (lifelong_solver_name == "DUMMY") {
         exit(-1);
     } else {
@@ -266,7 +268,9 @@ void WPPL::initialize(Environment *new_env) {
         exit(-1);
     }
 
-    cout << "planner initialization ends" << endl;
+    //cout << "planner initialization ends" << endl;
+    std::exit(8);
+    return nullptr;
 }
 
 

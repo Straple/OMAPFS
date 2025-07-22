@@ -95,6 +95,20 @@ int main(int argc, char *argv[]) {
             });
         }
     }
+
+    std::shared_ptr<HeuristicTable> wppl_heuristic_table;
+    WPPL planner;
+    Environment env;
+    if (get_planner_type() == PlannerType::WPPL){
+        env.num_of_agents = 0;
+        env.rows = get_map().get_rows();
+        env.cols = get_map().get_cols();
+        env.map.assign(get_map().get_size() - 1, -1);
+        for (uint32_t pos = 1; pos < get_map().get_size(); pos++) {
+            env.map[pos - 1] = !get_map().is_free(pos);
+        }
+        wppl_heuristic_table = planner.initialize(&env, nullptr);
+    }
 #endif
 
     std::filesystem::create_directories(config.output_path);
@@ -136,7 +150,7 @@ int main(int argc, char *argv[]) {
                 std::ifstream(config.tasks_path + "/tasks_" + std::to_string(test) + ".csv") >> task_pool;
             }
 
-            TestSystem test_system(robots, task_pool);
+            TestSystem test_system(robots, task_pool, wppl_heuristic_table);
 
             std::string test_dir = config.output_path + std::to_string(test) + "/";
             std::filesystem::create_directories(test_dir);
