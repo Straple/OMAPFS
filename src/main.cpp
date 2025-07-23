@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
                 output << "test id," << test << '\n';
                 output << "scheduler type," << scheduler_type_to_string(config.scheduler_type) << '\n';
                 output << "planner type," << planner_type_to_string(config.planner_type);
-                if (config.planner_type == PlannerType::EPIBT || config.planner_type == PlannerType::EPIBT_LNS || config.planner_type == PlannerType::PEPIBT_LNS) {
+                if (config.planner_type == PlannerType::EPIBT || config.planner_type == PlannerType::EPIBT_LNS || config.planner_type == PlannerType::EPIBT_LNS_OLD || config.planner_type == PlannerType::PEPIBT_LNS) {
                     output << "(" << EPIBT_DEPTH_VALUE << ")";
                 }
                 output << '\n';

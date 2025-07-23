@@ -48,7 +48,11 @@ void WPPL::load_configs() {
         //std::cout << config << std::endl;
 
         config["lifelong_solver_name"] = read_conditional_value(config, "lifelong_solver_name", env->num_of_agents);
-        config["map_weights_path"] = read_conditional_value(config, "map_weights_path", env->num_of_agents);
+        if (get_graph_guidance_type() == GraphGuidanceType::ENABLE) {
+            config["map_weights_path"] = read_conditional_value(config, "map_weights_path", env->num_of_agents);
+        } else {
+            config["map_weights_path"] = "";
+        }
 
         if (config.contains("max_task_completed")) {
             config["max_task_completed"] = read_conditional_value(config, "max_task_completed", env->num_of_agents);
@@ -70,11 +74,10 @@ void WPPL::load_configs() {
         config["LNS"]["LaCAM2"]["planning_window"] = read_conditional_value(config["LNS"]["LaCAM2"], "planning_window", env->num_of_agents);
 
 
-        string s = config.dump();
-        std::replace(s.begin(), s.end(), ',', '|');
+        // string s = config.dump();
+        // std::replace(s.begin(), s.end(), ',', '|');
         // config["details"] = s;
-
-        //std::cout << config << std::endl;
+        // std::cout << config << std::endl;
     } catch (nlohmann::json::parse_error error) {
         std::cout << "Failed to load " << config_path << std::endl;
         std::cout << "Message: " << error.what() << std::endl;
@@ -245,7 +248,7 @@ std::shared_ptr<HeuristicTable> WPPL::initialize(Environment *new_env, std::shar
             std::cout << "In LNS, must not consider rotation when compiled with NO_ROT unset" << std::endl;
             exit(-1);
         }
-        if(!shared_heuristic_table) {
+        if (!shared_heuristic_table) {
             shared_heuristic_table = std::make_shared<HeuristicTable>(env, map_weights, true);
             shared_heuristic_table->preprocess(suffix);
         }
