@@ -1,8 +1,11 @@
-#include <algorithm>
-#include <omp.h>
 #include <planner/wppl/LNS/Parallel/NeighborGenerator.h>
+#ifdef ENABLE_ROTATE_MODEL
+
 #include <planner/wppl/util/Dev.h>
 #include <planner/wppl/util/Timer.h>
+
+#include <algorithm>
+#include <omp.h>
 
 namespace LNS {
 
@@ -58,8 +61,8 @@ namespace LNS {
         }
 
         void NeighborGenerator::generate_parallel(const TimeLimiter &time_limiter) {
-// TODO(rivers): since here we use parallel, we need a random seed generator that support parallelization, that is why we only could use rand() but not rand(), but we can fix this later.
-//#pragma omp parallel for
+            // TODO(rivers): since here we use parallel, we need a random seed generator that support parallelization, that is why we only could use rand() but not rand(), but we can fix this later.
+            //#pragma omp parallel for
             for (int i = 0; i < num_threads; i++) {
                 generate(time_limiter, i);
             }
@@ -455,3 +458,4 @@ namespace LNS {
     }// namespace Parallel
 
 }// namespace LNS
+#endif

@@ -1,3 +1,6 @@
+#include <planner/wppl/util/analyze.h>
+#ifdef ENABLE_ROTATE_MODEL
+
 #include <nlohmann/json.hpp>
 #include <planner/wppl/util/common.h>
 
@@ -105,3 +108,4 @@ nlohmann::json analyze_result_json(const nlohmann::json &result, int h, int w) {
             {"edgeUsage", edge_usage}};
     return analysis;
 }
+#endif

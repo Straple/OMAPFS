@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/main/States.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace RHCR {
 
@@ -17,3 +18,4 @@ namespace RHCR {
         return out;
     }
 }// namespace RHCR
+#endif

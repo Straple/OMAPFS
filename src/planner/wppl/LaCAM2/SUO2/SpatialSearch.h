@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 #include <environment/environment.hpp>
 #include <planner/wppl/LaCAM2/SUO2/CostMap.h>
 #include <planner/wppl/LaCAM2/SUO2/SpatialState.h>
@@ -234,3 +235,4 @@ namespace SUO2 {
     }// namespace Spatial
 
 }// namespace SUO2
+#endif

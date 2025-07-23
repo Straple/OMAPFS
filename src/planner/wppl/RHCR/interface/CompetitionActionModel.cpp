@@ -1,4 +1,5 @@
 #include <planner/wppl/util/CompetitionActionModel.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <iostream>
 #include <map>
@@ -48,7 +49,9 @@ bool CompetitionActionModelWithRotate::is_valid(const std::vector<State> &prev, 
         }
 
         if (env->map[next[i].location] == 1) {
-            std::cout << "ERROR: agent " << i << " moves to an obstacle. state:" << "???"/*prev[i]*/ << " action:" << "???"/*actions[i]*/ << std::endl;
+            std::cout << "ERROR: agent " << i << " moves to an obstacle. state:"
+                      << "???" /*prev[i]*/ << " action:"
+                      << "???" /*actions[i]*/ << std::endl;
             errors.push_back(std::make_tuple("unallowed move", i, -1, next[i].timestep));
             return false;
         }
@@ -76,3 +79,4 @@ bool CompetitionActionModelWithRotate::is_valid(const std::vector<State> &prev, 
 
     return true;
 }
+#endif

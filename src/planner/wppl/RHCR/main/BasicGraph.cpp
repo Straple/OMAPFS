@@ -1,8 +1,12 @@
+#include <planner/wppl/RHCR/main/BasicGraph.h>
+#ifdef ENABLE_ROTATE_MODEL
+
+#include <planner/wppl/RHCR/main/StateTimeAStar.h>
+
 #include <boost/tokenizer.hpp>
+
 #include <chrono>
 #include <fstream>
-#include <planner/wppl/RHCR/main/BasicGraph.h>
-#include <planner/wppl/RHCR/main/StateTimeAStar.h>
 #include <random>
 #include <sstream>
 
@@ -231,3 +235,4 @@ namespace RHCR {
     }
 
 }// namespace RHCR
+#endif

@@ -1,4 +1,4 @@
-//#include "common.h"
+#ifdef ENABLE_ROTATE_MODEL
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -111,7 +111,7 @@ namespace RHCR {
             int ctr = 0;
             int step = 100;
             auto start = std::chrono::steady_clock::now();
-//#pragma omp parallel for
+            //#pragma omp parallel for
             for (int i = 0; i < idxs.size(); ++i) {
                 int thread_id = 0;//omp_get_thread_num();
 
@@ -119,7 +119,7 @@ namespace RHCR {
                 int s_idx = thread_id * this->size() * n_directions;
                 compute_heuristics(idx, lengths + s_idx, visited + s_idx, queues + s_idx, heuristics[idx], n_directions);
 
-//#pragma omp critical
+                //#pragma omp critical
                 {
                     ++ctr;
                     if (ctr % step == 0) {
@@ -257,7 +257,7 @@ namespace RHCR {
             }
             int batch_size = end_idx - start_idx;
             in.read((char *) buff, sizeof(unsigned short) * N * batch_size);
-//#pragma omp parallel for
+            //#pragma omp parallel for
             for (int i = start_idx; i < end_idx; ++i) {
                 for (int j = 0; j < N; ++j) {
                     int idx = i - start_idx;
@@ -416,3 +416,4 @@ namespace RHCR {
     }
 
 }// namespace RHCR
+#endif

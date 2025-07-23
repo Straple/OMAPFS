@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/main/ID.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace RHCR {
 
@@ -199,3 +200,4 @@ namespace RHCR {
         std::cout << runtime << "," << num_of_groups << "," << largest_group << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << window << std::endl;
     }
 }// namespace RHCR
+#endif

@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <chrono>
 #include <ctime>
@@ -52,3 +53,4 @@ private:
 };
 
 extern deadTimer g_timer;
+#endif

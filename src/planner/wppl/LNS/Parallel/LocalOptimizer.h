@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <planner/wppl/LNS/Parallel/TimeSpaceAStarPlanner.h>
 #include <planner/wppl/LNS/PathTable.h>
@@ -57,3 +58,4 @@ namespace LNS {
     }// namespace Parallel
 
 }// namespace LNS
+#endif

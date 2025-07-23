@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/environment.hpp>
 #include <environment/action_model.hpp>
@@ -252,5 +253,7 @@ public:
         return true;
     }
 };
+
+#endif
 
 #endif

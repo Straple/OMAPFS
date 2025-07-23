@@ -1,11 +1,12 @@
 #include <planner/wppl/util/HeuristicTable.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <fstream>
 
 HeuristicTable::HeuristicTable(Environment *_env, const std::shared_ptr<std::vector<float>> &map_weights, bool consider_rotation) : env(*_env),
-                                                                                                                                                          action_model(_env),
-                                                                                                                                                          consider_rotation(consider_rotation),
-                                                                                                                                                          map_weights(map_weights) {
+                                                                                                                                    action_model(_env),
+                                                                                                                                    consider_rotation(consider_rotation),
+                                                                                                                                    map_weights(map_weights) {
     if (consider_rotation) {
         n_orientations = 4;
     } else {
@@ -536,3 +537,4 @@ void HeuristicTable::load(const string &fpath) {
 
     //DEV_DEBUG("[end] load heuristics from {}. (duration: {:.3f})", fpath, g_timer.get_d("heu/load"));
 }
+#endif

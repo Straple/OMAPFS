@@ -1,4 +1,12 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
+
+#include <planner/wppl/util/HeuristicTable.h>
+
+#include <boost/heap/pairing_heap.hpp>
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
+
 #include <cfloat>
 #include <chrono>
 #include <ctime>
@@ -12,12 +20,6 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-
-#include <boost/heap/pairing_heap.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-
-#include <planner/wppl/util/HeuristicTable.h>
 
 using boost::unordered_map;
 using boost::unordered_set;
@@ -97,3 +99,4 @@ namespace LNS {
 
 
 }// end namespace LNS
+#endif

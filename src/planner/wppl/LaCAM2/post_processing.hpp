@@ -1,8 +1,11 @@
 #pragma once
-#include <memory>
+#ifdef ENABLE_ROTATE_MODEL
+
 #include <planner/wppl/LaCAM2/instance.hpp>
 #include <planner/wppl/LaCAM2/utils.hpp>
 #include <planner/wppl/util/HeuristicTable.h>
+
+#include <memory>
 
 namespace LaCAM2 {
 
@@ -24,3 +27,4 @@ namespace LaCAM2 {
     );
 
 }// namespace LaCAM2
+#endif

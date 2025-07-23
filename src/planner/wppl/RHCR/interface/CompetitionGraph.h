@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/environment.hpp>
 #include <planner/wppl/RHCR/main/BasicGraph.h>
@@ -26,3 +27,4 @@ namespace RHCR {
         bool load_heuristics_table(std::ifstream &myfile);
     };
 }// namespace RHCR
+#endif

@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/environment.hpp>
 #include <planner/wppl/LNS/common.h>
@@ -108,3 +109,4 @@ namespace LNS {
 
 
 }// end namespace LNS
+#endif

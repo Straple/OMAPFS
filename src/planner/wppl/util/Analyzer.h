@@ -1,12 +1,13 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/environment.hpp>
 #include <planner/wppl/LNS/common.h>
 #include <planner/wppl/util/Dev.h>
 
-#include <nlohmann/json.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <ctime>
@@ -125,3 +126,4 @@ public:
 };
 
 extern Analyzer analyzer;
+#endif

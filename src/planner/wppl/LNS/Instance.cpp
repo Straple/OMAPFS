@@ -1,4 +1,5 @@
 #include <planner/wppl/LNS/Instance.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <algorithm>// std::shuffle
 #include <boost/tokenizer.hpp>
@@ -575,3 +576,4 @@ namespace LNS {
         return true;
     }
 }// end namespace LNS
+#endif

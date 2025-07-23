@@ -1,5 +1,7 @@
 #include <planner/wppl/util/Analyzer.h>
 
+#ifdef ENABLE_ROTATE_MODEL
+
 void Analyzer::snapshot(
         const string &fp_prefix,
         int timestep,
@@ -36,3 +38,5 @@ void Analyzer::snapshot(
 }
 
 Analyzer analyzer;
+
+#endif

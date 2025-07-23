@@ -1,9 +1,13 @@
-#include <nlohmann/json.hpp>
-#include <omp.h>
 #include <planner/wppl/LaCAM2/LaCAM2Solver.hpp>
+#ifdef ENABLE_ROTATE_MODEL
+
 #include <planner/wppl/LaCAM2/SUO2/SpatialSUO.h>
 #include <planner/wppl/LaCAM2/post_processing.hpp>
 #include <planner/wppl/LaCAM2/utils.hpp>
+
+#include <nlohmann/json.hpp>
+
+#include <omp.h>
 #include <thread>
 
 namespace LaCAM2 {
@@ -689,3 +693,4 @@ namespace LaCAM2 {
 
 
 }// namespace LaCAM2
+#endif

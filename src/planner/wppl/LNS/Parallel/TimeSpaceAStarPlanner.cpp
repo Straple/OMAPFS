@@ -1,4 +1,5 @@
 #include <planner/wppl/LNS/Parallel/TimeSpaceAStarPlanner.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace LNS {
 
@@ -205,3 +206,4 @@ namespace LNS {
     }// namespace Parallel
 
 }// namespace LNS
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
+
 #include "nlohmann/json.hpp"
 #include <boost/heap/fibonacci_heap.hpp>
 #include <boost/tokenizer.hpp>
@@ -165,3 +167,4 @@ T read_param_json(nlohmann::json &data, std::string name, T default_value) {
         exit(1);
     }
 }
+#endif

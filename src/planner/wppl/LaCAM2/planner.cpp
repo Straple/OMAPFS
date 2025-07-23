@@ -1,4 +1,5 @@
 #include <planner/wppl/LaCAM2/planner.hpp>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace LaCAM2 {
 
@@ -1029,3 +1030,4 @@ namespace LaCAM2 {
     }
 
 }// namespace LaCAM2
+#endif

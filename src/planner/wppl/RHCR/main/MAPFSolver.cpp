@@ -1,7 +1,10 @@
+#include <planner/wppl/RHCR/main/MAPFSolver.h>
+#ifdef ENABLE_ROTATE_MODEL
+
+#include <planner/wppl/RHCR/main/PathTable.h>
+
 #include <ctime>
 #include <iostream>
-#include <planner/wppl/RHCR/main/MAPFSolver.h>
-#include <planner/wppl/RHCR/main/PathTable.h>
 
 namespace RHCR {
 
@@ -45,3 +48,4 @@ namespace RHCR {
         }
     }
 }// namespace RHCR
+#endif

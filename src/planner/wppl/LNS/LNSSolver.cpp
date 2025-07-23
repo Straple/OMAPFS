@@ -1,12 +1,11 @@
 #include <planner/wppl/LNS/LNSSolver.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <planner/wppl/LNS/Parallel/DataStructure.h>
 #include <planner/wppl/LNS/Parallel/GlobalManager.h>
 #include <planner/wppl/util/Analyzer.h>
 #include <planner/wppl/util/Dev.h>
 #include <planner/wppl/util/Timer.h>
-
-//#include <Objects/Basic/assert.hpp>
 
 namespace LNS {
 
@@ -516,3 +515,4 @@ namespace LNS {
     }
 
 }// end namespace LNS
+#endif

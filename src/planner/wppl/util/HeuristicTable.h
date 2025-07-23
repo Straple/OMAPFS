@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
@@ -70,3 +71,4 @@ public:
     void save(const string &fpath);
     void load(const string &fpath);
 };
+#endif

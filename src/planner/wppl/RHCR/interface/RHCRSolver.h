@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/action_model.hpp>
 #include <environment/environment.hpp>
@@ -51,3 +52,4 @@ namespace RHCR {
         void set_parameters(const string &map_name);
     };
 }// namespace RHCR
+#endif

@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/main/SingleAgentSolver.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace RHCR {
 
@@ -14,3 +15,4 @@ namespace RHCR {
     }
 
 }// namespace RHCR
+#endif

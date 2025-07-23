@@ -1,7 +1,8 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
-#include <planner/wppl/LNS/common.h>
 #include <environment/environment.hpp>
+#include <planner/wppl/LNS/common.h>
 
 #include <cassert>
 #include <iostream>
@@ -153,3 +154,4 @@ namespace LaCAM2 {
     };
 
 }// namespace LaCAM2
+#endif

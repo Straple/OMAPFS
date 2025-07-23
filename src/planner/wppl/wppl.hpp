@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #ifndef NO_ROT
 
@@ -24,7 +25,7 @@ class WPPL {
 public:
     Environment *env = nullptr;
 
-    std::shared_ptr<HeuristicTable> initialize(Environment *new_env, std::shared_ptr<HeuristicTable> shared_heuristic_table);
+    void initialize(Environment *new_env);
 
     // return next states for all agents
     void plan(int time_limit, std::vector<ActionType> &plan);
@@ -53,6 +54,8 @@ public:
 
     int max_execution_steps;
 };
+
+std::shared_ptr<HeuristicTable>& get_wppl_heuristic_table();
 
 #else
 
@@ -96,4 +99,5 @@ public:
     std::string load_map_weights(string weights_path);
 };
 
+#endif
 #endif

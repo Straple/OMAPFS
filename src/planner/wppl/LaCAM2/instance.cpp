@@ -1,4 +1,5 @@
 #include <planner/wppl/LaCAM2/instance.hpp>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace LaCAM2 {
 
@@ -9,12 +10,12 @@ namespace LaCAM2 {
             std::vector<AgentInfo> &agent_infos,
             int planning_window,
             std::vector<RobotPath> *_precomputed_paths) : G(G),
-                                                                     starts(agent_infos.size()),
-                                                                     goals(agent_infos.size()),
-                                                                     N(agent_infos.size()),
-                                                                     agent_infos(agent_infos),
-                                                                     planning_window(planning_window),
-                                                                     precomputed_paths(_precomputed_paths) {
+                                                          starts(agent_infos.size()),
+                                                          goals(agent_infos.size()),
+                                                          N(agent_infos.size()),
+                                                          agent_infos(agent_infos),
+                                                          planning_window(planning_window),
+                                                          precomputed_paths(_precomputed_paths) {
         // for (auto k : start_indexes) starts.push_back(G.U[k]);
         // for (auto k : goal_indexes) goals.push_back(G.U[k]);
 
@@ -131,3 +132,4 @@ namespace LaCAM2 {
     }
 
 }// namespace LaCAM2
+#endif

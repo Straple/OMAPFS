@@ -1,4 +1,5 @@
 #include <planner/wppl/LNS/PathTable.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace LNS {
 
@@ -390,3 +391,4 @@ namespace LNS {
         paths.clear();
     }
 }// end namespace LNS
+#endif

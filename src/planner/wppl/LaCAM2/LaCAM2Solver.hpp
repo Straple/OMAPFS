@@ -1,7 +1,6 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
-#include <memory>
-#include <nlohmann/json.hpp>
 #include <planner/wppl/LaCAM2/executor.hpp>
 #include <planner/wppl/LaCAM2/graph.hpp>
 #include <planner/wppl/LaCAM2/instance.hpp>
@@ -10,6 +9,10 @@
 #include <planner/wppl/util/CompetitionActionModel.h>
 #include <planner/wppl/util/HeuristicTable.h>
 #include <planner/wppl/util/common.h>
+
+#include <nlohmann/json.hpp>
+
+#include <memory>
 #include <random>
 
 namespace LaCAM2 {
@@ -155,3 +158,4 @@ namespace LaCAM2 {
     };
 
 }// namespace LaCAM2
+#endif

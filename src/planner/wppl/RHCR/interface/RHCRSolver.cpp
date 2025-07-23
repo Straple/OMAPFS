@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/interface/RHCRSolver.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/action_model.hpp>
 #include <environment/state.hpp>
@@ -197,3 +198,4 @@ namespace RHCR {
         // need_replan=true;
     }
 };// namespace RHCR
+#endif

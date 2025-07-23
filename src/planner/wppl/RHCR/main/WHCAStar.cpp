@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/main/WHCAStar.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace RHCR {
 
@@ -116,3 +117,4 @@ namespace RHCR {
         initial_rt.clear();
     }
 }// namespace RHCR
+#endif

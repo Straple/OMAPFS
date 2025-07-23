@@ -1,3 +1,6 @@
+#include <planner/wppl/wppl.hpp>
+#ifdef ENABLE_ROTATE_MODEL
+
 #ifndef NO_ROT
 
 #include <boost/format.hpp>
@@ -6,7 +9,6 @@
 #include <planner/wppl/util/HeuristicTable.h>
 #include <planner/wppl/util/MyCommon.h>
 #include <planner/wppl/util/TimeLimiter.h>
-#include <planner/wppl/wppl.hpp>
 
 #include <environment/info.hpp>
 
@@ -195,7 +197,7 @@ std::string WPPL::load_map_weights(string weights_path) {
     return suffix;
 }
 
-std::shared_ptr<HeuristicTable> WPPL::initialize(Environment *new_env, std::shared_ptr<HeuristicTable> shared_heuristic_table) {
+void WPPL::initialize(Environment *new_env) {
     env = new_env;
     //cout << "planner initialization begins" << endl;
     load_configs();
@@ -248,9 +250,9 @@ std::shared_ptr<HeuristicTable> WPPL::initialize(Environment *new_env, std::shar
             std::cout << "In LNS, must not consider rotation when compiled with NO_ROT unset" << std::endl;
             exit(-1);
         }
-        if (!shared_heuristic_table) {
-            shared_heuristic_table = std::make_shared<HeuristicTable>(env, map_weights, true);
-            shared_heuristic_table->preprocess(suffix);
+        if (!get_wppl_heuristic_table()) {
+            get_wppl_heuristic_table() = std::make_shared<HeuristicTable>(env, map_weights, true);
+            get_wppl_heuristic_table()->preprocess(suffix);
         }
         int max_agents_in_use = read_param_json<int>(config, "max_agents_in_use", -1);
         if (max_agents_in_use == -1) {
@@ -258,12 +260,11 @@ std::shared_ptr<HeuristicTable> WPPL::initialize(Environment *new_env, std::shar
         }
         bool disable_corner_target_agents = read_param_json<bool>(config, "disable_corner_target_agents", false);
         int max_task_completed = read_param_json<int>(config, "max_task_completed", 1000000);
-        auto lacam2_solver = std::make_shared<LaCAM2::LaCAM2Solver>(shared_heuristic_table, env, map_weights, max_agents_in_use, disable_corner_target_agents, max_task_completed, config["LNS"]["LaCAM2"]);
+        auto lacam2_solver = std::make_shared<LaCAM2::LaCAM2Solver>(get_wppl_heuristic_table(), env, map_weights, max_agents_in_use, disable_corner_target_agents, max_task_completed, config["LNS"]["LaCAM2"]);
         lacam2_solver->initialize(*env);
-        lns_solver = std::make_shared<LNS::LNSSolver>(shared_heuristic_table, env, map_weights, config["LNS"], lacam2_solver, max_task_completed);
+        lns_solver = std::make_shared<LNS::LNSSolver>(get_wppl_heuristic_table(), env, map_weights, config["LNS"], lacam2_solver, max_task_completed);
         lns_solver->initialize(*env);
         //cout << "LNSSolver initialized" << endl;
-        return shared_heuristic_table;
     } else if (lifelong_solver_name == "DUMMY") {
         exit(-1);
     } else {
@@ -272,8 +273,6 @@ std::shared_ptr<HeuristicTable> WPPL::initialize(Environment *new_env, std::shar
     }
 
     //cout << "planner initialization ends" << endl;
-    std::exit(8);
-    return nullptr;
 }
 
 
@@ -456,6 +455,11 @@ list<pair<int, int>> WPPL::getNeighbors(int location, int direction) {
     neighbors.emplace_back(make_pair(location, new_direction));
     neighbors.emplace_back(make_pair(location, direction));//wait
     return neighbors;
+}
+
+std::shared_ptr<HeuristicTable>& get_wppl_heuristic_table() {
+    static std::shared_ptr<HeuristicTable> object;
+    return object;
 }
 
 #else
@@ -747,5 +751,7 @@ list<pair<int, int>> MAPFPlanner::getNeighbors(int location, int direction) {
     neighbors.emplace_back(make_pair(location, direction));//wait
     return neighbors;
 }
+
+#endif
 
 #endif

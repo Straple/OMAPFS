@@ -1,7 +1,11 @@
+#include <planner/wppl/RHCR/main/PBS.h>
+
+#ifdef ENABLE_ROTATE_MODEL
+
+#include <planner/wppl/RHCR/main/PathTable.h>
+
 #include <ctime>
 #include <iostream>
-#include <planner/wppl/RHCR/main/PBS.h>
-#include <planner/wppl/RHCR/main/PathTable.h>
 
 namespace RHCR {
 
@@ -868,3 +872,5 @@ namespace RHCR {
         avg_path_length /= num_of_agents;
     }
 }// namespace RHCR
+
+#endif

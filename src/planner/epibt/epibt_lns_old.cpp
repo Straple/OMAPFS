@@ -1,5 +1,7 @@
 #include <planner/epibt/epibt_lns_old.hpp>
 
+#ifdef ENABLE_ROTATE_MODEL
+
 #include <environment/heuristic_matrix.hpp>
 #include <planner/epibt/operations_map.hpp>
 #include <utils/assert.hpp>
@@ -773,3 +775,5 @@ std::vector<ActionType> EPIBT_LNS_OLD::get_actions() const {
     }
     return answer;
 }
+
+#endif

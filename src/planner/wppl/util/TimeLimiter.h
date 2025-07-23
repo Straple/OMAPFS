@@ -1,4 +1,6 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
+
 #include <chrono>
 #include <iostream>
 
@@ -11,12 +13,12 @@ public:
     steady_clock::time_point start_time;
     double time_limit;
 
-    TimeLimiter(double _time_limit, const Environment& env): time_limit(_time_limit) {
+    TimeLimiter(double _time_limit, const Environment &env) : time_limit(_time_limit) {
         //reset_start_time();
         start_time = get_now();
     }
 
-    TimeLimiter(const TimeLimiter & other) {
+    TimeLimiter(const TimeLimiter &other) {
         time_limit = other.time_limit;
         start_time = other.start_time;
     }
@@ -32,7 +34,7 @@ public:
     }
 
     inline bool timeout() const {
-        double elapse=get_elapse();
+        double elapse = get_elapse();
         return elapse >= time_limit;
     }
 
@@ -40,3 +42,4 @@ public:
         return time_limit - get_elapse();
     }
 };
+#endif

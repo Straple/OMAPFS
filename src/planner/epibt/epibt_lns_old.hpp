@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_ROTATE_MODEL
 
 #include <environment/robot.hpp>
 #include <planner/epibt/operations.hpp>
@@ -105,3 +106,4 @@ public:
 
     [[nodiscard]] std::vector<ActionType> get_actions() const;
 };
+#endif

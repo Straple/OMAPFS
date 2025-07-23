@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/main/LRAStar.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace RHCR {
 
@@ -241,3 +242,4 @@ namespace RHCR {
         stats.close();
     }
 }// namespace RHCR
+#endif

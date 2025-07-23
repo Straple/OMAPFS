@@ -1,4 +1,5 @@
 #include <planner/wppl/RHCR/main/ECBS.h>
+#ifdef ENABLE_ROTATE_MODEL
 
 namespace RHCR {
 
@@ -762,3 +763,4 @@ namespace RHCR {
     }
 
 }// namespace RHCR
+#endif
