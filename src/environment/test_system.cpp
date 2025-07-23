@@ -149,11 +149,15 @@ std::vector<ActionType> TestSystem::get_actions() {
         for (uint32_t r = 0; r < epibt_prev_operations.size(); r++) {
             epibt_prev_operations[r] = get_operation_next(epibt_prev_operations[r]);
         }
-    } else if (get_planner_type() == PlannerType::EPIBT_LNS_OLD) {
+    }
+#ifdef ENABLE_ROTATE_MODEL
+    else if (get_planner_type() == PlannerType::EPIBT_LNS_OLD) {
         EPIBT_LNS_OLD solver(robots, end_time);
         solver.solve(rnd.get());
         actions = solver.get_actions();
-    } else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
+    }
+#endif
+    else if (get_planner_type() == PlannerType::PEPIBT_LNS) {
         PEPIBT_LNS solver(robots, end_time, epibt_prev_operations);
         solver.solve(rnd.get());
         actions = solver.get_actions();
@@ -189,12 +193,12 @@ std::vector<ActionType> TestSystem::get_actions() {
     }
 #endif
     else {
-        FAILED_ASSERT("unexpected planner type");
+        FAILED_ASSERT("unexpected planner type: " + planner_type_to_string(get_planner_type()));
     }
     return actions;
 }
 
-TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool, std::shared_ptr<HeuristicTable> wppl_heuristic_table) : robots(std::move(copy_robots)), task_pool(std::move(copy_task_pool)), epibt_prev_operations(this->robots.size()) {
+TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool) : robots(std::move(copy_robots)), task_pool(std::move(copy_task_pool)), epibt_prev_operations(this->robots.size()) {
     // gen_random_agents();
 
     if (get_scheduler_type() == SchedulerType::GREEDY) {
@@ -219,7 +223,7 @@ TestSystem::TestSystem(Robots copy_robots, TaskPool copy_task_pool, std::shared_
 
     if (get_planner_type() == PlannerType::WPPL) {
         wppl_planner = std::make_unique<WPPL>();
-        wppl_planner->initialize(&env, wppl_heuristic_table);
+        wppl_planner->initialize(&env);
     }
 #endif
 }

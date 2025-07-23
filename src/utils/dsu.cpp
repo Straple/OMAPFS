@@ -37,8 +37,3 @@ void DSU::uni(uint32_t a, uint32_t b) {
     parent[a] = b;
     size[b] += size[a];
 }
-
-/*DSU &get_dsu() {
-    static DSU dsu;
-    return dsu;
-}*/

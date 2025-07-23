@@ -47,7 +47,7 @@ class TestSystem {
     std::vector<ActionType> get_actions();
 
 public:
-    TestSystem(Robots robots, TaskPool task_pool, std::shared_ptr<HeuristicTable> wppl_heuristic_table);
+    TestSystem(Robots robots, TaskPool task_pool);
 
     Answer simulate(uint32_t steps_num);
 };
