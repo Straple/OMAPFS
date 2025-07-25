@@ -325,7 +325,7 @@ void EPIBT::solve() {
                 if (get_now() >= end_time) {
                     break;
                 }
-                if (visited[r] != visited_counter) {
+                if (visited[r] != visited_counter || visited_num[r] < 10) {
                     build(r);
                 }
             }
