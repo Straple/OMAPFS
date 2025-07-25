@@ -165,7 +165,6 @@ EPIBT::RetType EPIBT::build_impl(uint32_t r) {
         uint32_t to_r = get_used(r);
         if (to_r == -1) {
             add_path(r);
-#ifdef ENABLE_EPIBT_ROLLBACK
             if (!enable_rollback || old_score + 1e-3 < cur_score) {
                 return RetType::ACCEPTED;
             } else {
@@ -173,9 +172,6 @@ EPIBT::RetType EPIBT::build_impl(uint32_t r) {
                 desires[r] = old_desired;
                 return RetType::REJECTED;
             }
-#else
-            return RetType::ACCEPTED;
-#endif
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
@@ -304,9 +300,21 @@ EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t>
 }
 
 void EPIBT::solve() {
+    auto call_epibt = [&]() {
+        visited_counter++;
+        for (uint32_t r: order) {
+            if (get_now() >= end_time) {
+                break;
+            }
+            if (visited[r] != visited_counter || visited_num[r] < 10) {
+                build(r);
+            }
+        }
+    };
+
 #ifdef ENABLE_EPIBT_MULTILEVEL_LAUNCH
     for (uint32_t it = 0; it < 3; it++) {
-        enable_rollback = it > 0;// TODO: нужно ли это?
+        enable_rollback = it > 0;
 #ifdef ENABLE_ROTATE_MODEL
         available_operation_depth = 3;
 #else
@@ -320,15 +328,7 @@ void EPIBT::solve() {
     {
         {
 #endif
-            visited_counter++;
-            for (uint32_t r: order) {
-                if (get_now() >= end_time) {
-                    break;
-                }
-                if (visited[r] != visited_counter || visited_num[r] < 10) {
-                    build(r);
-                }
-            }
+            call_epibt();
         }
     }
 }
