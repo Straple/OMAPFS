@@ -142,12 +142,13 @@ uint32_t PIBT::get_used(uint32_t r, DirectionType desired) const {
     return answer;
 }
 
-PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
-    if (counter % 4 == 0 && get_now() >= end_time) {
+PIBT::RetType PIBT::build(uint32_t r, uint32_t priority) {
+    if (get_now() >= end_time) {
         return RetType::REJECTED;
     }
 
-    visited[r] = visited_counter;
+    visited[r]++;
+    curr_visited[r] = 1;
     DirectionType old_desired = desires[r];
 
     std::vector<DirectionType> robot_desires;
@@ -170,9 +171,12 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
-            if (visited[to_r] == visited_counter || robots[to_r].priority <= priority
-#ifdef ENABLE_REVISIT
-                || counter > 1000
+            if (curr_visited[to_r] ||
+                robots[to_r].priority <= priority
+#ifdef ENABLE_PIBT_REVISIT
+                || visited[to_r] >= 10
+#else
+                || visited[to_r] > 0
 #endif
             ) {
                 continue;
@@ -181,7 +185,7 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
             remove_path(to_r);
             add_path(r);
 
-            RetType res = build(to_r, priority, ++counter);
+            RetType res = build(to_r, priority);
             if (res == RetType::ACCEPTED) {
                 return res;
             } else if (res == RetType::REJECTED) {
@@ -197,13 +201,11 @@ PIBT::RetType PIBT::build(uint32_t r, uint32_t priority, uint32_t &counter) {
     }
 
     desires[r] = old_desired;
-#ifdef ENABLE_REVISIT
-    visited[r] = 0;
-#endif
+    curr_visited[r] = 0;
     return RetType::FAILED;
 }
 
-PIBT::PIBT(Robots &robots, TimePoint end_time) : robots(robots), end_time(end_time), desires(robots.size(), DirectionType::NONE), visited(robots.size()) {
+PIBT::PIBT(Robots &robots, TimePoint end_time) : robots(robots), end_time(end_time), desires(robots.size(), DirectionType::NONE), visited(robots.size()), curr_visited(robots.size()) {
 
     {
         order.resize(robots.size());
@@ -228,15 +230,19 @@ PIBT::PIBT(Robots &robots, TimePoint end_time) : robots(robots), end_time(end_ti
 }
 
 void PIBT::solve() {
-    visited_counter++;
     for (uint32_t r: order) {
         if (get_now() >= end_time) {
             break;
         }
-        if (visited[r] != visited_counter) {
+        if (visited[r] <
+#ifdef ENABLE_PIBT_REVISIT
+            10
+#else
+            1
+#endif
+        ) {
             remove_path(r);
-            uint32_t counter = 0;
-            if (build(r, robots[r].priority, counter) != RetType::ACCEPTED) {
+            if (build(r, robots[r].priority) != RetType::ACCEPTED) {
                 add_path(r);
             }
         }

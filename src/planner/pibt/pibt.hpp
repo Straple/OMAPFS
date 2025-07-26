@@ -17,9 +17,9 @@ class PIBT {
 
     std::vector<uint32_t> visited;
 
-    std::vector<uint32_t> order;
+    std::vector<uint32_t> curr_visited;
 
-    uint32_t visited_counter = 0;
+    std::vector<uint32_t> order;
 
     TimePoint end_time;
 
@@ -47,7 +47,7 @@ class PIBT {
         REJECTED,// success + not accepted
     };
 
-    RetType build(uint32_t r, uint32_t priority, uint32_t &counter);
+    RetType build(uint32_t r, uint32_t priority);
 
 public:
     PIBT(Robots &robots, TimePoint end_time);
