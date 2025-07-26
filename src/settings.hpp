@@ -45,7 +45,7 @@ constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
 // TODO: выключить наследование операций EPIBT
 // оно показывает хуже результаты
 
-// #define ENABLE_REVISIT
+// #define ENABLE_PIBT_REVISIT
 
 /*
 Алгоритм:
