@@ -6,8 +6,6 @@
 // Enhanced Priority Inheritance with BackTracking + Large Neighborhood Search
 class EPIBT_LNS : public EPIBT {
 
-    double temp = 1;
-
     uint32_t lns_step = 0;
 
     Randomizer rnd;

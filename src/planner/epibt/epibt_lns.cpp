@@ -12,9 +12,14 @@ EPIBT_LNS::RetType EPIBT_LNS::try_build(uint32_t r, uint32_t &counter) {
         return RetType::REJECTED;
     }
 
+    if (visited[r] != visited_counter) {
+        visited_num[r] = 0;
+    }
+    visited_num[r]++;
     visited[r] = visited_counter;
-    uint32_t old_desired = desires[r];
+    curr_visited[r] = visited_counter;
 
+    uint32_t old_desired = desires[r];
     for (uint32_t desired: robot_desires[r]) {
         desires[r] = desired;
         uint32_t to_r = get_used(r);
@@ -30,7 +35,9 @@ EPIBT_LNS::RetType EPIBT_LNS::try_build(uint32_t r, uint32_t &counter) {
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r");
 
-            if (visited[to_r] == visited_counter || rnd.get_d() < 0.3 || counter > 3'000) {
+            if (curr_visited[to_r] == visited_counter ||                     // если мы уже построили его сейчас
+                (visited[to_r] == visited_counter && visited_num[to_r] >= 10)// ограничение на количество посещений <= 10
+                || rnd.get_d() < 0.3) {
                 continue;
             }
 
@@ -53,12 +60,11 @@ EPIBT_LNS::RetType EPIBT_LNS::try_build(uint32_t r, uint32_t &counter) {
     }
 
     desires[r] = old_desired;
-    visited[r] = 0;
+    curr_visited[r] = 0;
     return RetType::FAILED;
 }
 
 void EPIBT_LNS::try_build(uint32_t r) {
-    ++visited_counter;
     old_score = cur_score;
     remove_path(r);
     uint32_t counter = 0;
@@ -75,22 +81,33 @@ void EPIBT_LNS::solve(uint64_t seed) {
     EPIBT::solve();
 
     rnd = Randomizer(seed);
-    temp = 0.001;
+
+    auto call_epibt = [&]() {
+        visited_counter++;
+        for (uint32_t r: order) {
+            if (get_now() >= end_time) {
+                break;
+            }
+            if (visited[r] != visited_counter /* || visited_num[r] < 10*/) {
+                try_build(r);
+            }
+        }
+    };
+
     while (get_now() < end_time) {
-        uint32_t r = rnd.get(0, robots.size() - 1);
-        try_build(r);
-        temp *= 0.999;
-        lns_step++;
+        //std::sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
+        //    return get_smart_dist(lhs, desires[lhs]) < get_smart_dist(rhs, desires[rhs]);
+        //});
+        std::shuffle(order.begin(), order.end(), rnd.generator);
+        call_epibt();
     }
 }
 
 void EPIBT_LNS::parallel_solve(uint64_t seed) {
     rnd = Randomizer(seed);
-    temp = 0.001;
     while (get_now() < end_time && lns_step < robots.size() * 10) {
         uint32_t r = rnd.get(0, robots.size() - 1);
         try_build(r);
-        temp *= 0.999;
         lns_step++;
     }
 }

@@ -103,10 +103,10 @@ std::vector<Operation> OperationsGenerator::get() {
         int64_t score = 0;
         for (uint32_t d = 0; d < op.size(); d++) {
 #ifdef ENABLE_ROTATE_MODEL
-            score += (op[d] == ActionType::FORWARD) * static_cast<int64_t>(op.size() - d) * 10;
-            score -= (op[d] == ActionType::WAIT) * static_cast<int64_t>(op.size() - d) * 1;
-            score -= (op[d] == ActionType::ROTATE) * static_cast<int64_t>(op.size() - d) * 1;
-            score -= (op[d] == ActionType::COUNTER_ROTATE) * static_cast<int64_t>(op.size() - d) * 1;
+            score += (op[d] == ActionType::FORWARD) * static_cast<int64_t>(op.size() - d + 1) * 10;
+            score -= (op[d] == ActionType::WAIT) * static_cast<int64_t>(op.size() - d) * 3;
+            score -= (op[d] == ActionType::ROTATE) * static_cast<int64_t>(op.size() - d) * 2;
+            score -= (op[d] == ActionType::COUNTER_ROTATE) * static_cast<int64_t>(op.size() - d) * 2;
 #else
             /*score += (op[d] == ActionType::EAST) * static_cast<int64_t>(op.size() - d) * 10;
             score += (op[d] == ActionType::SOUTH) * static_cast<int64_t>(op.size() - d) * 10;
@@ -234,7 +234,7 @@ std::vector<uint32_t> &get_operations_ids(uint32_t d) {
     return data[d];
 }
 
-uint32_t get_operation_weight(uint32_t index){
+uint32_t get_operation_weight(uint32_t index) {
     ASSERT(0 <= index && index < operation_weight.size(), "invalid index");
     ASSERT(operation_weight.size() == get_operations().size(), "unmatch sizes");
     return operation_weight[index];

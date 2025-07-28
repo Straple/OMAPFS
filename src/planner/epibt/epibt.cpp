@@ -62,8 +62,9 @@ int64_t EPIBT::get_smart_dist_IMPL(uint32_t r, uint32_t desired) const {
             break;
         }
     }
-    dist = dist * static_cast<int64_t>(get_operations().size()) - desired;
-    // - get_operation_weight(desired);
+    dist = dist * static_cast<int64_t>(get_operation_weight(get_operations().size() - 1)) - get_operation_weight(desired);
+    // - desired;
+    //- (int64_t)rnd.get(0, get_operations().size() - 1);
     return dist;
 }
 
@@ -145,13 +146,7 @@ EPIBT::RetType EPIBT::build_impl(uint32_t r) {
         uint32_t to_r = get_used(r);
         if (to_r == -1) {
             add_path(r);
-            if (!enable_rollback || old_score + 1e-3 < cur_score) {
-                return RetType::ACCEPTED;
-            } else {
-                remove_path(r);
-                desires[r] = old_desired;
-                return RetType::REJECTED;
-            }
+            return RetType::ACCEPTED;
         } else if (to_r != -2) {
             ASSERT(0 <= to_r && to_r < robots.size(), "invalid to_r: " + std::to_string(to_r));
 
@@ -280,35 +275,13 @@ EPIBT::EPIBT(Robots &new_robots, TimePoint end_time, const std::vector<uint32_t>
 }
 
 void EPIBT::solve() {
-    auto call_epibt = [&]() {
-        visited_counter++;
-        for (uint32_t r: order) {
-            if (get_now() >= end_time) {
-                break;
-            }
-            if (visited[r] != visited_counter || visited_num[r] < 10) {
-                build(r);
-            }
+    visited_counter++;
+    for (uint32_t r: order) {
+        if (get_now() >= end_time) {
+            break;
         }
-    };
-
-#ifdef ENABLE_EPIBT_MULTILEVEL_LAUNCH
-    for (uint32_t it = 0; it < 3; it++) {
-        enable_rollback = it > 0;
-#ifdef ENABLE_ROTATE_MODEL
-        available_operation_depth = 3;
-#else
-        available_operation_depth = 1;
-#endif
-        for (; available_operation_depth <= EPIBT_DEPTH_VALUE; available_operation_depth++) {
-            std::sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
-                return get_smart_dist(lhs, desires[lhs]) < get_smart_dist(rhs, desires[rhs]);
-            });
-#else
-    {
-        {
-#endif
-            call_epibt();
+        if (visited[r] != visited_counter) {
+            build(r);
         }
     }
 }

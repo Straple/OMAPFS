@@ -23,8 +23,6 @@ protected:
 
     uint32_t inheritance_priority = 0;
 
-    bool enable_rollback = true;
-
     std::vector<uint32_t> desires;
 
     std::vector<uint32_t> curr_visited;
