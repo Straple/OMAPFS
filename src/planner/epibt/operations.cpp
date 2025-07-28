@@ -3,11 +3,11 @@
 #include <environment/position.hpp>
 #include <utils/assert.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <sstream>
 #include <tuple>
-#include <algorithm>
 
 class OperationsGenerator {
     std::vector<Operation> pool;
@@ -68,6 +68,8 @@ void OperationsGenerator::generate(Operation &op, uint32_t i) {
         }
     }
 }
+
+static inline std::vector<uint32_t> operation_weight;
 
 std::vector<Operation> OperationsGenerator::get() {
     Operation op;
@@ -182,13 +184,26 @@ std::vector<Operation> OperationsGenerator::get() {
         }
     }
 
+    {
+        int64_t prev_operation_weight = -1;
+        uint32_t new_weight = -1;
+        for (auto operation: result) {
+            if (prev_operation_weight != get_operation_weight(operation)) {
+                prev_operation_weight = get_operation_weight(operation);
+                new_weight++;
+            }
+            operation_weight.push_back(new_weight);
+        }
+    }
+
     std::cout << "Operations:\n"
-              << result.size() << ' ';
-    for (auto operation: result) {
-        std::cout << operation << ' ';
+              << result.size() << '\n';
+    for (uint32_t i = 0; i < result.size(); i++) {
+        auto operation = result[i];
+        std::cout << operation << ' ';// << get_operation_weight(operation) << ' ' << operation_weight[i] << '\n';
     }
     std::cout << std::endl;
-    //_exit(100);
+    //std::exit(100);
     return result;
 }
 
@@ -217,6 +232,12 @@ std::vector<uint32_t> &get_operations_ids(uint32_t d) {
     static std::array<std::vector<uint32_t>, EPIBT_DEPTH_VALUE + 1> data;
     ASSERT(0 <= d && d <= EPIBT_DEPTH_VALUE, "invalid d");
     return data[d];
+}
+
+uint32_t get_operation_weight(uint32_t index){
+    ASSERT(0 <= index && index < operation_weight.size(), "invalid index");
+    ASSERT(operation_weight.size() == get_operations().size(), "unmatch sizes");
+    return operation_weight[index];
 }
 
 void init_operations() {

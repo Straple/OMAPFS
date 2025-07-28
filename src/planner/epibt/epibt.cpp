@@ -55,28 +55,7 @@ int64_t EPIBT::get_smart_dist_IMPL(uint32_t r, uint32_t desired) const {
     const uint32_t target = robots[r].target;
 
     int64_t dist = get_hm().get(path.back(), target);
-
-    /*#ifdef ENABLE_ROTATE_MODEL
-    if (op.back() == ActionType::WAIT) {
-        uint32_t node = path[EPIBT_DEPTH - 2];
-        {
-            uint32_t to = get_graph().get_to_node(node, static_cast<uint32_t>(ActionType::ROTATE));
-            dist = std::min(dist, static_cast<int64_t>(get_hm().get(to, target)));
-        }
-        {
-            uint32_t to = get_graph().get_to_node(node, static_cast<uint32_t>(ActionType::COUNTER_ROTATE));
-            dist = std::min(dist, static_cast<int64_t>(get_hm().get(to, target)));
-        }
-
-        if (op[EPIBT_DEPTH - 2] == ActionType::WAIT) {
-            uint32_t to = path[EPIBT_DEPTH - 3];
-            to = get_graph().get_to_node(to, static_cast<uint32_t>(ActionType::ROTATE));
-            to = get_graph().get_to_node(to, static_cast<uint32_t>(ActionType::ROTATE));
-            dist = std::min(dist, static_cast<int64_t>(get_hm().get(to, target)));
-        }
-    }
-#endif*/
-
+    dist += EPIBT_DEPTH;
     for (uint32_t d = 0; d < EPIBT_DEPTH; d++) {
         if (get_graph().get_pos(path[d]).get_pos() == target) {
             dist = d;
@@ -84,6 +63,7 @@ int64_t EPIBT::get_smart_dist_IMPL(uint32_t r, uint32_t desired) const {
         }
     }
     dist = dist * static_cast<int64_t>(get_operations().size()) - desired;
+    // - get_operation_weight(desired);
     return dist;
 }
 

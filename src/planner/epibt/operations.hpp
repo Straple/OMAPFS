@@ -28,6 +28,8 @@ uint32_t get_operation_next(uint32_t index);
 
 std::vector<uint32_t> &get_operations_ids(uint32_t d);
 
+uint32_t get_operation_weight(uint32_t index);
+
 void init_operations();
 
 std::ostream &operator<<(std::ostream &output, const Operation &op);
