@@ -62,8 +62,9 @@ int64_t EPIBT::get_smart_dist_IMPL(uint32_t r, uint32_t desired) const {
             break;
         }
     }
-    dist = dist * static_cast<int64_t>(get_operation_weight(get_operations().size() - 1)) - get_operation_weight(desired);
-    // - desired;
+    dist = dist * static_cast<int64_t>(get_operations().size()) - desired;
+
+    // - get_operation_weight(desired);
     //- (int64_t)rnd.get(0, get_operations().size() - 1);
     return dist;
 }

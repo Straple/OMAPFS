@@ -34,7 +34,7 @@ constexpr uint32_t THREADS_NUM = THREADS_NUM_DEFAULT;
  * 1) улучшить проверки в Answer
  */
 
-#define ENABLE_EPIBT_MULTILEVEL_LAUNCH
+// TODO: remove get_operation_weight
 
 // #define ENABLE_EPIBT_SMART_OPERATION_EXECUTION
 
