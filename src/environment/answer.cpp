@@ -4,13 +4,13 @@
 #include <utils/assert.hpp>
 
 #include <iomanip>
-#include <map>
 #include <numeric>
+#include <unordered_map>
 
 void Answer::validate_actions(uint32_t step) const {
     // проверить, что нет коллизий по вершинам и ребрам
 
-    std::map<uint32_t, uint32_t> pos_usage, edge_usage;
+    std::unordered_map<uint32_t, uint32_t> pos_usage, edge_usage;
     for (uint32_t r = 0; r < robots.size(); r++) {
         Position pos = robots[r].positions[step];
         ActionType action = robots[r].actions[step];
@@ -40,7 +40,7 @@ void Answer::validate_schedule(uint32_t step) const {
     // проверить, что нет коллизий по задачам
 
     // task_used[task_id] = assigned agent
-    std::map<uint32_t, uint32_t> task_used;
+    std::unordered_map<uint32_t, uint32_t> task_used;
     for (uint32_t r = 0; r < robots.size(); r++) {
         uint32_t task_id = robots[r].assigned_task[step];
         if (task_id != -1) {
@@ -108,9 +108,9 @@ void Answer::write_log(std::ostream &&output) const {
     write_log(output);
 }
 
-void Answer::write_agent() const{
+void Answer::write_agent() const {
     uint32_t r = 0;
-    for(auto action : robots[r].actions){
+    for (auto action: robots[r].actions) {
         std::cout << action_to_char(action);
     }
 }
