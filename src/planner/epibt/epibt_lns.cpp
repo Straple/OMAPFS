@@ -88,16 +88,13 @@ void EPIBT_LNS::solve(uint64_t seed) {
             if (get_now() >= end_time) {
                 break;
             }
-            if (visited[r] != visited_counter /* || visited_num[r] < 10*/) {
+            if (visited[r] != visited_counter) {
                 try_build(r);
             }
         }
     };
 
     while (get_now() < end_time) {
-        //std::sort(order.begin(), order.end(), [&](uint32_t lhs, uint32_t rhs) {
-        //    return get_smart_dist(lhs, desires[lhs]) < get_smart_dist(rhs, desires[rhs]);
-        //});
         std::shuffle(order.begin(), order.end(), rnd.generator);
         call_epibt();
     }
