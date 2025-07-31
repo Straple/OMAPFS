@@ -8,30 +8,54 @@ from PIL import Image
 from matplotlib.ticker import FixedFormatter
 from matplotlib.ticker import MaxNLocator
 
-PLANNERS = [
+PRINT_TIME = True
 
-    # 'PIBT',
-    # 'PIBT-C', # PIBT + пункт C про перепосещение но с ограничением в 10 на одного агента
+'''
+'PIBT+MAO(3)',
+'PIBT+MAO(3)+Revisit(∞)',
+'PIBT+MAO(3)+Revisit(10)',
+'PIBT+MAO(3)+Revisit(10)+IO',
 
-    # 'Causal PIBT',
-    # 'PIBT+traffic flow',
+'PIBT+MAO(4)+Revisit(10)',
+'PIBT+MAO(4)+Revisit(10)+IO',
 
-    # 'EPIBT(1)',
-    # 'EPIBT(2)',
-    # 'EPIBT(3)',
-    # 'EPIBT(4)',
-    # 'EPIBT(5)',
+'PIBT+MAO(5)+Revisit(10)',
+'PIBT+MAO(5)+Revisit(10)+IO',
+'''
 
-    # 'LoRR24-Winner',
-    'LoRR24-Winner+GG',
+'''
+'PIBT',
+'PIBT+Revisit(10)',
+'Causal PIBT',
+'EPIBT(3)',
+'''
 
-    # 'WPPL',
-    'WPPL+GG',
+'''
+'PIBT+traffic flow',
+'EPIBT(3)+LNS',
+'LoRR24-Winner',
+'WPPL',
+'''
 
-    # 'EPIBT(3)+LNS',
+'''
+'PIBT+traffic flow',
+'EPIBT(3)+LNS+GG',
+'LoRR24-Winner+GG',
+'WPPL+GG',
+'''
+
+'''
+'PIBT+traffic flow',
     'EPIBT(3)+LNS+GG',
-    # 'EPIBT(4)+LNS+GG',
+    'EPIBT(4)+LNS+GG',
+    'EPIBT(5)+LNS+GG',
+    'LoRR24-Winner+GG',
+    'WPPL+GG',
+'''
 
+PLANNERS = [
+    'EPIBT(1)',
+    'EPIBT(2)',
 ]
 
 # plan_algos = ["EPIBT(1)", "EPIBT(2)", "EPIBT(3)"]
@@ -62,7 +86,7 @@ def add_map(map_name, map_text, column):
     grouped = data.groupby('map type').get_group(map_name)
     grouped = grouped.groupby('planner type')
 
-    if True:
+    if False:
         if len(maps) == 1:
             ax = axes[0]
         else:
@@ -72,11 +96,16 @@ def add_map(map_name, map_text, column):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    for planner_type in grouped.groups:
-        if len(PLANNERS) != 0 and not planner_type in PLANNERS:
+    #grouped.groups
+    for planner_type in PLANNERS:
+        #if len(PLANNERS) != 0 and not planner_type in PLANNERS:
+        #    continue
+        if not planner_type in grouped.groups:
             continue
-
         df = grouped.get_group(planner_type)
+        #planner_type = PLANNERS.get(kek)
+
+        times = np.maximum(0.1, df['avg planner time (ms)'])
 
         if not planner_type in planner_to_marker:
             planner_to_marker[planner_type] = markers[marker_it % len(markers)]
@@ -84,48 +113,58 @@ def add_map(map_name, map_text, column):
 
         if True:
             if len(maps) == 1:
-                ax = axes[1]
+                ax = axes[0]
+            elif not PRINT_TIME:
+                ax = axes[column]
             else:
-                ax = axes[1][column]
+                ax = axes[0][column]
+            ax.title.set_text(map_text)
             ax.plot(df['agents num'], df['throughput'], alpha=1, label=planner_type,
                     marker=planner_to_marker[planner_type])
             if is_first:
                 ax.set_ylabel('Throughput')
             ax.grid(True)
 
-        if True:
+        if PRINT_TIME:
             if len(maps) == 1:
-                ax = axes[2]
+                ax = axes[1]
+            elif not PRINT_TIME:
+                ax = axes[column]
             else:
-                ax = axes[2][column]
-            ax.plot(df['agents num'], df['avg planner time (ms)'], alpha=1, label=planner_type,
+                ax = axes[1][column]
+            ax.plot(df['agents num'], times, alpha=1, label=planner_type,
                     marker=planner_to_marker[planner_type])
             ax.set_yscale('log')
             if is_first:
                 ax.set_ylabel('Decision Time (ms)')
             ax.grid(True)
             ax.set_xlabel('Number of Agents')
-            ax.set_ylim(0.5, 2000)
+            ax.set_ylim(0.07, 1500)
 
     if is_first:
         is_first = False
 
     if len(maps) == 1:
-        ax = axes[1]
+        ax = axes[0]
+    elif not PRINT_TIME:
+        ax = axes[column]
     else:
-        ax = axes[1][column]
+        ax = axes[0][column]
     ax.set_ylim(0, None)
     ax.set_yticks(np.unique(np.round(ax.get_yticks()).astype(int)))
 
 
 if __name__ == '__main__':
-    fig, axes = plt.subplots(3, len(maps), figsize=(14, 8))
+    row_len = 1
+    if PRINT_TIME:
+        row_len = 2
+    fig, axes = plt.subplots(row_len, len(maps), figsize=(18, 4 * row_len))
 
-    add_map('RANDOM', 'random-32-32-20\nSize: 32x32\n|V|=819', 0)
-    add_map('CITY', 'Paris-1-256\nSize: 256x256\n|V|=47240', 1)
-    add_map('GAME', 'brc202d\nSize: 481x530\n|V|=43151', 2)
-    add_map('SORTATION', 'sortation\nSize: 140x500\n|V|=54320', 3)
-    add_map('WAREHOUSE', 'warehouse\nSize: 140x500\n|V|=38586', 4)
+    add_map('RANDOM', 'random-32-32-20', 0)  # \nSize: 32x32\n|V|=819
+    add_map('CITY', 'Paris-1-256', 1)  # \nSize: 256x256\n|V|=47240
+    add_map('GAME', 'brc202d', 2)  # \nSize: 481x530\n|V|=43151
+    add_map('SORTATION', 'sortation', 3)  # \nSize: 140x500\n|V|=54320
+    add_map('WAREHOUSE', 'warehouse', 4)  # \nSize: 140x500\n|V|=38586
 
     lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
@@ -141,7 +180,7 @@ if __name__ == '__main__':
         else:
             break
     # print(labels)
-    fig.legend(lines, labels, loc='lower center', ncol=6)
+    fig.legend(lines, labels, loc='lower center', ncol=4)
 
-    plt.savefig("metrics_plot.pdf", format='pdf', bbox_inches="tight", dpi=800, pad_inches=0.1)
+    plt.savefig("metrics_plot.pdf", format='pdf', bbox_inches="tight", dpi=800, pad_inches=0.2)
     # plt.show()

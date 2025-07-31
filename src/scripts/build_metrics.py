@@ -3,9 +3,22 @@ import os
 from pathlib import Path
 
 INPUT_DIRS = [
-    #"tmp_solutions"
-    #"solutions/lmapf"
-    "solutions/lmapf-t"
+    #"solutions_epibt_versions",
+    "solutions_super/lmapf",
+    #"solutions_super/lmapf-t",
+    #"solutions_new_4",
+    #"solutions_new_2",
+    #"solutions_new_3",
+    #"solutions_new_4",
+    #"solutions_new_epibt",
+    #"tmp_solutions",
+    #"solutions/lmapf",
+
+    #"solutions/lmapf-t",
+
+    #"solutions_visited",
+    #"solutions_epibt_opw",
+    #"solutions",
               ]
 OUTPUT_FILENAME = 'metrics.csv'
 REMOVE_ACTIONS = True
@@ -28,7 +41,7 @@ def process_dir(path):
             if REMOVE_ACTIONS and (column_name == "F" or column_name == "R" or column_name == "C" \
                                    or column_name == "E" or column_name == "S" or column_name == "W" or column_name == "N" \
                                    or column_name == "w"):
-                continue
+                pass#continue
             if not column_name in table:
                 table[column_name] = []
             table[column_name].append(value)
